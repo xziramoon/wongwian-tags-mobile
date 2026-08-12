@@ -97,6 +97,29 @@ input {
   pointer-events: none;
 }
 
+.torch-btn {
+  position: absolute;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  transform: translateX(-50%);
+  z-index: 40;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(20, 20, 28, 0.6);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.torch-btn.active {
+  background: #f4b400;
+  box-shadow: 0 0 0 4px rgba(244, 180, 0, 0.25);
+}
+
 /* ============ connection status pill ============ */
 .conn-status {
   position: absolute;
@@ -459,10 +482,23 @@ input {
 }
 
 /* ============ manual search ============ */
+.manual-search-sheet {
+  min-height: 0; /* lets .search-results own the scroll instead of the whole sheet */
+}
+
+.manual-search-fixed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .search-results {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
 }
 

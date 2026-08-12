@@ -36,7 +36,18 @@ export async function startScanning(videoEl: HTMLVideoElement, onDetect: (code: 
   const token = ++startToken;
 
   const newControls = await reader.decodeFromConstraints(
-    { video: { facingMode: 'environment' } },
+    {
+      video: {
+        facingMode: 'environment',
+        // request the highest feed the camera offers — small/far barcodes need real
+        // pixel density to decode reliably, the default (often 640x480) is too coarse
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        // best-effort only: unsupported keys inside `advanced` are silently ignored
+        // rather than rejected, so this is safe to request even where unsupported
+        advanced: [{ focusMode: 'continuous' } as MediaTrackConstraintSet],
+      },
+    },
     videoEl,
     (result) => {
       if (token !== startToken) return; // superseded by a newer start/stop — ignore
@@ -63,4 +74,23 @@ export function stopScanning(): void {
   startToken++;
   controls?.stop();
   controls = null;
+}
+
+/** true if the active camera stream exposes a torch (flashlight) track capability */
+export function hasTorch(): boolean {
+  try {
+    const caps = controls?.streamVideoCapabilitiesGet?.((t) => [t]);
+    return !!(caps as MediaTrackCapabilities & { torch?: boolean })?.torch;
+  } catch {
+    return false; // capability query not supported on this device — treat as no torch
+  }
+}
+
+/** best-effort torch on/off — no-ops silently if the device/browser doesn't support it */
+export async function setTorch(on: boolean): Promise<void> {
+  try {
+    await controls?.switchTorch?.(on);
+  } catch {
+    /* torch not supported on this device — non-critical, scanning still works */
+  }
 }

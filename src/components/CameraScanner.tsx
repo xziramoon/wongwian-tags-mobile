@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUIStore } from '../store/uiStore';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
-import { startScanning, stopScanning } from '../lib/scan';
+import { startScanning, stopScanning, hasTorch, setTorch } from '../lib/scan';
 import { feedback } from '../lib/feedback';
 
 /* Full-screen rear-camera scanner. App.tsx only mounts this while
@@ -14,6 +14,8 @@ export default function CameraScanner() {
   const queueDrawerOpen = useUIStore((s) => s.queueDrawerOpen);
   const manualSearchOpen = useUIStore((s) => s.manualSearchOpen);
   const openScanSheet = useUIStore((s) => s.openScanSheet);
+  const [torchAvailable, setTorchAvailable] = useState(false);
+  const [torchOn, setTorchOn] = useState(false);
 
   const handleDetect = useCallback(
     (code: string) => {
@@ -33,6 +35,8 @@ export default function CameraScanner() {
     // automatically when they close
     const paused = scanSheetOpen || queueDrawerOpen || manualSearchOpen;
     const videoEl = videoRef.current;
+    setTorchAvailable(false);
+    setTorchOn(false);
     if (paused || !videoEl) {
       stopScanning();
       return;
@@ -42,7 +46,9 @@ export default function CameraScanner() {
     setCameraStatus('starting');
     startScanning(videoEl, handleDetect)
       .then(() => {
-        if (!cancelled) setCameraStatus('active');
+        if (cancelled) return;
+        setCameraStatus('active');
+        setTorchAvailable(hasTorch());
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -56,11 +62,27 @@ export default function CameraScanner() {
     };
   }, [scanSheetOpen, queueDrawerOpen, manualSearchOpen, handleDetect, setCameraStatus]);
 
+  const toggleTorch = () => {
+    const next = !torchOn;
+    setTorchOn(next);
+    void setTorch(next);
+  };
+
   return (
     <div className="camera-scanner">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video ref={videoRef} className="camera-video" autoPlay playsInline muted />
       <div className="viewfinder" aria-hidden="true" />
+      {torchAvailable && (
+        <button
+          type="button"
+          className={`torch-btn${torchOn ? ' active' : ''}`}
+          onClick={toggleTorch}
+          aria-label={torchOn ? 'ปิดไฟฉาย' : 'เปิดไฟฉาย'}
+        >
+          {torchOn ? '🔦' : '🔦'}
+        </button>
+      )}
     </div>
   );
 }

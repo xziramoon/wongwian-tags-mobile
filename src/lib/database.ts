@@ -121,9 +121,11 @@ class DatabaseService {
   search(query: string): Product[] {
     const q = query.toLowerCase().trim();
     if (!q) return [];
-    return this.data
-      .filter((p) => String(p.ProductName || '').toLowerCase().includes(q) || String(p.Barcode || '').includes(q))
-      .slice(0, 12);
+    // no result cap — the caller renders this in a scrollable list, so a common
+    // search term (e.g. "ไก่") should surface every match, not just the first page
+    return this.data.filter(
+      (p) => String(p.ProductName || '').toLowerCase().includes(q) || String(p.Barcode || '').includes(q),
+    );
   }
 }
 
