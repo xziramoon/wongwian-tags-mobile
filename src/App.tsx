@@ -10,6 +10,8 @@ import ConnectionStatus from './components/ConnectionStatus';
 import QueueBadge from './components/QueueBadge';
 import QueueDrawer from './components/QueueDrawer';
 import ManualSearchSheet from './components/ManualSearchSheet';
+import SettingsSheet from './components/SettingsSheet';
+import TagEditSheet from './components/TagEditSheet';
 import ToastContainer from './components/ToastContainer';
 
 /* maps Ably's connection.state values to the coarser 3-state pill the UI shows */
@@ -23,6 +25,7 @@ function App() {
   const cameraStatus = useUIStore((s) => s.cameraStatus);
   const setAblyStatus = useUIStore((s) => s.setAblyStatus);
   const showToast = useUIStore((s) => s.showToast);
+  const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
 
   useEffect(() => {
     // product DB sync — needed before any barcode lookup will succeed
@@ -50,10 +53,20 @@ function App() {
     <div className="app-shell">
       {cameraStatus === 'denied' || cameraStatus === 'error' ? <CameraPermissionDenied /> : <CameraScanner />}
       <ConnectionStatus />
+      <button
+        type="button"
+        className="settings-gear-btn"
+        onClick={() => setSettingsSheetOpen(true)}
+        aria-label="ออกแบบป้ายราคา"
+      >
+        ⚙
+      </button>
       <QueueBadge />
       <ScanResultSheet />
       <QueueDrawer />
       <ManualSearchSheet />
+      <SettingsSheet />
+      <TagEditSheet />
       <ToastContainer />
     </div>
   );

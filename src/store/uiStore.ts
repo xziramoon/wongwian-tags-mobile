@@ -40,6 +40,16 @@ interface UIState {
   manualSearchOpen: boolean;
   setManualSearchOpen: (open: boolean) => void;
 
+  settingsSheetOpen: boolean;
+  setSettingsSheetOpen: (open: boolean) => void;
+
+  /** TagEditSheet — either creating a new item from a scan/search preview, or
+   * editing an existing queue row by index. null when the sheet is closed. */
+  tagEditTarget: { mode: 'new'; item: QueueItem } | { mode: 'edit'; index: number } | null;
+  openTagEditNew: (item: QueueItem) => void;
+  openTagEditForIndex: (index: number) => void;
+  closeTagEdit: () => void;
+
   sending: boolean;
   setSending: (sending: boolean) => void;
 }
@@ -71,6 +81,14 @@ export const useUIStore = create<UIState>((set) => ({
 
   manualSearchOpen: false,
   setManualSearchOpen: (manualSearchOpen) => set({ manualSearchOpen }),
+
+  settingsSheetOpen: false,
+  setSettingsSheetOpen: (settingsSheetOpen) => set({ settingsSheetOpen }),
+
+  tagEditTarget: null,
+  openTagEditNew: (item) => set({ tagEditTarget: { mode: 'new', item } }),
+  openTagEditForIndex: (index) => set({ tagEditTarget: { mode: 'edit', index } }),
+  closeTagEdit: () => set({ tagEditTarget: null }),
 
   sending: false,
   setSending: (sending) => set({ sending }),

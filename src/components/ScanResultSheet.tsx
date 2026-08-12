@@ -11,6 +11,7 @@ export default function ScanResultSheet() {
   const found = useUIStore((s) => s.scanSheetFound);
   const updateScanSheetItem = useUIStore((s) => s.updateScanSheetItem);
   const closeScanSheet = useUIStore((s) => s.closeScanSheet);
+  const openTagEditNew = useUIStore((s) => s.openTagEditNew);
   const addItem = useQueueStore((s) => s.addItem);
   const sendQueue = useQueueStore((s) => s.sendQueue);
 
@@ -29,6 +30,11 @@ export default function ScanResultSheet() {
     addItem(item);
     closeScanSheet();
     void sendQueue();
+  };
+
+  const handleCustomize = () => {
+    closeScanSheet();
+    openTagEditNew(item);
   };
 
   return (
@@ -83,6 +89,10 @@ export default function ScanResultSheet() {
             +
           </button>
         </div>
+
+        <button type="button" className="btn btn-secondary btn-block" onClick={handleCustomize}>
+          ปรับแต่งป้าย
+        </button>
 
         <div className="sheet-actions">
           <button type="button" className="btn btn-secondary" onClick={handleAdd}>

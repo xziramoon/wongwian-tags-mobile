@@ -14,9 +14,14 @@ export const PRINT_EVENT_NAME = 'print';
 export const PRINT_PAYLOAD_VERSION = 1;
 
 export const QUEUE_STORAGE_KEY = 'wongwianMobileQueue_v1';
+/* mobile namespaces its own storage keys separately from desktop (which uses
+ * 'wongwianConfig_v9') — never reuse the desktop key, the shapes aren't guaranteed
+ * compatible and the two apps should be free to evolve independently */
+export const CONFIG_STORAGE_KEY = 'wongwianMobileConfig_v1';
 
 /* ⚠️ ห้ามแก้ค่า — default ตรงกับ wongwian-tags01/src/constants.ts DEFAULT_CONFIG
- * (ค่าตัวเลขคัดลอกมาจาก SLIDER_DEFS[...].def เดิม เพราะฝั่งมือถือไม่มี UI ปรับ config) */
+ * (ค่าตัวเลขคัดลอกมาจาก SLIDER_DEFS[...].def เดิม) — เป็นค่าเริ่มต้นก่อนผู้ใช้ปรับแต่งเอง
+ * ผ่าน SettingsSheet */
 export const DEFAULT_CONFIG: Config = {
   header: 'ร้านวงเวียน',
   font: "'Kanit',sans-serif",
@@ -37,4 +42,38 @@ export const DEFAULT_CONFIG: Config = {
   largeW: 11.4,
   largeH: 6.0,
   bcHeightLrg: 35,
+};
+
+export interface SliderDef {
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  def: number;
+}
+
+/* ⚠️ ห้ามแก้ค่า — ยกมาจาก wongwian-tags01/src/constants.ts SLIDER_DEFS ตรงตัว
+ * (label, min, max, step, unit, default) */
+export const SLIDER_DEFS: Record<string, SliderDef> = {
+  w: { label: 'W (cm)', min: 2, max: 15, step: 0.1, def: 5.4 },
+  h: { label: 'H (cm)', min: 2, max: 15, step: 0.1, def: 4.0 },
+  bcHeight: { label: 'BARCODE HEIGHT', min: 10, max: 60, step: 1, def: 24 },
+  globalNameSz: { label: 'NAME (0=Auto)', min: 0, max: 40, step: 1, def: 0 },
+  priceSz: { label: 'PRICE 1', min: 10, max: 100, step: 1, def: 46 },
+  dualSz: { label: 'DUAL / WHOLESALE', min: 10, max: 80, step: 1, def: 28 },
+  metaSz: { label: 'META INFO', min: 6, max: 24, step: 1, def: 10 },
+  ribbonSz: { label: 'RIBBON SIZE', min: 6, max: 24, step: 1, def: 10 },
+  ribbonX: { label: 'RIBBON OFFSET X', min: -100, max: 100, step: 1, def: -32 },
+  ribbonY: { label: 'RIBBON OFFSET Y', min: -100, max: 100, step: 1, def: 15 },
+  largeW: { label: 'LARGE W (cm)', min: 5, max: 20, step: 0.1, def: 11.4 },
+  largeH: { label: 'LARGE H (cm)', min: 3, max: 15, step: 0.1, def: 6.0 },
+  bcHeightLrg: { label: 'LARGE BC HEIGHT', min: 10, max: 80, step: 1, def: 35 },
+};
+
+/* ⚠️ ห้ามแก้ค่า — ยกมาจาก wongwian-tags01/src/constants.ts SIZE_PRESETS ตรงตัว */
+export const SIZE_PRESETS: Record<string, Partial<Config>> = {
+  S: { w: 3.0, h: 2.5, bcHeight: 18 },
+  M: { w: 5.4, h: 4.0, bcHeight: 24 },
+  L: { w: 8.0, h: 6.0, bcHeight: 30 },
+  XL: { largeW: 11.4, largeH: 6.0, bcHeightLrg: 35 },
 };

@@ -5,6 +5,7 @@ import { useUIStore } from '../store/uiStore';
 export default function QueueDrawer() {
   const open = useUIStore((s) => s.queueDrawerOpen);
   const setOpen = useUIStore((s) => s.setQueueDrawerOpen);
+  const openTagEditForIndex = useUIStore((s) => s.openTagEditForIndex);
   const sending = useUIStore((s) => s.sending);
   const queue = useQueueStore((s) => s.queue);
   const changeQty = useQueueStore((s) => s.changeQty);
@@ -15,6 +16,14 @@ export default function QueueDrawer() {
 
   const handleSendAll = () => {
     void sendQueue();
+  };
+
+  // tapping a row's name/price opens TagEditSheet in edit mode for that index —
+  // close the drawer first so reopening it afterward clearly shows the saved change
+  // (qty +/- and remove are separate sibling elements, untouched, no stopPropagation needed)
+  const handleEditRow = (index: number) => {
+    setOpen(false);
+    openTagEditForIndex(index);
   };
 
   return (
@@ -34,7 +43,15 @@ export default function QueueDrawer() {
           <div className="queue-list">
             {queue.map((item, index) => (
               <div className="queue-row" key={`${item.Barcode}-${index}`}>
-                <div className="queue-row-info">
+                <div
+                  className="queue-row-info"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleEditRow(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') handleEditRow(index);
+                  }}
+                >
                   <div className="queue-row-name">{item.ProductName}</div>
                   <div className="queue-row-price">{item.Price} บาท</div>
                 </div>

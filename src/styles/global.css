@@ -218,6 +218,23 @@ input {
   margin: 6px auto 2px;
 }
 
+/* ============ tag preview (scale-to-fit wrapper around <PriceTag>) ============ */
+.tag-preview-frame {
+  margin: 0 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: var(--surface2);
+  border: 1px solid var(--ln2);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.tag-preview-scale {
+  transform-origin: top center;
+}
+
 /* ============ scan result sheet ============ */
 .scan-result-name {
   font-size: 19px;
@@ -390,6 +407,13 @@ input {
 .queue-row-info {
   flex: 1;
   min-width: 0;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.queue-row-info:focus-visible {
+  outline: 2px solid var(--ac);
+  outline-offset: 2px;
 }
 
 .queue-row-name {
@@ -454,6 +478,298 @@ input {
   background: var(--surface2);
   text-align: left;
   cursor: pointer;
+}
+
+/* ============ settings sheet (full-height sheet variant + gear button) ============ */
+.sheet-full {
+  height: 92dvh;
+  max-height: 92dvh;
+}
+
+.settings-gear-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(23, 23, 37, 0.55);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.preset-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.btn-preset {
+  flex: none;
+  min-height: 44px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface2);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cfg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cfg-full {
+  grid-column: 1 / -1;
+}
+
+.cfg-lbl {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--txt2);
+  margin-bottom: 4px;
+}
+
+.cfg-sec-lbl {
+  margin-top: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ac-d);
+}
+
+.inp {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--ln2);
+  border-radius: 12px;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface2);
+}
+
+.inp:focus {
+  outline: none;
+  border-color: var(--ac);
+}
+
+.cb-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.cb-wrap input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--ac);
+}
+
+.cb-wrap label {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+/* ============ fold (details/summary section) ============ */
+.fold summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  border-top: 1px solid var(--ln);
+}
+
+.fold summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold-arrow {
+  transition: transform 0.2s;
+  color: var(--txt2);
+}
+
+.fold[open] .fold-arrow {
+  transform: rotate(180deg);
+}
+
+.fold-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 2px 8px;
+}
+
+.fold-hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--txt2);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.p-lbl {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ============ slider row (used by SettingsSheet's advanced fold) ============
+ * Always stacked one-per-row (.slider-stack) rather than desktop's 2-per-row grid —
+ * the stepper (label + −/range/number/+) needs more width than a mobile half-column
+ * can give it without overflowing. */
+.slider-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.slider-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.slider-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ac-d);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stepper input[type='range'] {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  accent-color: var(--ac);
+}
+
+.step-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface2);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.step-num {
+  width: 52px;
+  min-height: 44px;
+  text-align: center;
+  border: 1.5px solid var(--ln2);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+
+/* ============ tag edit sheet (new + edit, shared with SettingsSheet's .fold) ============ */
+.q-price-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.q-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.q-lbl {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--txt2);
+}
+
+.q-pack-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.q-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mode-btns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.mode-btns-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mode-btn {
+  min-height: 44px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface2);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mode-btn.active {
+  background: var(--ac);
+  border-color: var(--ac);
+  color: #fff;
 }
 
 /* ============ camera permission denied ============ */
