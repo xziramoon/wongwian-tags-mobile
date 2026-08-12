@@ -24,6 +24,12 @@ interface UIState {
   cameraStatus: CameraStatus;
   setCameraStatus: (status: CameraStatus) => void;
 
+  /* user-initiated camera on/off (separate from cameraStatus, which reflects what the
+   * device/browser reports) — lets someone switch to search-only mode deliberately,
+   * e.g. to save battery or when typing is faster than scanning right now */
+  cameraEnabled: boolean;
+  setCameraEnabled: (enabled: boolean) => void;
+
   /* bottom sheet shown after a scan (or a manual-search tap) — scanSheetItem is a
    * preview QueueItem not yet committed to the queue; scanSheetFound tells the sheet
    * whether to render the found layout or the "ไม่พบสินค้า" manual-entry layout */
@@ -67,6 +73,9 @@ export const useUIStore = create<UIState>((set) => ({
 
   cameraStatus: 'starting',
   setCameraStatus: (cameraStatus) => set({ cameraStatus }),
+
+  cameraEnabled: true,
+  setCameraEnabled: (cameraEnabled) => set({ cameraEnabled }),
 
   scanSheetOpen: false,
   scanSheetItem: null,

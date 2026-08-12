@@ -76,11 +76,24 @@ export function stopScanning(): void {
   controls = null;
 }
 
+/* non-standard MediaTrackCapabilities/Constraints keys (torch, zoom) — supported by
+ * Chromium-based browsers, not part of the official W3C MediaCapture spec */
+interface ExtendedTrackCapabilities extends MediaTrackCapabilities {
+  torch?: boolean;
+  zoom?: { min: number; max: number; step: number };
+}
+
+/* the shipped .d.ts types this parameter as `(track) => MediaStreamTrack[]`, but the
+ * actual runtime implementation (BrowserCodeReader.js) uses it as a plain boolean
+ * predicate via Array.prototype.find/.filter — the type declaration is simply wrong,
+ * so this cast matches reality rather than the (incorrect) published types. */
+const includeAllTracks = (() => true) as unknown as (track: MediaStreamTrack) => MediaStreamTrack[];
+
 /** true if the active camera stream exposes a torch (flashlight) track capability */
 export function hasTorch(): boolean {
   try {
-    const caps = controls?.streamVideoCapabilitiesGet?.((t) => [t]);
-    return !!(caps as MediaTrackCapabilities & { torch?: boolean })?.torch;
+    const caps = controls?.streamVideoCapabilitiesGet?.(includeAllTracks) as ExtendedTrackCapabilities | undefined;
+    return !!caps?.torch;
   } catch {
     return false; // capability query not supported on this device — treat as no torch
   }
@@ -92,5 +105,25 @@ export async function setTorch(on: boolean): Promise<void> {
     await controls?.switchTorch?.(on);
   } catch {
     /* torch not supported on this device — non-critical, scanning still works */
+  }
+}
+
+/** the active camera's optical zoom range, or null if the device/browser doesn't
+ * expose one (in practice: mostly Android Chrome — iOS Safari has no zoom control) */
+export function getZoomRange(): { min: number; max: number; step: number } | null {
+  try {
+    const caps = controls?.streamVideoCapabilitiesGet?.(includeAllTracks) as ExtendedTrackCapabilities | undefined;
+    return caps?.zoom ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** best-effort zoom-level set — no-ops silently if unsupported */
+export async function setZoom(level: number): Promise<void> {
+  try {
+    await controls?.streamVideoConstraintsApply?.({ advanced: [{ zoom: level } as MediaTrackConstraintSet] });
+  } catch {
+    /* zoom not supported on this device — non-critical, scanning still works */
   }
 }

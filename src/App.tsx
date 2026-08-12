@@ -5,6 +5,7 @@ import { audioEngine } from './lib/audio';
 import { useUIStore } from './store/uiStore';
 import CameraScanner from './components/CameraScanner';
 import CameraPermissionDenied from './components/CameraPermissionDenied';
+import CameraOff from './components/CameraOff';
 import ScanResultSheet from './components/ScanResultSheet';
 import ConnectionStatus from './components/ConnectionStatus';
 import QueueBadge from './components/QueueBadge';
@@ -23,9 +24,14 @@ function toAblyStatus(state: AblyConnState): 'connecting' | 'connected' | 'offli
 
 function App() {
   const cameraStatus = useUIStore((s) => s.cameraStatus);
+  const cameraEnabled = useUIStore((s) => s.cameraEnabled);
+  const setCameraEnabled = useUIStore((s) => s.setCameraEnabled);
   const setAblyStatus = useUIStore((s) => s.setAblyStatus);
   const showToast = useUIStore((s) => s.showToast);
   const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
+  const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
+
+  const cameraUnavailable = cameraStatus === 'denied' || cameraStatus === 'error';
 
   useEffect(() => {
     // product DB sync — needed before any barcode lookup will succeed
@@ -51,8 +57,32 @@ function App() {
 
   return (
     <div className="app-shell">
-      {cameraStatus === 'denied' || cameraStatus === 'error' ? <CameraPermissionDenied /> : <CameraScanner />}
+      {cameraUnavailable ? (
+        <CameraPermissionDenied />
+      ) : cameraEnabled ? (
+        <CameraScanner />
+      ) : (
+        <CameraOff />
+      )}
       <ConnectionStatus />
+      <button
+        type="button"
+        className="search-toggle-btn"
+        onClick={() => setManualSearchOpen(true)}
+        aria-label="ค้นหาสินค้าด้วยตนเอง"
+      >
+        🔍
+      </button>
+      {!cameraUnavailable && (
+        <button
+          type="button"
+          className="camera-toggle-btn"
+          onClick={() => setCameraEnabled(!cameraEnabled)}
+          aria-label={cameraEnabled ? 'ปิดกล้อง' : 'เปิดกล้อง'}
+        >
+          {cameraEnabled ? '📷' : '🚫'}
+        </button>
+      )}
       <button
         type="button"
         className="settings-gear-btn"
