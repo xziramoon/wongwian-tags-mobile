@@ -119,13 +119,29 @@ class DatabaseService {
   }
 
   search(query: string): Product[] {
-    const q = query.toLowerCase().trim();
-    if (!q) return [];
+    // multi-token AND match: "ไก่ 5กิโล" splits into ["ไก่","5กิโล"], and a product
+    // must contain EVERY token somewhere (in either order, anywhere in the name/
+    // barcode) to match — e.g. "ข้าวไก่แจ้ 5 กิโล" matches both tokens even though
+    // neither appears as one contiguous phrase. A single-word query like "ไก่แจ้"
+    // still behaves as a plain substring search, just with one token.
+    const tokens = query
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (!tokens.length) return [];
+
+    // spaces stripped on both sides so "5กิโล" (typed with no space) still matches
+    // a product name written "5 กิโล" (with a space) — units/numbers are written
+    // inconsistently across the sheet, this keeps token matching spacing-tolerant
+    const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '');
+
     // no result cap — the caller renders this in a scrollable list, so a common
-    // search term (e.g. "ไก่") should surface every match, not just the first page
-    return this.data.filter(
-      (p) => String(p.ProductName || '').toLowerCase().includes(q) || String(p.Barcode || '').includes(q),
-    );
+    // search term should surface every match, not just the first page
+    return this.data.filter((p) => {
+      const haystack = normalize(String(p.ProductName || '') + ' ' + String(p.Barcode || ''));
+      return tokens.every((t) => haystack.includes(t));
+    });
   }
 }
 

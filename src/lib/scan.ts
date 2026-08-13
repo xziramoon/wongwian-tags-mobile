@@ -39,10 +39,12 @@ export async function startScanning(videoEl: HTMLVideoElement, onDetect: (code: 
     {
       video: {
         facingMode: 'environment',
-        // request the highest feed the camera offers — small/far barcodes need real
-        // pixel density to decode reliably, the default (often 640x480) is too coarse
-        width: { ideal: 1920 },
-        height: { ideal: 1080 },
+        // 720p: enough pixel density to read small/far barcodes clearly without the
+        // decode cost of full 1080p. 1080p was tried first but the JS-based zxing
+        // decode (re-run every ~500ms) was heavy enough at that resolution to
+        // visibly stall the main thread on real phones — this is the balance point.
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
         // best-effort only: unsupported keys inside `advanced` are silently ignored
         // rather than rejected, so this is safe to request even where unsupported
         advanced: [{ focusMode: 'continuous' } as MediaTrackConstraintSet],
