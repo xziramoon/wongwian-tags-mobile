@@ -28,6 +28,8 @@ export default function ScanResultSheet() {
 
   const [oosFormOpen, setOosFormOpen] = useState(false);
   const [oosEta, setOosEta] = useState('');
+  const [locFormOpen, setLocFormOpen] = useState(false);
+  const [locValue, setLocValue] = useState('');
 
   if (!open || !item) return null;
 
@@ -61,6 +63,28 @@ export default function ScanResultSheet() {
     setOosFormOpen(false);
     setOosEta('');
     closeScanSheet();
+  };
+
+  const openLocForm = () => {
+    setOosFormOpen(false);
+    setLocFormOpen(true);
+  };
+
+  const openOosForm = () => {
+    setLocFormOpen(false);
+    setOosFormOpen(true);
+  };
+
+  /* ลงทะเบียนตำแหน่งชั้น-แถว — ตั้ง item.Loc แล้วเข้าคิวทันที เพื่อให้ป้ายที่พิมพ์ออกมา
+   * โชว์รหัสชั้น-แถวที่หัวป้าย (ดู renderHeader() ใน PriceTag.tsx) */
+  const handleRegisterLoc = () => {
+    const loc = locValue.trim().toUpperCase().slice(0, 5);
+    if (!loc) return;
+    addItem({ ...item, Loc: loc });
+    setLocFormOpen(false);
+    setLocValue('');
+    closeScanSheet();
+    useUIStore.getState().showToast(`ลงทะเบียนตำแหน่ง ${loc} แล้ว`, 'success');
   };
 
   // ของเข้ารอบใหม่ราคามักเปลี่ยน — ดึงราคาล่าสุดจาก CSV มาเข้าคิวพิมพ์ป้ายใหม่ทับไปเลย
@@ -156,6 +180,31 @@ export default function ScanResultSheet() {
           </button>
         </div>
 
+        {locFormOpen ? (
+          <div className="q-field">
+            <span className="q-lbl">ตำแหน่งชั้น-แถว (เช่น A-3)</span>
+            <input
+              className="field-input"
+              value={locValue}
+              onChange={(e) => setLocValue(e.target.value)}
+              placeholder="เช่น A-3"
+              autoFocus
+            />
+            <div className="sheet-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setLocFormOpen(false)}>
+                ยกเลิก
+              </button>
+              <button type="button" className="btn btn-primary" onClick={handleRegisterLoc}>
+                บันทึกตำแหน่ง
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button type="button" className="btn btn-secondary btn-block" onClick={openLocForm}>
+            📍 ลงทะเบียนตำแหน่งชั้น-แถว
+          </button>
+        )}
+
         {oosFormOpen ? (
           <div className="q-field">
             <span className="q-lbl">วันที่ของเข้า (ข้ามได้)</span>
@@ -175,8 +224,8 @@ export default function ScanResultSheet() {
             </div>
           </div>
         ) : (
-          <button type="button" className="btn btn-secondary btn-block" onClick={() => setOosFormOpen(true)}>
-            แถบสินค้าหมด
+          <button type="button" className="btn btn-secondary btn-block" onClick={openOosForm}>
+            🚫 แถบสินค้าหมด
           </button>
         )}
       </div>

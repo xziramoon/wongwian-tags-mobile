@@ -87,7 +87,10 @@ export default function QueueDrawer() {
                       if (e.key === 'Enter' || e.key === ' ') handleEditRow(index);
                     }}
                   >
-                    <div className="queue-row-name">{item.ProductName}</div>
+                    <div className="queue-row-name">
+                      {item.Loc && <span className="queue-row-loc">{item.Loc}</span>}
+                      {item.ProductName}
+                    </div>
                     <div className="queue-row-price">{item.Price} บาท</div>
                   </div>
                   <div className="queue-row-qty">

@@ -248,6 +248,15 @@ export default function TagEditSheet() {
                 />
               </div>
               <div className="q-field">
+                <span className="q-lbl">ตำแหน่งชั้น-แถว (Loc)</span>
+                <input
+                  className="field-input"
+                  value={item.Loc || ''}
+                  onChange={(e) => setField('Loc', e.target.value.toUpperCase().slice(0, 5))}
+                  placeholder="เช่น A-3 (ว่าง = ไม่ระบุ)"
+                />
+              </div>
+              <div className="q-field">
                 <span className="q-lbl">ริบบิ้นมุมป้าย</span>
                 <input
                   className="field-input"
