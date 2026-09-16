@@ -25,6 +25,7 @@ export interface QueueItem {
   PriceDiff: string | null;
   OosEta: string; // เช่น '18 ก.ย.' หรือ ''
   OosReason: OosReason;
+  Loc: string;
 }
 
 export interface Config {

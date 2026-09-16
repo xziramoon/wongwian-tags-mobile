@@ -33,6 +33,7 @@ function normalize(q: Partial<QueueItem>): QueueItem {
     PriceDiff: null,
     OosEta: '',
     OosReason: 'temp',
+    Loc: '',
     ...q,
   };
 }
@@ -137,7 +138,9 @@ export const useQueueStore = create<QueueState>((set, get) => ({
   addItem: (item) => {
     set((s) => {
       const queue = s.queue.slice();
-      const existingIdx = queue.findIndex((i) => i.Barcode === item.Barcode);
+      const existingIdx = queue.findIndex(
+        (i) => i.Barcode === item.Barcode && (i.Loc || '') === (item.Loc || ''),
+      );
       if (existingIdx !== -1) {
         const existing = queue[existingIdx];
         queue[existingIdx] = {
