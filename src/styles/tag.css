@@ -82,6 +82,16 @@
   .dual-div, .tag-large-divider { border-right: 1px dashed #000 !important; }
 }
 
+/* ============ LOC HEADER (รหัสชั้น-แถว บนหัวป้าย) — ต้องตรงกับ wongwian-tags01 tag.css ============ */
+.tag-header.hs { display:flex; align-items:center; gap:3px; padding:3px 2px; letter-spacing:0; }
+.hs-name { flex:1 1 auto; min-width:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:1px; }
+.loc-chip { flex:0 0 auto; background:#fff; color:#000; font-size:11px; font-weight:900; line-height:12px; padding:0 4px; border-radius:2px; white-space:nowrap; }
+.tag-header.hl { font-size:11px; letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+@media print {
+  .loc-chip { background:#fff !important; color:#000 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+
 /* ============ OOS STRIP (แถบสินค้าหมด — ปิดทับช่องราคาของป้ายเดิม) ============ */
 .price-tag-oos { width: var(--oos-w); height: var(--oos-h); background:#000; flex-direction:row; align-items:center; justify-content:center; gap:8px; padding:0 8px; }
 .oos-main { color:#fff; font-size:var(--oos-sz); font-weight:900; letter-spacing:2px; line-height:1; white-space:nowrap; }
