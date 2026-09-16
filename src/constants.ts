@@ -18,6 +18,11 @@ export const QUEUE_STORAGE_KEY = 'wongwianMobileQueue_v1';
  * 'wongwianConfig_v9') — never reuse the desktop key, the shapes aren't guaranteed
  * compatible and the two apps should be free to evolve independently */
 export const CONFIG_STORAGE_KEY = 'wongwianMobileConfig_v1';
+/* OOS registry (Phase 2) — tracks which barcodes currently have an OOS strip out on
+ * the shelf, so ScanResultSheet/QueueDrawer can show "หมดมา N วัน" and clear it when
+ * stock returns. Namespaced separately from QUEUE_STORAGE_KEY/CONFIG_STORAGE_KEY since
+ * it's a different kind of data (a registry, not the print queue or design config). */
+export const OOS_STORAGE_KEY = 'wongwianOosRegister_v1';
 
 /* ⚠️ ห้ามแก้ค่า — default ตรงกับ wongwian-tags01/src/constants.ts DEFAULT_CONFIG
  * (ค่าตัวเลขคัดลอกมาจาก SLIDER_DEFS[...].def เดิม) — เป็นค่าเริ่มต้นก่อนผู้ใช้ปรับแต่งเอง
@@ -42,6 +47,11 @@ export const DEFAULT_CONFIG: Config = {
   largeW: 11.4,
   largeH: 6.0,
   bcHeightLrg: 35,
+  oosW: 5.4,
+  oosH: 1.4,
+  oosSz: 22,
+  labelOos: 'สินค้าหมด',
+  labelStop: 'เลิกจำหน่าย',
 };
 
 export interface SliderDef {
@@ -68,6 +78,9 @@ export const SLIDER_DEFS: Record<string, SliderDef> = {
   largeW: { label: 'LARGE W (cm)', min: 5, max: 20, step: 0.1, def: 11.4 },
   largeH: { label: 'LARGE H (cm)', min: 3, max: 15, step: 0.1, def: 6.0 },
   bcHeightLrg: { label: 'LARGE BC HEIGHT', min: 10, max: 80, step: 1, def: 35 },
+  oosW: { label: 'OOS W (cm)', min: 2, max: 15, step: 0.1, def: 5.4 },
+  oosH: { label: 'OOS H (cm)', min: 0.8, max: 4, step: 0.1, def: 1.4 },
+  oosSz: { label: 'OOS TEXT', min: 10, max: 40, step: 1, def: 22 },
 };
 
 /* ⚠️ ห้ามแก้ค่า — ยกมาจาก wongwian-tags01/src/constants.ts SIZE_PRESETS ตรงตัว */

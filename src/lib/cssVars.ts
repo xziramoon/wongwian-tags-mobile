@@ -17,4 +17,7 @@ export function applyCSSVars(config: Config) {
   set('--ribbon-x', config.ribbonX ?? -32, 'px');
   set('--ribbon-y', config.ribbonY ?? 15, 'px');
   set('--f-tag', config.font);
+  set('--oos-w', config.oosW || 5.4, 'cm');
+  set('--oos-h', config.oosH || 1.4, 'cm');
+  set('--oos-sz', config.oosSz || 22, 'px');
 }

@@ -40,11 +40,12 @@ export default function PriceTag({ item, config, selected }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const isLarge = item.TagMode === 'large';
+  const isOos = item.TagMode === 'oos';
   const bcHeightStd = config.bcHeight || 24;
   const bcHeightLrg = config.bcHeightLrg || 35;
 
   useEffect(() => {
-    if (!item.Barcode || !svgRef.current) return;
+    if (isOos || !item.Barcode || !svgRef.current) return;
     try {
       JsBarcode(svgRef.current, String(item.Barcode), {
         format: 'CODE128',
@@ -60,7 +61,17 @@ export default function PriceTag({ item, config, selected }: Props) {
     } catch {
       /* invalid barcode value — leave svg empty */
     }
-  }, [item.Barcode, isLarge, bcHeightStd, bcHeightLrg]);
+  }, [item.Barcode, isLarge, bcHeightStd, bcHeightLrg, isOos]);
+
+  if (isOos) {
+    const stop = item.OosReason === 'stop';
+    return (
+      <div className="price-tag price-tag-oos">
+        <div className="oos-main">{stop ? config.labelStop : config.labelOos}</div>
+        {!stop && item.OosEta && <div className="oos-eta">เข้า {item.OosEta}</div>}
+      </div>
+    );
+  }
 
   const pDisp = fmtPrice(item.Price);
   const p2Disp = fmtPrice(item.Price2);

@@ -26,6 +26,8 @@ const PLACEHOLDER_ITEM: QueueItem = {
   Image: '',
   PrintQty: 1,
   PriceDiff: null,
+  OosEta: '',
+  OosReason: 'temp',
 };
 
 /* global tag-design editor — reachable via the gear-icon pill (top-right, mirrors
@@ -149,6 +151,15 @@ export default function SettingsSheet() {
                 <SliderRow configKey="largeW" full />
                 <SliderRow configKey="largeH" full />
                 <SliderRow configKey="bcHeightLrg" full />
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="p-lbl">ตั้งค่าแถบสินค้าหมด</div>
+              <div className="slider-stack">
+                <SliderRow configKey="oosW" full />
+                <SliderRow configKey="oosH" full />
+                <SliderRow configKey="oosSz" full />
               </div>
             </div>
           </div>

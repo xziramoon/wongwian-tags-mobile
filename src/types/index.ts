@@ -1,5 +1,6 @@
-export type TagMode = 'standard' | 'dual' | 'large';
+export type TagMode = 'standard' | 'dual' | 'large' | 'oos';
 export type DualStyle = 'A' | 'B';
+export type OosReason = 'temp' | 'stop'; // temp = หมดชั่วคราว, stop = เลิกจำหน่าย
 
 export interface QueueItem {
   Barcode: string;
@@ -22,6 +23,8 @@ export interface QueueItem {
   Image: string;
   PrintQty: number;
   PriceDiff: string | null;
+  OosEta: string; // เช่น '18 ก.ย.' หรือ ''
+  OosReason: OosReason;
 }
 
 export interface Config {
@@ -44,6 +47,11 @@ export interface Config {
   largeW: number;
   largeH: number;
   bcHeightLrg: number;
+  oosW: number;
+  oosH: number;
+  oosSz: number;
+  labelOos: string;
+  labelStop: string;
   [key: string]: string | number | boolean | undefined;
 }
 

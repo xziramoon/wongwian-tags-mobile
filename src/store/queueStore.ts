@@ -31,6 +31,8 @@ function normalize(q: Partial<QueueItem>): QueueItem {
     Image: '',
     PrintQty: 1,
     PriceDiff: null,
+    OosEta: '',
+    OosReason: 'temp',
     ...q,
   };
 }
@@ -239,7 +241,12 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     if (!queue.length) return;
     useUIStore.getState().setSending(true);
     try {
-      await printBridge.publish(config, queue);
+      // แถบสินค้าหมด (oos) สูงแค่ 1.4 ซม. ไม่เท่าป้ายอื่น (4.0 ซม.) — ถ้าปนกลางแถวใน A4
+      // จะเกิดช่องว่างฟันหลอ เรียงแถบไปท้ายสุดของงานพิมพ์เสมอ
+      const ordered = [...queue].sort(
+        (a, b) => (a.TagMode === 'oos' ? 1 : 0) - (b.TagMode === 'oos' ? 1 : 0),
+      );
+      await printBridge.publish(config, ordered);
       set((s) => {
         persist([], s.config);
         return { queue: [] };

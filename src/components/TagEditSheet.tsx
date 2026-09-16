@@ -82,38 +82,40 @@ export default function TagEditSheet() {
           placeholder="ชื่อสินค้า"
         />
 
-        <div className="q-price-grid">
-          <div className="q-field">
-            <span className="q-lbl">ราคาขาย (บาท)</span>
-            <input
-              className="field-input"
-              type="number"
-              step=".01"
-              value={item.Price}
-              onChange={(e) => setField('Price', e.target.value)}
-              placeholder="0"
-            />
-          </div>
-          <div className="q-field">
-            <span className="q-lbl">ราคาแพ็ค / ยกลัง (บาท)</span>
-            <div className="q-pack-row">
-              <input
-                className="field-input"
-                value={item.Unit2 || ''}
-                onChange={(e) => setField('Unit2', e.target.value)}
-                placeholder="ยกลัง"
-              />
+        {item.TagMode !== 'oos' && (
+          <div className="q-price-grid">
+            <div className="q-field">
+              <span className="q-lbl">ราคาขาย (บาท)</span>
               <input
                 className="field-input"
                 type="number"
                 step=".01"
-                value={item.Price2 || ''}
-                onChange={(e) => setField('Price2', e.target.value)}
-                placeholder="—"
+                value={item.Price}
+                onChange={(e) => setField('Price', e.target.value)}
+                placeholder="0"
               />
             </div>
+            <div className="q-field">
+              <span className="q-lbl">ราคาแพ็ค / ยกลัง (บาท)</span>
+              <div className="q-pack-row">
+                <input
+                  className="field-input"
+                  value={item.Unit2 || ''}
+                  onChange={(e) => setField('Unit2', e.target.value)}
+                  placeholder="ยกลัง"
+                />
+                <input
+                  className="field-input"
+                  type="number"
+                  step=".01"
+                  value={item.Price2 || ''}
+                  onChange={(e) => setField('Price2', e.target.value)}
+                  placeholder="—"
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <span className="q-lbl">เลือกแบบป้าย</span>
@@ -139,6 +141,13 @@ export default function TagEditSheet() {
             >
               ป้ายใหญ่
             </button>
+            <button
+              type="button"
+              className={`mode-btn${item.TagMode === 'oos' ? ' active' : ''}`}
+              onClick={() => setField('TagMode', 'oos')}
+            >
+              สินค้าหมด
+            </button>
           </div>
         </div>
 
@@ -158,6 +167,39 @@ export default function TagEditSheet() {
             >
               แบบ B: ราคาเด่น + แถบส่ง
             </button>
+          </div>
+        )}
+
+        {item.TagMode === 'oos' && (
+          <div>
+            <span className="q-lbl">สถานะ</span>
+            <div className="mode-btns mode-btns-2">
+              <button
+                type="button"
+                className={`mode-btn${item.OosReason !== 'stop' ? ' active' : ''}`}
+                onClick={() => setField('OosReason', 'temp')}
+              >
+                หมดชั่วคราว
+              </button>
+              <button
+                type="button"
+                className={`mode-btn${item.OosReason === 'stop' ? ' active' : ''}`}
+                onClick={() => setField('OosReason', 'stop')}
+              >
+                เลิกจำหน่าย
+              </button>
+            </div>
+            {item.OosReason !== 'stop' && (
+              <div className="q-field">
+                <span className="q-lbl">วันที่ของเข้า</span>
+                <input
+                  className="field-input"
+                  value={item.OosEta || ''}
+                  onChange={(e) => setField('OosEta', e.target.value)}
+                  placeholder="เช่น 18 ก.ย. (ข้ามได้)"
+                />
+              </div>
+            )}
           </div>
         )}
 

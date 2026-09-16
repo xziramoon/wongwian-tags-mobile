@@ -1,10 +1,18 @@
+import { useState } from 'react';
 import { useUIStore } from '../store/uiStore';
-import { useQueueStore } from '../store/queueStore';
+import { useQueueStore, previewFromBarcode } from '../store/queueStore';
+import { useOosStore } from '../store/oosStore';
+import type { QueueItem } from '../types';
 
 /* Bottom sheet shown after a scan (or a manual-search tap). Shows the looked-up
  * product with a qty stepper when found; falls back to a "ไม่พบสินค้า" state with
  * manual name/price text inputs when the barcode isn't in the product database —
- * still addable to the queue either way. */
+ * still addable to the queue either way.
+ *
+ * Phase 2 (OOS registry): branches on whether the scanned barcode is already sitting
+ * in oosStore. Already registered -> show a restock banner + one big "ของเข้าแล้ว"
+ * button instead of the normal flow. Not registered -> normal flow, plus one more
+ * action to put the barcode into the registry with an OOS strip. */
 export default function ScanResultSheet() {
   const open = useUIStore((s) => s.scanSheetOpen);
   const item = useUIStore((s) => s.scanSheetItem);
@@ -14,8 +22,16 @@ export default function ScanResultSheet() {
   const openTagEditNew = useUIStore((s) => s.openTagEditNew);
   const addItem = useQueueStore((s) => s.addItem);
   const sendQueue = useQueueStore((s) => s.sendQueue);
+  const oosRecords = useOosStore((s) => s.records);
+  const oosAdd = useOosStore((s) => s.add);
+  const oosClear = useOosStore((s) => s.clear);
+
+  const [oosFormOpen, setOosFormOpen] = useState(false);
+  const [oosEta, setOosEta] = useState('');
 
   if (!open || !item) return null;
+
+  const oosRecord = oosRecords[item.Barcode];
 
   const stepQty = (delta: number) => {
     updateScanSheetItem({ PrintQty: Math.max(1, item.PrintQty + delta) });
@@ -36,6 +52,43 @@ export default function ScanResultSheet() {
     closeScanSheet();
     openTagEditNew(item);
   };
+
+  const handleAddOosStrip = () => {
+    const eta = oosEta.trim();
+    const oosItem: QueueItem = { ...item, TagMode: 'oos', OosReason: 'temp', OosEta: eta };
+    addItem(oosItem);
+    oosAdd({ Barcode: item.Barcode, ProductName: item.ProductName, since: Date.now(), eta, reason: 'temp' });
+    setOosFormOpen(false);
+    setOosEta('');
+    closeScanSheet();
+  };
+
+  // ของเข้ารอบใหม่ราคามักเปลี่ยน — ดึงราคาล่าสุดจาก CSV มาเข้าคิวพิมพ์ป้ายใหม่ทับไปเลย
+  const handleRestock = () => {
+    oosClear(item.Barcode);
+    addItem(previewFromBarcode(item.Barcode).item);
+    closeScanSheet();
+  };
+
+  if (oosRecord) {
+    const days = Math.floor((Date.now() - oosRecord.since) / 86400000);
+    return (
+      <div className="sheet-backdrop" onClick={closeScanSheet}>
+        <div className="sheet scan-result-sheet" onClick={(e) => e.stopPropagation()}>
+          <div className="sheet-handle" />
+          <div className="scan-result-name">{item.ProductName}</div>
+          <div className="oos-banner">
+            หมดมา {days} วัน{oosRecord.eta ? ` · แจ้งของเข้า ${oosRecord.eta}` : ''}
+          </div>
+          <div className="sheet-actions">
+            <button type="button" className="btn btn-primary btn-block" onClick={handleRestock}>
+              ของเข้าแล้ว
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sheet-backdrop" onClick={closeScanSheet}>
@@ -102,6 +155,30 @@ export default function ScanResultSheet() {
             พิมพ์เลย
           </button>
         </div>
+
+        {oosFormOpen ? (
+          <div className="q-field">
+            <span className="q-lbl">วันที่ของเข้า (ข้ามได้)</span>
+            <input
+              className="field-input"
+              value={oosEta}
+              onChange={(e) => setOosEta(e.target.value)}
+              placeholder="เช่น 18 ก.ย."
+            />
+            <div className="sheet-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setOosFormOpen(false)}>
+                ยกเลิก
+              </button>
+              <button type="button" className="btn btn-primary" onClick={handleAddOosStrip}>
+                ยืนยันติดแถบ
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button type="button" className="btn btn-secondary btn-block" onClick={() => setOosFormOpen(true)}>
+            แถบสินค้าหมด
+          </button>
+        )}
       </div>
     </div>
   );

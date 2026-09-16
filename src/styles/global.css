@@ -974,3 +974,101 @@ input {
 .toast-msg.error {
   background: rgba(228, 60, 60, 0.95);
 }
+
+/* ============ OOS registry (Phase 2) ============ */
+.oos-banner {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(219, 138, 10, 0.12);
+  color: var(--o);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.queue-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.queue-tab {
+  flex: 1;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface2);
+  color: var(--txt2);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.queue-tab.active {
+  background: var(--ac-tint);
+  border-color: var(--ac);
+  color: var(--ac-d);
+}
+
+.oos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.oos-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface2);
+}
+
+.oos-row-warn {
+  background: rgba(228, 60, 60, 0.08);
+}
+
+.oos-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.oos-row-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oos-row-meta {
+  font-size: 13px;
+  color: var(--txt2);
+  margin-top: 2px;
+}
+
+.oos-row-warn .oos-row-meta {
+  color: var(--r);
+  font-weight: 700;
+}
+
+.oos-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.oos-row-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+  cursor: pointer;
+}
