@@ -110,6 +110,7 @@ export default function PriceTag({ item, config, selected }: Props) {
   const safeUnit = item.Unit || 'ชิ้น';
   const safeUnit1 = (item.Unit1 || '').trim();
   const safeUnit2 = item.Unit2 || '';
+  const printed = (item.Printed || '').trim().slice(0, 8);
   const safeRibbon = (item.Ribbon || '').trim();
   const safePack = (item.PackType || '').trim();
   const imgURL = (item.Image || '').trim();
@@ -335,8 +336,9 @@ export default function PriceTag({ item, config, selected }: Props) {
       {safeRibbon && <div className="tag-ribbon">{safeRibbon}</div>}
       {renderHeader(item, config)}
       {middle}
-      <div className="tag-bc-area">
+      <div className={`tag-bc-area${printed ? ' has-date' : ''}`}>
         <svg ref={svgRef} />
+        {printed && <span className="bc-date">{printed}</span>}
       </div>
     </div>
   );
