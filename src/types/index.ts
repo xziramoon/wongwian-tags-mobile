@@ -26,6 +26,7 @@ export interface QueueItem {
   OosEta: string; // เช่น '18 ก.ย.' หรือ ''
   OosReason: OosReason;
   Loc: string;
+  Printed: string; // วันที่พิมพ์ป้าย เช่น '17/9/69' หรือ ''
 }
 
 export interface Config {

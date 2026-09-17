@@ -45,6 +45,15 @@ export const extractSize = (name: string | undefined): string => {
   return m.length ? m[m.length - 1][0].trim() : '';
 };
 
+/* วันที่พิมพ์บนป้าย — วัน/เดือน/ปี พ.ศ. 2 หลัก ไม่เติมศูนย์หน้าวัน/เดือน แต่ปีเติมศูนย์
+ * ให้ครบ 2 หลักเสมอ (เช่น พ.ศ. 2600 -> "00") เพื่อความกว้างคงที่ตอนอ่านบนป้ายเล็กๆ
+ * ต้องตรงกับ wongwian-tags01/src/lib/utils.ts formatPrintedDate() ทุกตัวอักษร */
+export const formatPrintedDate = (d: Date): string => {
+  const beYear = d.getFullYear() + 543;
+  const yy = String(beYear % 100).padStart(2, '0');
+  return `${d.getDate()}/${d.getMonth() + 1}/${yy}`;
+};
+
 export const autoFontSize = (name: string | undefined, mode: TagMode = 'standard'): number => {
   const len = (name || '').trim().length;
   if (mode === 'large') {

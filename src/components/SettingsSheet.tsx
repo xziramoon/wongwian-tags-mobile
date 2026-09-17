@@ -29,6 +29,7 @@ const PLACEHOLDER_ITEM: QueueItem = {
   OosEta: '',
   OosReason: 'temp',
   Loc: '',
+  Printed: '',
 };
 
 /* global tag-design editor — reachable via the gear-icon pill (top-right, mirrors
