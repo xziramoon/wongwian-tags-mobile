@@ -11,6 +11,14 @@ const HEADER_WORDS = ['barcode', 'price', 'ราคา', 'บาร์โค้
 
 export type DatabaseListener = (data: Product[]) => void;
 
+/* the shared product sheet runs ~38k rows — a short/common query (a single digit,
+ * a common Thai word) can match most of that. Below MIN_QUERY_LENGTH characters we
+ * don't search at all, and past SEARCH_RESULT_CAP matches we stop scanning, so a
+ * broad query can no longer force the UI to filter+render tens of thousands of rows
+ * on a single keystroke (that was the cause of the search freezing on mobile). */
+export const MIN_QUERY_LENGTH = 2;
+export const SEARCH_RESULT_CAP = 50;
+
 class DatabaseService {
   data: Product[] = [];
   index: Record<string, Product> = {};
@@ -119,6 +127,8 @@ class DatabaseService {
   }
 
   search(query: string): Product[] {
+    if (query.trim().length < MIN_QUERY_LENGTH) return [];
+
     // multi-token AND match: "ไก่ 5กิโล" splits into ["ไก่","5กิโล"], and a product
     // must contain EVERY token somewhere (in either order, anywhere in the name/
     // barcode) to match — e.g. "ข้าวไก่แจ้ 5 กิโล" matches both tokens even though
@@ -136,12 +146,16 @@ class DatabaseService {
     // inconsistently across the sheet, this keeps token matching spacing-tolerant
     const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '');
 
-    // no result cap — the caller renders this in a scrollable list, so a common
-    // search term should surface every match, not just the first page
-    return this.data.filter((p) => {
+    // stop scanning once we hit the cap instead of filtering the full array then
+    // slicing — a broad query that matches most of the sheet returns as soon as
+    // SEARCH_RESULT_CAP is reached rather than finishing all ~38k rows regardless
+    const results: Product[] = [];
+    for (const p of this.data) {
+      if (results.length >= SEARCH_RESULT_CAP) break;
       const haystack = normalize(String(p.ProductName || '') + ' ' + String(p.Barcode || ''));
-      return tokens.every((t) => haystack.includes(t));
-    });
+      if (tokens.every((t) => haystack.includes(t))) results.push(p);
+    }
+    return results;
   }
 }
 
