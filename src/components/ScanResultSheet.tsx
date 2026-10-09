@@ -3,6 +3,7 @@ import { useUIStore } from '../store/uiStore';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { useOosStore } from '../store/oosStore';
 import type { QueueItem } from '../types';
+import { isVeg } from '../lib/veg';
 
 /* Bottom sheet shown after a scan (or a manual-search tap). Shows the looked-up
  * product with a qty stepper when found; falls back to a "ไม่พบสินค้า" state with
@@ -25,6 +26,7 @@ export default function ScanResultSheet() {
   const oosRecords = useOosStore((s) => s.records);
   const oosAdd = useOosStore((s) => s.add);
   const oosClear = useOosStore((s) => s.clear);
+  const config = useQueueStore((s) => s.config);
 
   const [oosFormOpen, setOosFormOpen] = useState(false);
   const [oosEta, setOosEta] = useState('');
@@ -34,6 +36,7 @@ export default function ScanResultSheet() {
   if (!open || !item) return null;
 
   const oosRecord = oosRecords[item.Barcode];
+  const vegNow = isVeg(item, config);
 
   const stepQty = (delta: number) => {
     updateScanSheetItem({ PrintQty: Math.max(1, item.PrintQty + delta) });
@@ -157,8 +160,32 @@ export default function ScanResultSheet() {
           </>
         )}
 
-        <div className="qty-stepper">
-          <button type="button" className="qty-btn" onClick={() => stepQty(-1)} aria-label="ลดจำนวน">
+        {/* สินค้าเจ? — กดเลือกได้ทันทีหลังสแกน (Veg: 'Y' / 'N') ยังไม่กด = ตรวจจากคำว่า "เจ" ในชื่ออัตโนมัติ */}
+        <div className="veg-toggle">
+          <span className="veg-toggle-lbl">
+            สินค้าเจ?{item.Veg === '' && vegNow ? ' · เจอคำว่า "เจ" ในชื่อ' : ''}
+          </span>
+          <div className="mode-btns mode-btns-2">
+            <button
+              type="button"
+              className={`mode-btn veg-on${vegNow ? ' active' : ''}`}
+              aria-pressed={vegNow}
+              onClick={() => updateScanSheetItem({ Veg: 'Y' })}
+            >
+              <span className="veg-cn">齋</span>&nbsp;เจ
+            </button>
+            <button
+              type="button"
+              className={`mode-btn${!vegNow ? ' active' : ''}`}
+              aria-pressed={!vegNow}
+              onClick={() => updateScanSheetItem({ Veg: 'N' })}
+            >
+              ไม่เจ
+            </button>
+          </div>
+        </div>
+
+        <div className="qty-stepper">          <button type="button" className="qty-btn" onClick={() => stepQty(-1)} aria-label="ลดจำนวน">
             −
           </button>
           <span className="qty-value">{item.PrintQty}</span>

@@ -149,6 +149,8 @@ export const useQueueStore = create<QueueState>((set, get) => ({
           ...existing,
           PrintQty: existing.PrintQty + item.PrintQty,
           ...(item.Exp ? { Exp: item.Exp } : {}),
+          /* กด เจ / ไม่เจ ตอนสแกนซ้ำ = ใช้ค่าล่าสุด ('' = ไม่ได้กด คงค่าเดิมไว้) */
+          ...(item.Veg ? { Veg: item.Veg } : {}),
         };
       } else {
         queue.push(item);

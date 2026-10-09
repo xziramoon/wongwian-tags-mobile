@@ -1084,3 +1084,37 @@ input {
   font-size: 16px;
   cursor: pointer;
 }
+
+/* ============ สินค้าเจ? (ScanResultSheet) ============ */
+.veg-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.veg-toggle-lbl {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.veg-toggle .mode-btn {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.veg-toggle .mode-btn.veg-on.active {
+  background: #ffd400;
+  border-color: #d7141a;
+  color: #d7141a;
+}
+
+.veg-toggle .veg-cn {
+  display: inline-block;
+  background: #d7141a;
+  color: #ffd400;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  border-radius: 3px;
+  padding: 0 3px;
+}
