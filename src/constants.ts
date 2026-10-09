@@ -52,6 +52,15 @@ export const DEFAULT_CONFIG: Config = {
   oosSz: 22,
   labelOos: 'สินค้าหมด',
   labelStop: 'เลิกจำหน่าย',
+  /* ค่าตั้งใหม่ (ฟอนต์พู่กัน / ธีม / ป้ายเจ) — ตรงกับ wongwian-tags01 branch brush-ink-price */
+  priceFont: '',
+  priceInk: 'black',
+  inkTilt: false,
+  headerCN: '',
+  vegAuto: true,
+  tagTheme: 'classic',
+  headerSub: '',
+  branchLabel: '',
 };
 
 export interface SliderDef {
@@ -89,4 +98,25 @@ export const SIZE_PRESETS: Record<string, Partial<Config>> = {
   M: { w: 5.4, h: 4.0, bcHeight: 24 },
   L: { w: 8.0, h: 6.0, bcHeight: 30 },
   XL: { largeW: 11.4, largeH: 6.0, bcHeightLrg: 35 },
+};
+
+/* ฟอนต์ตัวเลขราคา — หมึกพู่กันญี่ปุ่น/จีน (โหลดจาก Google Fonts ใน index.html และ TAG_PRINTER.html) */
+export const PRICE_FONTS: { value: string; label: string }[] = [
+  { value: '', label: 'ค่าเริ่มต้น (ป้ายเดิม = ฟอนต์ตัวหนังสือ · ธีม = ฟอนต์ของธีม)' },
+  { value: "'Potta One',cursive", label: 'J1 · Potta One — พู่กันหนา' },
+  { value: "'Yuji Boku',serif", label: 'J2 · Yuji Boku — พู่กันแห้ง' },
+  { value: "'Yuji Syuku',serif", label: 'J3 · Yuji Syuku — ลายมือพู่กัน' },
+  { value: "'Yuji Mai',serif", label: 'J4 · Yuji Mai — พู่กันอ่อนช้อย' },
+  { value: "'Zen Kurenaido',sans-serif", label: 'J5 · Zen Kurenaido — ปากกาพู่กัน' },
+  { value: "'Reggae One',cursive", label: 'J6 · Reggae One — หมึกขอบขรุขระ' },
+  { value: "'Ma Shan Zheng',cursive", label: 'พู่กันจีน · Ma Shan Zheng' },
+  { value: "'Black Han Sans',sans-serif", label: 'K1 · Black Han Sans — ตัวหนาเกาหลี' },
+];
+export const INK_RED = '#C0141C';
+export const THEME_ACCENT = '#B3261E';
+
+/* ค่าตั้งสำเร็จรูปของธีม — กดปุ่มในหน้าตั้งค่าแล้วใส่ให้ครบทีเดียว */
+export const THEME_PRESETS: Record<string, Partial<Config>> = {
+  korean: { tagTheme: 'korean', header: 'อึ้งลักเส็ง', headerCN: '黄六盛', headerSub: 'ซุปเปอร์มาร์เก็ต', branchLabel: 'สาขาวงเวียน' },
+  ink: { tagTheme: 'ink', header: 'อึ้งลักเส็ง', headerCN: '黄六盛', headerSub: 'ซุปเปอร์มาร์เก็ต', branchLabel: 'สาขาวงเวียน' },
 };

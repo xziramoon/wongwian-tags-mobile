@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import JsBarcode from 'jsbarcode';
 import type { Config, QueueItem } from '../types';
 import { fmtPrice } from '../lib/utils';
+import { isVeg } from '../lib/veg';
 
 interface Props {
   item: QueueItem;
@@ -40,8 +41,15 @@ const heroScale = (s: string) => {
  * ต้องตรงกับ wongwian-tags01/src/components/PriceTag.tsx renderHeader() ทุกตัวอักษร */
 function renderHeader(item: QueueItem, config: Config) {
   const loc = (item.Loc || '').trim().slice(0, 5);
+  const cn = String(config.headerCN || '').trim();
+  const cnEl = cn ? <span className="hdr-cn">{cn}</span> : null;
   if (!loc) {
-    return <div className="tag-header">{config.header || ' '}</div>;
+    return (
+      <div className="tag-header">
+        {config.header || ' '}
+        {cnEl}
+      </div>
+    );
   }
   const isLarge = item.TagMode === 'large';
   const tagWidth = isLarge ? config.largeW : config.w;
@@ -49,7 +57,10 @@ function renderHeader(item: QueueItem, config: Config) {
     return (
       <div className="tag-header hs">
         <span className="loc-chip">{loc}</span>
-        <span className="hs-name">{config.header || ' '}</span>
+        <span className="hs-name">
+          {config.header || ' '}
+          {cnEl}
+        </span>
         <span className="loc-chip" style={{ visibility: 'hidden' }}>
           {loc}
         </span>
@@ -59,6 +70,25 @@ function renderHeader(item: QueueItem, config: Config) {
   const [floor, row] = loc.split('-');
   const label = row ? `ชั้น ${floor} · แถว ${row}` : `ชั้น ${floor}`;
   return <div className="tag-header hl">{label}</div>;
+}
+
+/* ขนาดตัวเลขราคาในธีม — ตามแถบเลื่อน PRICE (--price-sz × heroScale) แต่ไม่เกินพื้นที่จริงของแถวราคา
+ * (.th-row เป็น container: cqh = ความสูงที่เหลือใต้ชื่อสินค้า, cqw = ความกว้างป้าย) จึงขยายได้เต็มช่องโดยไม่ล้นขอบ
+ * ⚠️ ตรงกับ wongwian-tags01 PriceTag.tsx / TAG_PRINTER.html thPriceFs() ทุกตัวอักษร */
+function thPriceFs(pDisp: string, ps: number, pill: boolean, veg: boolean, stamp: boolean) {
+  const byHeight = `calc((100cqh - ${pill ? 'var(--meta-sz) * 1.7' : '0px'}) / 0.9)`;
+  const widthPct = 66 - (veg ? 14 : 0) - (stamp ? 22 : 0);
+  const byWidth = `calc(${widthPct}cqw / ${(Math.max(pDisp.length, 1) * 0.6).toFixed(2)})`;
+  return `min(calc(var(--price-sz) * ${ps}), ${byHeight}, ${byWidth})`;
+}
+
+/* คลาสเสริมของตัวเลขราคา (src/styles/tag-ink.css) — ปิดทั้งหมด = className เดิมทุกตัวอักษร */
+function inkClasses(config: Config) {
+  let c = '';
+  if (config.priceFont) c += ' brush-price';
+  if (config.priceInk === 'red') c += ' ink-red';
+  if (config.inkTilt) c += ' ink-tilt';
+  return c;
 }
 
 export default function PriceTag({ item, config, selected }: Props) {
@@ -114,6 +144,12 @@ export default function PriceTag({ item, config, selected }: Props) {
   const safeRibbon = (item.Ribbon || '').trim();
   const safePack = (item.PackType || '').trim();
   const imgURL = (item.Image || '').trim();
+  /* ป้าย เจ หน้าชื่อสินค้า (src/styles/tag-veg.css) */
+  const vegEl = isVeg(item, config) ? (
+    <span className="veg-badge">
+      <span className="veg-cn">齋</span>เจ
+    </span>
+  ) : null;
 
   const bahtEl = invBaht ? (
     <span className="tag-baht-inv">บาท</span>
@@ -147,6 +183,83 @@ export default function PriceTag({ item, config, selected }: Props) {
       </div>
     ) : null;
 
+  /* ธีมป้าย เกาหลี / หมึกแดง (src/styles/tag-theme.css) — เฉพาะป้ายปกติ */
+  const theme = config.tagTheme === 'korean' ? 'theme-kr' : config.tagTheme === 'ink' ? 'theme-ink' : '';
+  if (theme && (item.TagMode === 'standard' || !item.TagMode)) {
+    const loc = (item.Loc || '').trim().slice(0, 5);
+    const cn = String(config.headerCN || '').trim();
+    const sub = String(config.headerSub || '').trim();
+    const branch = String(config.branchLabel || '').trim();
+    const promo = !!(item.OldPrice && parseFloat(item.OldPrice) > 0);
+    const hasP2 = !!(item.Price2 && String(item.Price2).trim() !== '');
+    const sizeLine = [safeSize && `${LBL_SIZE} ${safeSize}`, `${LBL_UNIT} 1 ${safeUnit}`].filter(Boolean).join(' · ');
+    const ps = heroScale(pDisp);
+    return (
+      <div className={`price-tag price-tag-normal ${theme}${selected ? ' selected' : ''}`}>
+        {safeRibbon && <div className="tag-ribbon">{safeRibbon}</div>}
+        <div className="th-head">
+          <div className="th-brand">
+            {loc && <span className="loc-chip">{loc}</span>}
+            <span>{config.header || ' '}</span>
+            {cn && <span className="th-cn">{cn}</span>}
+          </div>
+          {sub && <div className="th-sub">{sub}</div>}
+        </div>
+        <div className="th-body">
+          <div>
+            <div className="th-name" style={{ fontSize: `${item.NameFontSize || 13}px` }}>
+              {item.ProductName}
+            </div>
+            <div className="th-sizeline">{sizeLine}</div>
+          </div>
+          <div className="th-row">
+            <div className="th-badges">
+              {hasP2 && (
+                <span className="th-badge-solid">
+                  {safeUnit2 || 'ราคาส่ง'} {p2Disp} บ.
+                </span>
+              )}
+              {promo && (
+                <span className="th-badge-line">
+                  ปกติ <del>{fmtPrice(item.OldPrice)}</del>
+                </span>
+              )}
+              {packEl}
+            </div>
+            <div className="th-price-col" style={{ transform: `translateX(${xOffset}px)` }}>
+              {theme === 'theme-kr' && promo && <span className="th-pill">특가 · SALE</span>}
+              {theme === 'theme-ink' && promo && (
+                <div className="th-stamp">
+                  <span>特</span>
+                  <span>价</span>
+                </div>
+              )}
+              <div
+                className="th-price-row"
+                style={{ fontSize: thPriceFs(pDisp, ps, theme === 'theme-kr' && promo, !!vegEl, theme === 'theme-ink' && promo) }}
+              >
+                {/* ธีมใหม่: ป้าย เจ ตัวใหญ่หน้าตัวเลขราคา (ขนาดอิงตัวเลขราคา) */}
+                {vegEl && (
+                  <span className="veg-big">
+                    <span className="veg-cn">齋</span>
+                    <span>เจ</span>
+                  </span>
+                )}
+                <span className="th-price">{pDisp}</span>
+                <span className="th-baht">บาท</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={`tag-bc-area${printed ? ' has-date' : ''}`}>
+          <svg ref={svgRef} />
+          {branch && <span className="bc-branch">{branch}</span>}
+          {printed && <span className="bc-date">{printed}</span>}
+        </div>
+      </div>
+    );
+  }
+
   let middle: React.ReactNode = null;
   let tagClass = 'price-tag-normal';
 
@@ -155,7 +268,7 @@ export default function PriceTag({ item, config, selected }: Props) {
       <>
         <div className="tag-name-area">
           <div className="tag-name" style={{ fontSize: `${item.NameFontSize || 13}px` }}>
-            {item.ProductName}
+            {vegEl}{item.ProductName}
           </div>
         </div>
         <div className="tag-mid-std">
@@ -195,7 +308,7 @@ export default function PriceTag({ item, config, selected }: Props) {
         <>
           <div className="tag-name-area">
             <div className="tag-name" style={{ fontSize: `${item.NameFontSize || 13}px` }}>
-              {item.ProductName}
+              {vegEl}{item.ProductName}
             </div>
           </div>
           <div className="tag-mid-hero">
@@ -233,7 +346,7 @@ export default function PriceTag({ item, config, selected }: Props) {
         <>
           <div className="tag-name-area">
             <div className="tag-name" style={{ fontSize: `${item.NameFontSize || 13}px` }}>
-              {item.ProductName}
+              {vegEl}{item.ProductName}
             </div>
             {safeSize && (
               <div style={{ fontSize: 9, fontWeight: 600, marginTop: 2, lineHeight: 1.3 }}>
@@ -272,7 +385,7 @@ export default function PriceTag({ item, config, selected }: Props) {
       <>
         <div className="tag-name-area-large">
           <div className="tag-name-large" style={{ fontSize: `calc(${item.NameFontSize || 14}px + 6px)` }}>
-            {item.ProductName}
+            {vegEl}{item.ProductName}
           </div>
         </div>
         <div className="tag-large-body">
@@ -331,8 +444,10 @@ export default function PriceTag({ item, config, selected }: Props) {
     );
   }
 
+  const inkCls = inkClasses(config);
+
   return (
-    <div className={`price-tag ${tagClass}${selected ? ' selected' : ''}`}>
+    <div className={`price-tag ${tagClass}${inkCls}${selected ? ' selected' : ''}`}>
       {safeRibbon && <div className="tag-ribbon">{safeRibbon}</div>}
       {renderHeader(item, config)}
       {middle}

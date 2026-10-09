@@ -1,0 +1,66 @@
+/* ============================================================
+ * INK / BRUSH PRICE + ชื่อจีนบนหัวป้าย — ส่วนเสริม (ไม่แตะ tag.css เดิม)
+ * ทำงานเฉพาะเมื่อเปิดใช้ในตั้งค่า:
+ *   .brush-price  → ตัวเลขราคาใช้ฟอนต์หมึกพู่กัน (var(--f-price))
+ *   .ink-red      → ตัวเลขราคาสีแดงหมึก (พิมพ์สีจริงด้วย print-color-adjust)
+ *   .ink-tilt     → เอียงตัวเลข + ขอบหมึกซึม
+ *   .hdr-cn       → ตราชื่อจีนบนหัวป้าย
+ * ⚠️ public/TAG_PRINTER.html มีสำเนาของไฟล์นี้ — แก้ที่นี่ต้องแก้ที่นั่นด้วย
+ * ============================================================ */
+
+.price-tag.brush-price .tag-price,
+.price-tag.brush-price .hero-price,
+.price-tag.brush-price .dual-price-val,
+.price-tag.brush-price .tag-price-large,
+.price-tag.brush-price .ws-price,
+.price-tag.brush-price .tag-large-box-price {
+  font-family: var(--f-price);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.price-tag.ink-red .tag-price,
+.price-tag.ink-red .hero-price,
+.price-tag.ink-red .dual-price-val,
+.price-tag.ink-red .tag-price-large,
+.price-tag.ink-red .tag-large-box-price {
+  color: var(--ink-red);
+}
+
+.price-tag.ink-tilt .tag-price,
+.price-tag.ink-tilt .hero-price,
+.price-tag.ink-tilt .dual-price-val,
+.price-tag.ink-tilt .tag-price-large {
+  display: inline-block;
+  transform: rotate(-4deg);
+  text-shadow: 0 0 1px currentColor;
+}
+
+.hdr-cn {
+  display: inline-block;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  background: #fff;
+  color: #000;
+  padding: 0 3px;
+  margin-left: 4px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  line-height: 1.25;
+  vertical-align: middle;
+}
+.price-tag.ink-red .hdr-cn { background: var(--ink-red); color: #fff; }
+
+@media print {
+  .price-tag.ink-red .tag-price,
+  .price-tag.ink-red .hero-price,
+  .price-tag.ink-red .dual-price-val,
+  .price-tag.ink-red .tag-price-large,
+  .price-tag.ink-red .tag-large-box-price {
+    color: var(--ink-red) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .tag-header .hdr-cn { background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .price-tag.ink-red .tag-header .hdr-cn { background: var(--ink-red) !important; color: #fff !important; }
+}

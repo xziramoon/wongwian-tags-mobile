@@ -35,6 +35,7 @@ function normalize(q: Partial<QueueItem>): QueueItem {
     OosReason: 'temp',
     Loc: '',
     Printed: '',
+    Veg: '',
     ...q,
   };
 }

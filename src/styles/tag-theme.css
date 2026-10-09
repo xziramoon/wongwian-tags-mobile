@@ -1,0 +1,54 @@
+/* ============================================================
+ * TAG THEMES — ธีมป้ายแบบ "เกาหลี" และ "หมึกแดง" (ใช้กับป้ายปกติเท่านั้น)
+ * ออกแบบจากแคนวาส "อึ้งลักเส็ง ฟอนต์และสไตล์" (PriceTag / PriceTagInk)
+ * ทำงานเมื่อ config.tagTheme = 'korean' | 'ink' — 'classic' = ป้ายเดิมทุกจุด
+ * ขนาดทั้งหมดอิง --meta-sz / --price-sz จึงปรับจากแถบเลื่อนเดิมได้
+ * ⚠️ public/TAG_PRINTER.html มีสำเนาตรงตัวของไฟล์นี้ — แก้ที่นี่ต้องแก้ที่นั่นด้วย
+ * ============================================================ */
+
+.price-tag.theme-kr, .price-tag.theme-ink { background:#fff; }
+
+.th-head { flex:0 0 auto; min-height:18px; display:flex; align-items:center; justify-content:space-between; gap:4px; padding:2px 5px; color:#fff; font-size:calc(var(--meta-sz) + 1px); font-weight:800; line-height:1.3; white-space:nowrap; overflow:hidden; }
+.theme-kr .th-head { background:var(--th-accent); }
+.theme-ink .th-head { background:#000; }
+.th-brand { flex:1 1 auto; display:flex; align-items:center; gap:4px; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.th-brand > span:not(.loc-chip):not(.th-cn) { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.th-cn { font-family:'Noto Serif SC', serif; font-weight:900; letter-spacing:1px; flex-shrink:0; }
+.theme-ink .th-cn { background:var(--ink-red); color:#fff; padding:0 3px; border-radius:2px; }
+.th-sub { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; font-weight:600; font-size:calc(var(--meta-sz) - 1px); }
+.th-head .loc-chip { font-size:calc(var(--meta-sz) + 1px); line-height:1.2; }
+
+.th-body { flex:1 1 auto; min-height:0; position:relative; display:flex; flex-direction:column; justify-content:space-between; gap:2px; padding:3px 6px 2px; overflow:hidden; }
+.th-name { font-weight:700; color:#000; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; }
+.th-sizeline { font-size:var(--meta-sz); color:#333; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.th-row { flex:1 1 0; min-height:0; container-type:size; display:flex; justify-content:space-between; align-items:flex-end; gap:4px; min-width:0; }
+.th-badges { display:flex; flex-direction:column; align-items:flex-start; gap:2px; font-size:calc(var(--meta-sz) - 1px); font-weight:700; min-width:0; overflow:hidden; padding-bottom:1px; }
+.th-badge-solid { background:#000; color:#fff; padding:0 4px; border-radius:2px; white-space:nowrap; line-height:1.4; }
+.th-badge-line { border:1px solid #000; color:#000; padding:0 4px; border-radius:2px; white-space:nowrap; line-height:1.3; }
+
+.th-price-col { display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; }
+.theme-ink .th-price-col { flex-direction:row; align-items:center; gap:3px; }
+.th-pill { background:#000; color:#FFD43B; font-family:'Black Han Sans', sans-serif; font-size:calc(var(--meta-sz) - 1px); line-height:1.4; padding:0 6px; border-radius:999px; letter-spacing:.5px; }
+.th-price-row { display:flex; align-items:flex-end; gap:2px; }
+.th-price { font-size:1em; white-space:nowrap; line-height:.85; }
+.theme-kr .th-price { font-family:var(--f-th-price, 'Black Han Sans', sans-serif); color:var(--th-accent); letter-spacing:-1px; text-shadow:2px 2px 0 #FFD43B; }
+.theme-ink .th-price { display:inline-block; font-family:var(--f-th-price, 'Potta One', cursive); color:var(--ink-red); line-height:.95; transform:rotate(-4deg); text-shadow:0 0 1px currentColor; }
+.th-baht { color:#000; font-weight:800; font-size:calc(var(--meta-sz) + 1px); line-height:1; padding-bottom:2px; flex-shrink:0; }
+
+.th-stamp { width:calc(var(--meta-sz) * 2.1); height:calc(var(--meta-sz) * 2.1); margin-right:calc(var(--meta-sz) * 0.8); box-sizing:border-box; border:2px solid var(--ink-red); border-radius:3px; color:var(--ink-red); font-family:'Noto Serif SC', serif; font-weight:900; font-size:var(--meta-sz); line-height:1; display:grid; grid-template-columns:1fr 1fr; place-items:center; transform:rotate(8deg); opacity:.9; }
+
+.bc-branch { position:absolute; left:3px; bottom:1px; font-size:8px; font-weight:700; line-height:1; background:#fff; color:#000; padding:0 1px; white-space:nowrap; }
+
+@media print {
+  .th-head, .th-cn, .th-pill, .th-badge-solid, .th-price, .th-stamp, .th-baht, .th-badge-line, .bc-branch { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .theme-kr .th-head { background:var(--th-accent) !important; color:#fff !important; }
+  .theme-ink .th-head { background:#000 !important; color:#fff !important; }
+  .theme-ink .th-cn { background:var(--ink-red) !important; color:#fff !important; }
+  .th-badge-solid { background:#000 !important; color:#fff !important; }
+  .th-pill { background:#000 !important; color:#FFD43B !important; }
+  .theme-kr .th-price { color:var(--th-accent) !important; }
+  .theme-ink .th-price { color:var(--ink-red) !important; }
+  .th-stamp { color:var(--ink-red) !important; border-color:var(--ink-red) !important; }
+  .th-name, .th-baht, .th-badge-line { color:#000 !important; }
+}

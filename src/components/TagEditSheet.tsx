@@ -257,6 +257,14 @@ export default function TagEditSheet() {
                 />
               </div>
               <div className="q-field">
+                <span className="q-lbl">สินค้าเจ (ธงเหลือง 齋 เจ)</span>
+                <select className="field-input" value={item.Veg || ''} onChange={(e) => setField('Veg', e.target.value)}>
+                  <option value="">อัตโนมัติ — ดูคำว่า "เจ" ในชื่อ</option>
+                  <option value="Y">เป็นสินค้าเจ</option>
+                  <option value="N">ไม่ใช่สินค้าเจ</option>
+                </select>
+              </div>
+              <div className="q-field">
                 <span className="q-lbl">ริบบิ้นมุมป้าย</span>
                 <input
                   className="field-input"
