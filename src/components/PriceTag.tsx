@@ -73,12 +73,14 @@ function renderHeader(item: QueueItem, config: Config) {
 }
 
 /* ขนาดตัวเลขราคาในธีม — ตามแถบเลื่อน PRICE (--price-sz × heroScale) แต่ไม่เกินพื้นที่จริงของแถวราคา
- * (.th-row เป็น container: cqh = ความสูงที่เหลือใต้ชื่อสินค้า, cqw = ความกว้างป้าย) จึงขยายได้เต็มช่องโดยไม่ล้นขอบ
+ * (.th-body เป็น container: cqh = ความสูงตัวป้าย ลบชื่อบรรทัดแรก 18px, cqw = ความกว้างป้าย) ใหญ่ได้จนชื่อเหลือบรรทัดเดียว ไม่ล้นขอบ
  * ⚠️ ตรงกับ wongwian-tags01 PriceTag.tsx / TAG_PRINTER.html thPriceFs() ทุกตัวอักษร */
-function thPriceFs(pDisp: string, ps: number, pill: boolean, veg: boolean, stamp: boolean) {
-  const byHeight = `calc((100cqh - ${pill ? 'var(--meta-sz) * 1.7' : '0px'}) / 0.9)`;
-  const widthPct = 66 - (veg ? 14 : 0) - (stamp ? 22 : 0);
-  const byWidth = `calc(${widthPct}cqw / ${(Math.max(pDisp.length, 1) * 0.6).toFixed(2)})`;
+function thPriceFs(pDisp: string, ps: number, pill: boolean, veg: boolean, stamp: boolean, charW: number, left: boolean) {
+  const byHeight = `calc((100cqh - 18px - ${pill ? 'var(--meta-sz) * 1.7' : '0px'}) / 0.9)`;
+  /* กว้างได้ = กว้างป้าย − "บาท" − ตรา 特价 − กรอบซ้าย (ปกติ/ราคาส่ง) แล้วหารด้วยความกว้าง em ของตัวเลข (+ ธงเจ ที่โตตามตัวเลข) */
+  const fixedMeta = 2.6 + (stamp ? 2.4 : 0) + (left ? 4.2 : 0);
+  const em = Math.max(pDisp.length, 1) * charW + (veg ? 0.74 : 0);
+  const byWidth = `calc((100cqw - var(--meta-sz) * ${fixedMeta} - 6px) / ${em.toFixed(2)})`;
   return `min(calc(var(--price-sz) * ${ps}), ${byHeight}, ${byWidth})`;
 }
 
@@ -237,7 +239,7 @@ export default function PriceTag({ item, config, selected }: Props) {
               )}
               <div
                 className="th-price-row"
-                style={{ fontSize: thPriceFs(pDisp, ps, theme === 'theme-kr' && promo, !!vegEl, theme === 'theme-ink' && promo) }}
+                style={{ fontSize: thPriceFs(pDisp, ps, theme === 'theme-kr' && promo, !!vegEl, theme === 'theme-ink' && promo, theme === 'theme-kr' && !config.priceFont ? 0.52 : 0.64, promo || hasP2) }}
               >
                 {/* ธีมใหม่: ป้าย เจ ตัวใหญ่หน้าตัวเลขราคา (ขนาดอิงตัวเลขราคา) */}
                 {vegEl && (
