@@ -3,6 +3,8 @@ import { database } from './lib/database';
 import { printBridge, type AblyConnState } from './lib/printBridge';
 import { audioEngine } from './lib/audio';
 import { useUIStore } from './store/uiStore';
+import { useQueueStore } from './store/queueStore';
+import { applyCSSVars } from './lib/cssVars';
 import CameraScanner from './components/CameraScanner';
 import CameraPermissionDenied from './components/CameraPermissionDenied';
 import CameraOff from './components/CameraOff';
@@ -32,6 +34,13 @@ function App() {
   const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
 
   const cameraUnavailable = cameraStatus === 'denied' || cameraStatus === 'error';
+
+  /* ตั้งตัวแปรขนาดป้าย (--tag-w/--tag-h/--price-sz/...) ทุกครั้งที่ config เปลี่ยน — เหมือน wongwian-tags01 App.tsx
+   * เดิมมือถือไม่เคยเรียก ป้ายในตัวอย่างเลยไม่มีขนาดจริง (กว้างล้นกรอบ ธีมใหม่แถวราคาหาย) */
+  const config = useQueueStore((s) => s.config);
+  useEffect(() => {
+    applyCSSVars(config);
+  }, [config]);
 
   useEffect(() => {
     // product DB sync — needed before any barcode lookup will succeed

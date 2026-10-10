@@ -9,8 +9,8 @@ const PX_PER_CM = 37.795;
 /* fixed preview-card footprint: width chosen so that even a standard tag's aspect
  * ratio (~5.4:4) scaled to this width stays within FRAME_HEIGHT tall (no clipping) —
  * see TagPreview's own verification notes for the math. */
-const FRAME_WIDTH = 230;
-const FRAME_HEIGHT = 180;
+/* กรอบตัวอย่างกว้างเกือบเต็มชีต (สูงสุด 340px) และสูงตามสัดส่วนป้ายจริง — เดิม 230×180 ตายตัว ดูเล็ก/ไม่พอดี */
+const FRAME_MAX_WIDTH = 340;
 
 interface Props {
   item: QueueItem;
@@ -25,6 +25,7 @@ export default function TagPreview({ item, config }: Props) {
   const [scale, setScale] = useState(1);
 
   const tagWidthCm = item.TagMode === 'large' ? config.largeW : config.w;
+  const tagHeightCm = item.TagMode === 'large' ? config.largeH : item.TagMode === 'oos' ? config.oosH : config.h;
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -40,7 +41,11 @@ export default function TagPreview({ item, config }: Props) {
   }, [tagWidthCm]);
 
   return (
-    <div className="tag-preview-frame" ref={frameRef} style={{ width: FRAME_WIDTH, height: FRAME_HEIGHT }}>
+    <div
+      className="tag-preview-frame"
+      ref={frameRef}
+      style={{ width: '100%', maxWidth: FRAME_MAX_WIDTH, height: Math.ceil((tagHeightCm || 1) * PX_PER_CM * scale) + 2 }}
+    >
       <div className="tag-preview-scale" style={{ transform: `scale(${scale})` }}>
         <PriceTag item={item} config={config} queueIndex={0} selected={false} />
       </div>
