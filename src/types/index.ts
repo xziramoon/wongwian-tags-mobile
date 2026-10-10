@@ -59,6 +59,7 @@ export interface Config {
   priceInk: string; // 'black' | 'red'
   inkTilt: boolean;
   headerCN: string; // ชื่อจีนบนหัวป้าย เช่น 黄六盛
+  printMono: boolean; // พิมพ์ขาว-ดำ: แดง/เหลืองทุกจุดเป็นโทนดำ
   vegAuto: boolean; // ติดป้าย เจ อัตโนมัติเมื่อชื่อสินค้ามีคำว่า เจ
   tagTheme: string; // 'classic' | 'korean' | 'ink' — ธีมป้ายปกติ
   headerSub: string; // ข้อความขวาบนหัวป้าย (ธีมใหม่) เช่น ซุปเปอร์มาร์เก็ต

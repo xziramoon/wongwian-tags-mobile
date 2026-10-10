@@ -1,0 +1,35 @@
+/* ============================================================
+ * พิมพ์ขาว-ดำ (config.printMono) — คลาส .mono บน .price-tag
+ * เปลี่ยนแดง/เหลืองทุกจุดเป็นโทนดำ-เทา ให้เครื่องพิมพ์ขาวดำพิมพ์ออกมาคมชัด ไม่เป็นเม็ดเทาซีดๆ
+ * ใช้ได้ทั้งป้ายแบบเดิม, ธีมเกาหลี, ธีมหมึกแดง และป้าย เจ
+ * ใส่ !important ทุกบรรทัดเพื่อชนะ @media print เดิมใน tag-ink.css / tag-theme.css / tag-veg.css
+ * ⚠️ public/TAG_PRINTER.html มีสำเนาตรงตัวของไฟล์นี้ — แก้ที่นี่ต้องแก้ที่นั่นด้วย
+ * ============================================================ */
+
+/* หัวป้ายธีม: พื้นดำทึบ ตัวขาว ชื่อจีนเป็นกรอบขาวตัวดำ */
+.price-tag.mono .th-head { background:#000 !important; color:#fff !important; }
+.price-tag.mono .th-cn { background:#fff !important; color:#000 !important; padding:0 3px; border-radius:2px; }
+.price-tag.mono .hdr-cn { background:#fff !important; color:#000 !important; }
+
+/* ตัวเลขราคา: ดำสนิท — ธีมเกาหลีใช้เงาเทาแทนเงาเหลือง ให้ยังดูมีมิติ */
+.price-tag.mono .th-price,
+.price-tag.mono .tag-price,
+.price-tag.mono .hero-price,
+.price-tag.mono .dual-price-val,
+.price-tag.mono .tag-price-large,
+.price-tag.mono .tag-large-box-price { color:#000 !important; }
+.price-tag.mono.theme-kr .th-price { text-shadow:2px 2px 0 #b5b5b5 !important; }
+
+/* ป้าย SALE / ตรา 特价: ดำ-ขาว */
+.price-tag.mono .th-pill { background:#000 !important; color:#fff !important; }
+.price-tag.mono .th-stamp { color:#000 !important; border-color:#000 !important; }
+
+/* ป้าย เจ: กรอบดำพื้นขาว + 齋 กลับสีพื้นดำตัวขาว */
+.price-tag.mono .veg-badge,
+.price-tag.mono .veg-big { background:#fff !important; color:#000 !important; border-color:#000 !important; }
+.price-tag.mono .veg-cn { background:#000 !important; color:#fff !important; }
+
+@media print {
+  .price-tag.mono .th-head, .price-tag.mono .th-cn, .price-tag.mono .th-pill,
+  .price-tag.mono .veg-badge, .price-tag.mono .veg-big, .price-tag.mono .veg-cn { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}

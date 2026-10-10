@@ -86,8 +86,9 @@ function thPriceFs(pDisp: string, ps: number, pill: boolean, veg: boolean, stamp
 function inkClasses(config: Config) {
   let c = '';
   if (config.priceFont) c += ' brush-price';
-  if (config.priceInk === 'red') c += ' ink-red';
+  if (config.priceInk === 'red' && !config.printMono) c += ' ink-red';
   if (config.inkTilt) c += ' ink-tilt';
+  if (config.printMono) c += ' mono'; /* พิมพ์ขาว-ดำ (tag-mono.css) */
   return c;
 }
 
@@ -195,7 +196,7 @@ export default function PriceTag({ item, config, selected }: Props) {
     const sizeLine = [safeSize && `${LBL_SIZE} ${safeSize}`, `${LBL_UNIT} 1 ${safeUnit}`].filter(Boolean).join(' · ');
     const ps = heroScale(pDisp);
     return (
-      <div className={`price-tag price-tag-normal ${theme}${selected ? ' selected' : ''}`}>
+      <div className={`price-tag price-tag-normal ${theme}${config.printMono ? ' mono' : ''}${selected ? ' selected' : ''}`}>
         {safeRibbon && <div className="tag-ribbon">{safeRibbon}</div>}
         <div className="th-head">
           <div className="th-brand">

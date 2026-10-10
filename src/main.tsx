@@ -5,6 +5,7 @@ import './styles/tag.css'
 import './styles/tag-ink.css'
 import './styles/tag-theme.css'
 import './styles/tag-veg.css'
+import './styles/tag-mono.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
