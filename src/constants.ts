@@ -23,6 +23,10 @@ export const CONFIG_STORAGE_KEY = 'wongwianMobileConfig_v1';
  * stock returns. Namespaced separately from QUEUE_STORAGE_KEY/CONFIG_STORAGE_KEY since
  * it's a different kind of data (a registry, not the print queue or design config). */
 export const OOS_STORAGE_KEY = 'wongwianOosRegister_v1';
+/* ประวัติการส่งพิมพ์ — เก็บล็อตที่ส่งไปแล้ว เผื่อกดส่งผิดแล้วดึงกลับเข้าคิวมาแก้/ส่งใหม่ */
+export const HISTORY_STORAGE_KEY = 'wongwianMobileSendHistory_v1';
+export const HISTORY_MAX_BATCHES = 30;
+export const HISTORY_MAX_AGE_MS = 7 * 86400000;
 
 /* ⚠️ ห้ามแก้ค่า — default ตรงกับ wongwian-tags01/src/constants.ts DEFAULT_CONFIG
  * (ค่าตัวเลขคัดลอกมาจาก SLIDER_DEFS[...].def เดิม) — เป็นค่าเริ่มต้นก่อนผู้ใช้ปรับแต่งเอง

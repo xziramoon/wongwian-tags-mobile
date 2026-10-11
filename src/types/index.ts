@@ -78,3 +78,9 @@ export interface Product {
 }
 
 export type ToastType = 'info' | 'success' | 'error';
+
+export interface SendHistoryEntry {
+  id: string;
+  ts: number; // Date.now() ตอนส่งสำเร็จ
+  items: QueueItem[];
+}

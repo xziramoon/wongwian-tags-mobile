@@ -1005,6 +1005,7 @@ input {
 
 .queue-tab {
   flex: 1;
+  min-width: 0;
   min-height: 40px;
   padding: 8px 12px;
   border-radius: 12px;
@@ -1059,6 +1060,12 @@ input {
   font-size: 13px;
   color: var(--txt2);
   margin-top: 2px;
+}
+
+.history-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .oos-row-warn .oos-row-meta {

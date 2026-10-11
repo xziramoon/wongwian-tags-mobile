@@ -19,10 +19,14 @@ export default function QueueDrawer() {
   const remove = useQueueStore((s) => s.remove);
   const sendQueue = useQueueStore((s) => s.sendQueue);
   const addItem = useQueueStore((s) => s.addItem);
+  const history = useQueueStore((s) => s.history);
+  const restoreFromHistory = useQueueStore((s) => s.restoreFromHistory);
+  const removeHistory = useQueueStore((s) => s.removeHistory);
+  const clearHistory = useQueueStore((s) => s.clearHistory);
   const oosRecords = useOosStore((s) => s.records);
   const oosClear = useOosStore((s) => s.clear);
 
-  const [tab, setTab] = useState<'queue' | 'oos'>('queue');
+  const [tab, setTab] = useState<'queue' | 'oos' | 'history'>('queue');
 
   if (!open) return null;
 
@@ -69,6 +73,13 @@ export default function QueueDrawer() {
           <button type="button" className={`queue-tab${tab === 'oos' ? ' active' : ''}`} onClick={() => setTab('oos')}>
             สินค้าหมด ({oosList.length})
           </button>
+          <button
+            type="button"
+            className={`queue-tab${tab === 'history' ? ' active' : ''}`}
+            onClick={() => setTab('history')}
+          >
+            ประวัติส่ง ({history.length})
+          </button>
         </div>
 
         {tab === 'queue' ? (
@@ -107,6 +118,57 @@ export default function QueueDrawer() {
                   </button>
                 </div>
               ))}
+            </div>
+          )
+        ) : tab === 'history' ? (
+          history.length === 0 ? (
+            <div className="queue-empty">ยังไม่มีประวัติการส่ง</div>
+          ) : (
+            <div className="oos-list">
+              {history.map((h) => {
+                const d = new Date(h.ts);
+                const when = `${d.getDate()}/${d.getMonth() + 1} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                const preview = h.items.slice(0, 3).map((i) => i.ProductName).join(', ');
+                return (
+                  <div className="oos-row" key={h.id}>
+                    <div className="oos-row-info">
+                      <div className="oos-row-name">
+                        {when} · {h.items.length} รายการ
+                      </div>
+                      <div className="oos-row-meta history-preview">
+                        {preview}
+                        {h.items.length > 3 ? ' ...' : ''}
+                      </div>
+                    </div>
+                    <div className="oos-row-actions">
+                      <button
+                        type="button"
+                        className="oos-row-btn"
+                        onClick={() => {
+                          restoreFromHistory(h.id);
+                          setTab('queue');
+                        }}
+                        aria-label="ดึงกลับเข้าคิว"
+                        title="ดึงกลับเข้าคิว"
+                      >
+                        ↩
+                      </button>
+                      <button
+                        type="button"
+                        className="oos-row-btn"
+                        onClick={() => removeHistory(h.id)}
+                        aria-label="ลบประวัติ"
+                        title="ลบประวัติ"
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+              <button type="button" className="btn btn-block" onClick={clearHistory}>
+                ล้างประวัติทั้งหมด
+              </button>
             </div>
           )
         ) : oosList.length === 0 ? (

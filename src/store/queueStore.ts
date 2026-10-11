@@ -1,6 +1,14 @@
 import { create } from 'zustand';
-import type { Config, DualStyle, QueueItem } from '../types';
-import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG, QUEUE_STORAGE_KEY, SIZE_PRESETS } from '../constants';
+import type { Config, DualStyle, QueueItem, SendHistoryEntry } from '../types';
+import {
+  CONFIG_STORAGE_KEY,
+  DEFAULT_CONFIG,
+  HISTORY_MAX_AGE_MS,
+  HISTORY_MAX_BATCHES,
+  HISTORY_STORAGE_KEY,
+  QUEUE_STORAGE_KEY,
+  SIZE_PRESETS,
+} from '../constants';
 import { database } from '../lib/database';
 import { printBridge } from '../lib/printBridge';
 import { autoFontSize, extractSize } from '../lib/utils';
@@ -61,6 +69,29 @@ function loadConfig(): Config {
   return { ...DEFAULT_CONFIG };
 }
 
+function loadHistory(): SendHistoryEntry[] {
+  try {
+    const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
+    if (saved) {
+      const cutoff = Date.now() - HISTORY_MAX_AGE_MS;
+      return (JSON.parse(saved) as SendHistoryEntry[])
+        .filter((h) => h.ts >= cutoff)
+        .map((h) => ({ ...h, items: h.items.map(normalize) }));
+    }
+  } catch {
+    /* corrupted storage — start with empty history */
+  }
+  return [];
+}
+
+function persistHistory(history: SendHistoryEntry[]) {
+  try {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+  } catch {
+    /* storage full — history is best-effort, never block a send */
+  }
+}
+
 function persist(queue: QueueItem[], config: Config) {
   localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));
   localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config));
@@ -107,6 +138,8 @@ export function previewFromBarcode(code: string, exp = ''): { item: QueueItem; f
 interface QueueState {
   queue: QueueItem[];
   config: Config;
+  /** ล็อตที่ส่งพิมพ์สำเร็จแล้ว (ใหม่สุดก่อน) — เผื่อกดส่งผิด */
+  history: SendHistoryEntry[];
 
   /** merges `item` into the queue: same Barcode already present → PrintQty bump by
    * item.PrintQty (keeps existing product data, refreshes Exp if provided); else appended. */
@@ -131,11 +164,17 @@ interface QueueState {
    * clears the queue ONLY on success; on failure the queue is left intact and the
    * error is rethrown so the caller can show a retry toast. */
   sendQueue: () => Promise<void>;
+
+  /** ดึงล็อตที่ส่งไปแล้วกลับเข้าคิว (รวมกับของที่มีในคิว) — ไม่ลบประวัติ */
+  restoreFromHistory: (id: string) => void;
+  removeHistory: (id: string) => void;
+  clearHistory: () => void;
 }
 
 export const useQueueStore = create<QueueState>((set, get) => ({
   queue: loadQueue(),
   config: loadConfig(),
+  history: loadHistory(),
 
   addItem: (item) => {
     set((s) => {
@@ -256,7 +295,12 @@ export const useQueueStore = create<QueueState>((set, get) => ({
       await printBridge.publish(config, ordered);
       set((s) => {
         persist([], s.config);
-        return { queue: [] };
+        const history = [{ id: `${Date.now()}`, ts: Date.now(), items: queue }, ...s.history].slice(
+          0,
+          HISTORY_MAX_BATCHES,
+        );
+        persistHistory(history);
+        return { queue: [], history };
       });
       useUIStore.getState().showToast(`ส่งพิมพ์แล้ว · ${queue.length} รายการ`, 'success');
     } catch (err) {
@@ -265,5 +309,25 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     } finally {
       useUIStore.getState().setSending(false);
     }
+  },
+
+  restoreFromHistory: (id) => {
+    const entry = get().history.find((h) => h.id === id);
+    if (!entry) return;
+    entry.items.forEach((it) => get().addItem(it));
+    useUIStore.getState().showToast(`ดึงกลับเข้าคิวแล้ว · ${entry.items.length} รายการ`, 'success');
+  },
+
+  removeHistory: (id) => {
+    set((s) => {
+      const history = s.history.filter((h) => h.id !== id);
+      persistHistory(history);
+      return { history };
+    });
+  },
+
+  clearHistory: () => {
+    persistHistory([]);
+    set({ history: [] });
   },
 }));
