@@ -7,9 +7,8 @@ import { useQueueStore } from './store/queueStore';
 import { applyCSSVars } from './lib/cssVars';
 import CameraScanner from './components/CameraScanner';
 import CameraPermissionDenied from './components/CameraPermissionDenied';
-import CameraOff from './components/CameraOff';
+import HomeScreen from './components/HomeScreen';
 import ScanResultSheet from './components/ScanResultSheet';
-import ConnectionStatus from './components/ConnectionStatus';
 import QueueBadge from './components/QueueBadge';
 import QueueDrawer from './components/QueueDrawer';
 import ManualSearchSheet from './components/ManualSearchSheet';
@@ -27,11 +26,8 @@ function toAblyStatus(state: AblyConnState): 'connecting' | 'connected' | 'offli
 function App() {
   const cameraStatus = useUIStore((s) => s.cameraStatus);
   const cameraEnabled = useUIStore((s) => s.cameraEnabled);
-  const setCameraEnabled = useUIStore((s) => s.setCameraEnabled);
   const setAblyStatus = useUIStore((s) => s.setAblyStatus);
   const showToast = useUIStore((s) => s.showToast);
-  const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
-  const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
 
   const cameraUnavailable = cameraStatus === 'denied' || cameraStatus === 'error';
 
@@ -66,41 +62,16 @@ function App() {
 
   return (
     <div className="app-shell">
-      {cameraUnavailable ? (
+      {!cameraEnabled ? (
+        <HomeScreen />
+      ) : cameraUnavailable ? (
         <CameraPermissionDenied />
-      ) : cameraEnabled ? (
-        <CameraScanner />
       ) : (
-        <CameraOff />
+        <>
+          <CameraScanner />
+          <QueueBadge />
+        </>
       )}
-      <ConnectionStatus />
-      <button
-        type="button"
-        className="search-toggle-btn"
-        onClick={() => setManualSearchOpen(true)}
-        aria-label="ค้นหาสินค้าด้วยตนเอง"
-      >
-        🔍
-      </button>
-      {!cameraUnavailable && (
-        <button
-          type="button"
-          className="camera-toggle-btn"
-          onClick={() => setCameraEnabled(!cameraEnabled)}
-          aria-label={cameraEnabled ? 'ปิดกล้อง' : 'เปิดกล้อง'}
-        >
-          {cameraEnabled ? '📷' : '🚫'}
-        </button>
-      )}
-      <button
-        type="button"
-        className="settings-gear-btn"
-        onClick={() => setSettingsSheetOpen(true)}
-        aria-label="ออกแบบป้ายราคา"
-      >
-        ⚙
-      </button>
-      <QueueBadge />
       <ScanResultSheet />
       <QueueDrawer />
       <ManualSearchSheet />

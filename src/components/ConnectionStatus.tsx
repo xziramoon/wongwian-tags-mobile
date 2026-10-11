@@ -14,10 +14,11 @@ const STATUS_CLASS: Record<string, string> = {
   offline: 'status-err',
 };
 
-export default function ConnectionStatus() {
+/* inline = วางในแถวหัวหน้าแรก (ไม่ลอยทับกล้อง) */
+export default function ConnectionStatus({ inline = false }: { inline?: boolean }) {
   const ablyStatus = useUIStore((s) => s.ablyStatus);
   return (
-    <div id="ably-status" className={`conn-status ${STATUS_CLASS[ablyStatus]}`}>
+    <div id="ably-status" className={`conn-status ${STATUS_CLASS[ablyStatus]}${inline ? ' conn-status-inline' : ''}`}>
       <span className="conn-dot" />
       <span className="conn-text">{STATUS_TEXT[ablyStatus]}</span>
     </div>

@@ -3,6 +3,10 @@ import { useUIStore } from '../store/uiStore';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { startScanning, stopScanning, hasTorch, setTorch, getZoomRange, setZoom } from '../lib/scan';
 import { feedback } from '../lib/feedback';
+import ConnectionStatus from './ConnectionStatus';
+
+/* ไม่มีการสแกนนานเท่านี้ → ปิดกล้องกลับหน้าแรกเอง ประหยัดแบต/ไม่ให้กล้องค้าง */
+const IDLE_CLOSE_MS = 2 * 60 * 1000;
 
 interface ZoomRange {
   min: number;
@@ -20,6 +24,12 @@ export default function CameraScanner() {
   const queueDrawerOpen = useUIStore((s) => s.queueDrawerOpen);
   const manualSearchOpen = useUIStore((s) => s.manualSearchOpen);
   const openScanSheet = useUIStore((s) => s.openScanSheet);
+  const setCameraEnabled = useUIStore((s) => s.setCameraEnabled);
+  const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
+  const showToast = useUIStore((s) => s.showToast);
+  const settingsOpen = useUIStore((s) => s.settingsSheetOpen);
+  const tagEditOpen = useUIStore((s) => s.tagEditTarget !== null);
+  const [lastActivity, setLastActivity] = useState(() => Date.now());
   const [torchAvailable, setTorchAvailable] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
   const [zoomRange, setZoomRange] = useState<ZoomRange | null>(null);
@@ -29,6 +39,7 @@ export default function CameraScanner() {
     (code: string) => {
       const trimmed = code.trim();
       if (!trimmed) return;
+      setLastActivity(Date.now());
       const alreadyQueued = useQueueStore.getState().queue.some((i) => i.Barcode === trimmed);
       const { item, found } = previewFromBarcode(trimmed);
       if (found) feedback[alreadyQueued ? 'duplicate' : 'success']();
@@ -75,6 +86,26 @@ export default function CameraScanner() {
     };
   }, [scanSheetOpen, queueDrawerOpen, manualSearchOpen, handleDetect, setCameraStatus]);
 
+  // ปิดกล้องอัตโนมัติเมื่อไม่ได้ใช้ — นับเฉพาะตอนกล้องโชว์อยู่ (มีแผ่นไหนเปิดทับ = กำลังใช้งาน)
+  const anySheetOpen = scanSheetOpen || queueDrawerOpen || manualSearchOpen || settingsOpen || tagEditOpen;
+  useEffect(() => {
+    if (anySheetOpen) return;
+    const t = window.setTimeout(() => {
+      setCameraEnabled(false);
+      showToast('ปิดกล้องอัตโนมัติเพื่อประหยัดแบตเตอรี่', 'info');
+    }, IDLE_CLOSE_MS);
+    return () => window.clearTimeout(t);
+  }, [anySheetOpen, lastActivity, setCameraEnabled, showToast]);
+
+  // สลับไปแอปอื่น/ล็อกจอ → ปิดกล้องทันที กลับมาเจอหน้าแรก ไม่ใช่กล้องเปิดค้าง
+  useEffect(() => {
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') setCameraEnabled(false);
+    };
+    document.addEventListener('visibilitychange', onHide);
+    return () => document.removeEventListener('visibilitychange', onHide);
+  }, [setCameraEnabled]);
+
   const toggleTorch = () => {
     const next = !torchOn;
     setTorchOn(next);
@@ -96,6 +127,26 @@ export default function CameraScanner() {
          * keeps it centered in the sharpest/most stable part of the frame */}
         <div className="scan-line" />
       </div>
+      <div className="scanner-topbar">
+        <button
+          type="button"
+          className="scanner-close-btn"
+          onClick={() => setCameraEnabled(false)}
+          aria-label="ปิดกล้อง กลับหน้าแรก"
+        >
+          ✕ ปิดกล้อง
+        </button>
+        <ConnectionStatus inline />
+        <button
+          type="button"
+          className="scanner-icon-btn"
+          onClick={() => setManualSearchOpen(true)}
+          aria-label="ค้นหาสินค้าด้วยตนเอง"
+        >
+          🔍
+        </button>
+      </div>
+      <div className="scanner-hint">เล็งบาร์โค้ดให้อยู่ในกรอบ</div>
       {torchAvailable && (
         <button
           type="button"

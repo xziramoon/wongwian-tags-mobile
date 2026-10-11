@@ -74,8 +74,11 @@ export const useUIStore = create<UIState>((set) => ({
   cameraStatus: 'starting',
   setCameraStatus: (cameraStatus) => set({ cameraStatus }),
 
-  cameraEnabled: true,
-  setCameraEnabled: (cameraEnabled) => set({ cameraEnabled }),
+  /* เริ่มที่หน้าแรกเสมอ — กล้องเปิดเมื่อผู้ใช้กด "สแกนบาร์โค้ด" เท่านั้น */
+  cameraEnabled: false,
+  /* เปิดใหม่ทุกครั้ง = ลองขอกล้องใหม่ (เคยถูกปฏิเสธ/error แล้วไปแก้สิทธิ์มา ก็ไม่ต้องรีโหลดหน้า) */
+  setCameraEnabled: (cameraEnabled) =>
+    set(cameraEnabled ? { cameraEnabled, cameraStatus: 'starting' } : { cameraEnabled }),
 
   scanSheetOpen: false,
   scanSheetItem: null,

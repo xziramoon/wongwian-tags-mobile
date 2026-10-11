@@ -576,68 +576,8 @@ input {
   max-height: 92dvh;
 }
 
-.settings-gear-btn {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 14px);
-  right: calc(env(safe-area-inset-right, 0px) + 14px);
-  z-index: 40;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(23, 23, 37, 0.55);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
-.camera-toggle-btn {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 68px);
-  right: calc(env(safe-area-inset-right, 0px) + 14px);
-  z-index: 40;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(23, 23, 37, 0.55);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-size: 19px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
-.search-toggle-btn {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 62px);
-  left: calc(env(safe-area-inset-left, 0px) + 14px);
-  z-index: 40;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(23, 23, 37, 0.55);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
 .preset-row {
   display: grid;
@@ -1124,4 +1064,264 @@ input {
   font-weight: 900;
   border-radius: 3px;
   padding: 0 3px;
+}
+/* ============ หน้าแรก (กล้องไม่เปิดเองแล้ว) ============ */
+.conn-status-inline {
+  position: static;
+  backdrop-filter: none;
+  padding: 0;
+  background: none;
+  color: var(--txt2);
+  font-size: 12.5px;
+}
+
+.home {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  background: var(--surface2);
+  color: var(--ink);
+}
+
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.home-title-main {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.home-icon-btn {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 21px;
+  cursor: pointer;
+}
+
+/* ปุ่มหลักใหญ่ — แตะซ้ำทั้งวัน ต้องกดง่ายด้วยนิ้วโป้ง */
+.home-scan-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 200px;
+  padding: 24px 16px;
+  border: none;
+  border-radius: 24px;
+  background: linear-gradient(160deg, var(--ac) 0%, var(--ac-d) 100%);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(75, 71, 230, 0.35);
+  cursor: pointer;
+}
+
+.home-scan-btn:active {
+  transform: scale(0.985);
+}
+
+.home-scan-icon {
+  font-size: 54px;
+  line-height: 1;
+}
+
+.home-scan-label {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.home-scan-sub {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.home-search-btn {
+  min-height: 56px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--ln);
+}
+
+.home-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.home-card-title {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.home-card-count {
+  font-size: 13.5px;
+  color: var(--txt2);
+  font-weight: 600;
+}
+
+.home-card-empty {
+  font-size: 14px;
+  color: var(--txt2);
+  padding: 6px 0;
+}
+
+.home-queue-preview {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-queue-preview li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14.5px;
+}
+
+.home-queue-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-queue-price {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--ac-d);
+}
+
+.home-queue-preview .home-queue-more {
+  color: var(--txt2);
+  font-size: 13px;
+}
+
+.home-card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.home-last {
+  flex-direction: row;
+  align-items: center;
+}
+
+.home-last-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-last-meta {
+  font-size: 13px;
+  color: var(--txt2);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-last-btn {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ln2);
+  background: var(--surface2);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ============ แถบบนหน้าสแกน ============ */
+.scanner-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px 12px;
+  background: linear-gradient(rgba(0, 0, 0, 0.55), transparent);
+}
+
+.scanner-topbar .conn-status-inline {
+  color: #fff;
+}
+
+.scanner-close-btn,
+.scanner-icon-btn {
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(23, 23, 37, 0.6);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scanner-close-btn {
+  padding: 0 16px;
+}
+
+.scanner-icon-btn {
+  width: 44px;
+  font-size: 18px;
+}
+
+.scanner-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + min(20vw, 100px) + 18px);
+  z-index: 30;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
 }
