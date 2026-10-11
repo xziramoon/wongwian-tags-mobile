@@ -1,5 +1,22 @@
 import { create } from 'zustand';
 import type { QueueItem, ToastType } from '../types';
+import { PREFS_STORAGE_KEY } from '../constants';
+
+interface Prefs {
+  autoOpenCamera: boolean;
+}
+
+function loadPrefs(): Prefs {
+  try {
+    const saved = localStorage.getItem(PREFS_STORAGE_KEY);
+    if (saved) return { autoOpenCamera: false, ...JSON.parse(saved) };
+  } catch {
+    /* corrupted storage — defaults */
+  }
+  return { autoOpenCamera: false };
+}
+
+const initialPrefs = loadPrefs();
 
 /* toast shape/pattern ported verbatim from wongwian-tags01/src/store/uiStore.ts */
 export interface Toast {
@@ -11,6 +28,7 @@ export interface Toast {
 let toastSeq = 0;
 
 export type AblyStatus = 'connecting' | 'connected' | 'offline';
+export type QueueDrawerTab = 'queue' | 'oos' | 'history';
 export type CameraStatus = 'starting' | 'active' | 'denied' | 'error';
 
 interface UIState {
@@ -30,6 +48,10 @@ interface UIState {
   cameraEnabled: boolean;
   setCameraEnabled: (enabled: boolean) => void;
 
+  /** ค่าตั้ง: เข้าแอปแล้วเปิดกล้องเลย (สำหรับคนสแกนทั้งวัน ไม่อยากกดเพิ่ม) */
+  autoOpenCamera: boolean;
+  setAutoOpenCamera: (on: boolean) => void;
+
   /* bottom sheet shown after a scan (or a manual-search tap) — scanSheetItem is a
    * preview QueueItem not yet committed to the queue; scanSheetFound tells the sheet
    * whether to render the found layout or the "ไม่พบสินค้า" manual-entry layout */
@@ -41,7 +63,10 @@ interface UIState {
   closeScanSheet: () => void;
 
   queueDrawerOpen: boolean;
-  setQueueDrawerOpen: (open: boolean) => void;
+  /** เปิดลิ้นชักคิวที่แท็บไหน — การ์ด "สินค้าหมด" หน้าแรกเปิดตรงแท็บ oos */
+  queueDrawerTab: QueueDrawerTab;
+  setQueueDrawerOpen: (open: boolean, tab?: QueueDrawerTab) => void;
+  setQueueDrawerTab: (tab: QueueDrawerTab) => void;
 
   manualSearchOpen: boolean;
   setManualSearchOpen: (open: boolean) => void;
@@ -74,11 +99,21 @@ export const useUIStore = create<UIState>((set) => ({
   cameraStatus: 'starting',
   setCameraStatus: (cameraStatus) => set({ cameraStatus }),
 
-  /* เริ่มที่หน้าแรกเสมอ — กล้องเปิดเมื่อผู้ใช้กด "สแกนบาร์โค้ด" เท่านั้น */
-  cameraEnabled: false,
+  /* ค่าเริ่มต้นเริ่มที่หน้าแรก — กล้องเปิดเมื่อกด "สแกนบาร์โค้ด" เว้นแต่เปิดค่าตั้ง autoOpenCamera ไว้ */
+  cameraEnabled: initialPrefs.autoOpenCamera,
   /* เปิดใหม่ทุกครั้ง = ลองขอกล้องใหม่ (เคยถูกปฏิเสธ/error แล้วไปแก้สิทธิ์มา ก็ไม่ต้องรีโหลดหน้า) */
   setCameraEnabled: (cameraEnabled) =>
     set(cameraEnabled ? { cameraEnabled, cameraStatus: 'starting' } : { cameraEnabled }),
+
+  autoOpenCamera: initialPrefs.autoOpenCamera,
+  setAutoOpenCamera: (autoOpenCamera) => {
+    try {
+      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify({ autoOpenCamera }));
+    } catch {
+      /* storage blocked — ค่าใช้ได้แค่รอบนี้ */
+    }
+    set({ autoOpenCamera });
+  },
 
   scanSheetOpen: false,
   scanSheetItem: null,
@@ -89,7 +124,10 @@ export const useUIStore = create<UIState>((set) => ({
   closeScanSheet: () => set({ scanSheetOpen: false, scanSheetItem: null }),
 
   queueDrawerOpen: false,
-  setQueueDrawerOpen: (queueDrawerOpen) => set({ queueDrawerOpen }),
+  queueDrawerTab: 'queue',
+  setQueueDrawerOpen: (queueDrawerOpen, tab) =>
+    set(queueDrawerOpen ? { queueDrawerOpen, queueDrawerTab: tab ?? 'queue' } : { queueDrawerOpen }),
+  setQueueDrawerTab: (queueDrawerTab) => set({ queueDrawerTab }),
 
   manualSearchOpen: false,
   setManualSearchOpen: (manualSearchOpen) => set({ manualSearchOpen }),

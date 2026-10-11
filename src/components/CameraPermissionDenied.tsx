@@ -1,4 +1,5 @@
 import { useUIStore } from '../store/uiStore';
+import { IconCamera } from './Icons';
 
 /* full-screen fallback shown when the camera is unavailable (permission denied, or
  * any other getUserMedia error) — keeps the app usable via manual product search */
@@ -11,8 +12,8 @@ export default function CameraPermissionDenied() {
 
   return (
     <div className="camera-denied">
-      <div className="camera-denied-icon" aria-hidden="true">
-        📷
+      <div className="camera-denied-icon">
+        <IconCamera size={48} />
       </div>
       <h1 className="camera-denied-title">{isDenied ? 'ไม่ได้รับอนุญาตให้ใช้กล้อง' : 'ไม่สามารถเปิดกล้องได้'}</h1>
       <p className="camera-denied-text">

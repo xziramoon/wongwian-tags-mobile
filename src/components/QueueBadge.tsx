@@ -1,5 +1,6 @@
 import { useQueueStore } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
+import { IconTag } from './Icons';
 
 /* persistent floating badge showing queue item count — tap opens QueueDrawer.
  * Hidden entirely when the queue is empty so it doesn't block the viewfinder. */
@@ -16,8 +17,8 @@ export default function QueueBadge() {
       onClick={() => setQueueDrawerOpen(true)}
       aria-label={`เปิดคิวป้ายราคา (${count} รายการ)`}
     >
-      <span className="queue-badge-icon" aria-hidden="true">
-        🏷
+      <span className="queue-badge-icon">
+        <IconTag size={20} />
       </span>
       <span className="queue-badge-count">{count}</span>
     </button>

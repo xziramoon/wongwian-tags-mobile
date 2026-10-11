@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
 import { useOosStore } from '../store/oosStore';
+import { IconClose, IconPrinter, IconTrash, IconUndo } from './Icons';
 
 const OOS_WARN_DAYS = 14;
 
@@ -17,7 +17,8 @@ export default function QueueDrawer() {
   const queue = useQueueStore((s) => s.queue);
   const changeQty = useQueueStore((s) => s.changeQty);
   const remove = useQueueStore((s) => s.remove);
-  const sendQueue = useQueueStore((s) => s.sendQueue);
+  const requestSend = useQueueStore((s) => s.requestSend);
+  const pendingSendAt = useQueueStore((s) => s.pendingSendAt);
   const addItem = useQueueStore((s) => s.addItem);
   const history = useQueueStore((s) => s.history);
   const restoreFromHistory = useQueueStore((s) => s.restoreFromHistory);
@@ -26,14 +27,16 @@ export default function QueueDrawer() {
   const oosRecords = useOosStore((s) => s.records);
   const oosClear = useOosStore((s) => s.clear);
 
-  const [tab, setTab] = useState<'queue' | 'oos' | 'history'>('queue');
+  const tab = useUIStore((s) => s.queueDrawerTab);
+  const setTab = useUIStore((s) => s.setQueueDrawerTab);
 
   if (!open) return null;
 
   const oosList = Object.values(oosRecords).sort((a, b) => a.since - b.since);
 
   const handleSendAll = () => {
-    void sendQueue();
+    requestSend();
+    setOpen(false); // ปิดลิ้นชักให้เห็นแถบนับถอยหลัง/ปุ่มยกเลิกชัด ๆ
   };
 
   // tapping a row's name/price opens TagEditSheet in edit mode for that index —
@@ -58,7 +61,7 @@ export default function QueueDrawer() {
         <div className="queue-drawer-header">
           <span>คิวป้ายราคา ({queue.length})</span>
           <button type="button" className="sheet-close" onClick={() => setOpen(false)} aria-label="ปิด">
-            ✕
+            <IconClose size={20} />
           </button>
         </div>
 
@@ -114,7 +117,7 @@ export default function QueueDrawer() {
                     </button>
                   </div>
                   <button type="button" className="queue-row-remove" onClick={() => remove(index)} aria-label="ลบรายการ">
-                    🗑
+                    <IconTrash size={18} />
                   </button>
                 </div>
               ))}
@@ -136,6 +139,7 @@ export default function QueueDrawer() {
                         {when} · {h.items.length} รายการ
                       </div>
                       <div className="oos-row-meta history-preview">
+                        {h.restoredAt ? 'ดึงกลับเข้าคิวแล้ว · ' : ''}
                         {preview}
                         {h.items.length > 3 ? ' ...' : ''}
                       </div>
@@ -148,10 +152,11 @@ export default function QueueDrawer() {
                           restoreFromHistory(h.id);
                           setTab('queue');
                         }}
+                        disabled={!!h.restoredAt}
                         aria-label="ดึงกลับเข้าคิว"
-                        title="ดึงกลับเข้าคิว"
+                        title={h.restoredAt ? 'ดึงกลับไปแล้ว' : 'ดึงกลับเข้าคิว'}
                       >
-                        ↩
+                        <IconUndo size={18} />
                       </button>
                       <button
                         type="button"
@@ -160,7 +165,7 @@ export default function QueueDrawer() {
                         aria-label="ลบประวัติ"
                         title="ลบประวัติ"
                       >
-                        🗑
+                        <IconTrash size={18} />
                       </button>
                     </div>
                   </div>
@@ -194,7 +199,7 @@ export default function QueueDrawer() {
                       aria-label="พิมพ์แถบซ้ำ"
                       title="พิมพ์แถบซ้ำ"
                     >
-                      🖨
+                      <IconPrinter size={18} />
                     </button>
                     <button
                       type="button"
@@ -203,7 +208,7 @@ export default function QueueDrawer() {
                       aria-label="ลบออกจากทะเบียน"
                       title="ลบออกจากทะเบียน"
                     >
-                      🗑
+                      <IconTrash size={18} />
                     </button>
                   </div>
                 </div>
@@ -218,7 +223,7 @@ export default function QueueDrawer() {
               type="button"
               className="btn btn-primary btn-block"
               onClick={handleSendAll}
-              disabled={!queue.length || sending}
+              disabled={!queue.length || sending || !!pendingSendAt}
             >
               {sending ? 'กำลังส่ง...' : 'ส่งทั้งหมด'}
             </button>

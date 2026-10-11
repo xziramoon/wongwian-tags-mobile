@@ -2,19 +2,23 @@ import { useQueueStore } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
 import { useOosStore } from '../store/oosStore';
 import ConnectionStatus from './ConnectionStatus';
+import { IconBox, IconScan, IconSearch, IconSettings, IconUndo } from './Icons';
 
-/* หน้าแรกของแอป — กล้องจะไม่เปิดเองตอนเข้าแอปอีกต่อไป (ขอกล้องตอนผู้ใช้ตั้งใจจะสแกน
- * เท่านั้น ตามแนวทาง permission-in-context) หน้านี้รวมทางเข้าหลักไว้: สแกน / ค้นหา /
- * คิวรอพิมพ์ / ส่งล่าสุด เผื่อกดส่งผิด / ตั้งค่าป้าย */
+/* หน้าแรกของแอป — กล้องจะไม่เปิดเองตอนเข้าแอป (ขอกล้องตอนผู้ใช้ตั้งใจจะสแกน
+ * เท่านั้น ตามแนวทาง permission-in-context) เว้นแต่เปิดค่าตั้ง "เปิดกล้องทันที" ไว้
+ * หน้านี้รวมทางเข้าหลัก: สแกน / ค้นหา / คิวรอพิมพ์ / ส่งล่าสุด / สินค้าหมด / ตั้งค่าป้าย */
 export default function HomeScreen() {
   const setCameraEnabled = useUIStore((s) => s.setCameraEnabled);
   const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
   const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
   const setQueueDrawerOpen = useUIStore((s) => s.setQueueDrawerOpen);
+  const autoOpenCamera = useUIStore((s) => s.autoOpenCamera);
+  const setAutoOpenCamera = useUIStore((s) => s.setAutoOpenCamera);
   const sending = useUIStore((s) => s.sending);
   const queue = useQueueStore((s) => s.queue);
   const history = useQueueStore((s) => s.history);
-  const sendQueue = useQueueStore((s) => s.sendQueue);
+  const pendingSendAt = useQueueStore((s) => s.pendingSendAt);
+  const requestSend = useQueueStore((s) => s.requestSend);
   const restoreFromHistory = useQueueStore((s) => s.restoreFromHistory);
   const oosCount = useOosStore((s) => Object.keys(s.records).length);
 
@@ -37,20 +41,20 @@ export default function HomeScreen() {
           onClick={() => setSettingsSheetOpen(true)}
           aria-label="ออกแบบป้ายราคา"
         >
-          ⚙
+          <IconSettings />
         </button>
       </header>
 
       <button type="button" className="home-scan-btn" onClick={() => setCameraEnabled(true)}>
-        <span className="home-scan-icon" aria-hidden="true">
-          📷
+        <span className="home-scan-icon">
+          <IconScan size={56} />
         </span>
         <span className="home-scan-label">สแกนบาร์โค้ด</span>
         <span className="home-scan-sub">แตะเพื่อเปิดกล้อง</span>
       </button>
 
       <button type="button" className="home-search-btn" onClick={() => setManualSearchOpen(true)}>
-        <span aria-hidden="true">🔍</span> ค้นหาด้วยชื่อหรือรหัสสินค้า
+        <IconSearch size={20} /> ค้นหาด้วยชื่อหรือรหัสสินค้า
       </button>
 
       <section className="home-card">
@@ -64,26 +68,29 @@ export default function HomeScreen() {
           <div className="home-card-empty">ยังไม่มีป้ายในคิว — สแกนสินค้าเพื่อเริ่ม</div>
         ) : (
           <ul className="home-queue-preview">
-            {queue.slice(-3).reverse().map((item, i) => (
-              <li key={`${item.Barcode}-${i}`}>
-                <span className="home-queue-name">{item.ProductName}</span>
-                <span className="home-queue-price">
-                  {item.Price} ฿{item.PrintQty > 1 ? ` ×${item.PrintQty}` : ''}
-                </span>
-              </li>
-            ))}
+            {queue
+              .slice(-3)
+              .reverse()
+              .map((item, i) => (
+                <li key={`${item.Barcode}-${i}`}>
+                  <span className="home-queue-name">{item.ProductName}</span>
+                  <span className="home-queue-price">
+                    {item.Price} ฿{item.PrintQty > 1 ? ` ×${item.PrintQty}` : ''}
+                  </span>
+                </li>
+              ))}
             {queue.length > 3 && <li className="home-queue-more">และอีก {queue.length - 3} รายการ</li>}
           </ul>
         )}
         <div className="home-card-actions">
           <button type="button" className="btn btn-secondary" onClick={() => setQueueDrawerOpen(true)}>
-            ดูคิว{oosCount ? ` · หมด ${oosCount}` : ''}
+            ดู / แก้คิว
           </button>
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() => void sendQueue()}
-            disabled={!queue.length || sending}
+            onClick={requestSend}
+            disabled={!queue.length || sending || !!pendingSendAt}
           >
             {sending ? 'กำลังส่ง...' : 'ส่งพิมพ์ทั้งหมด'}
           </button>
@@ -91,19 +98,47 @@ export default function HomeScreen() {
       </section>
 
       {last && (
-        <section className="home-card home-last">
-          <div className="home-last-info">
+        <section className="home-card home-row-card">
+          <div className="home-row-info">
             <div className="home-card-title">ส่งล่าสุด {lastTime}</div>
-            <div className="home-last-meta">
+            <div className="home-row-meta">
               {last.items.length} รายการ · {last.items[0]?.ProductName}
               {last.items.length > 1 ? ' ...' : ''}
             </div>
           </div>
-          <button type="button" className="home-last-btn" onClick={() => restoreFromHistory(last.id)}>
-            ↩ ดึงกลับเข้าคิว
+          <button
+            type="button"
+            className="home-row-btn"
+            onClick={() => restoreFromHistory(last.id)}
+            disabled={!!last.restoredAt}
+          >
+            <IconUndo size={16} /> {last.restoredAt ? 'ดึงแล้ว' : 'ดึงกลับเข้าคิว'}
           </button>
         </section>
       )}
+
+      {oosCount > 0 && (
+        <button type="button" className="home-card home-row-card home-oos" onClick={() => setQueueDrawerOpen(true, 'oos')}>
+          <span className="home-oos-icon">
+            <IconBox size={22} />
+          </span>
+          <span className="home-row-info">
+            <span className="home-card-title">สินค้าหมดบนชั้น</span>
+            <span className="home-row-meta">{oosCount} รายการรอของเข้า</span>
+          </span>
+          <span className="home-chevron" aria-hidden="true">
+            ›
+          </span>
+        </button>
+      )}
+
+      <label className="home-pref">
+        <input type="checkbox" checked={autoOpenCamera} onChange={(e) => setAutoOpenCamera(e.target.checked)} />
+        <span>
+          เปิดกล้องทันทีเมื่อเข้าแอป
+          <small>สำหรับคนสแกนต่อเนื่องทั้งวัน ไม่ต้องกดปุ่มสแกนก่อน</small>
+        </span>
+      </label>
     </div>
   );
 }

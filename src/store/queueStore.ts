@@ -7,6 +7,7 @@ import {
   HISTORY_MAX_BATCHES,
   HISTORY_STORAGE_KEY,
   QUEUE_STORAGE_KEY,
+  SEND_DELAY_MS,
   SIZE_PRESETS,
 } from '../constants';
 import { database } from '../lib/database';
@@ -165,16 +166,28 @@ interface QueueState {
    * error is rethrown so the caller can show a retry toast. */
   sendQueue: () => Promise<void>;
 
-  /** ดึงล็อตที่ส่งไปแล้วกลับเข้าคิว (รวมกับของที่มีในคิว) — ไม่ลบประวัติ */
+  /** เวลาที่จะส่งจริง (Date.now() + SEND_DELAY_MS) ระหว่างรอให้กดยกเลิกได้ — null = ไม่มีงานรอส่ง */
+  pendingSendAt: number | null;
+  /** ทางเข้าของปุ่ม "ส่ง" ทุกปุ่ม — ตั้งเวลาส่ง แทนที่จะส่งทันที */
+  requestSend: () => void;
+  cancelSend: () => void;
+  /** ข้ามการรอ ส่งทันที */
+  sendNow: () => void;
+
+  /** ดึงล็อตที่ส่งไปแล้วกลับเข้าคิว (รวมกับของที่มีในคิว) — ไม่ลบประวัติ
+   * ดึงได้ครั้งเดียวต่อล็อต (restoredAt) กันกดซ้ำแล้วจำนวนป้ายคูณสอง */
   restoreFromHistory: (id: string) => void;
   removeHistory: (id: string) => void;
   clearHistory: () => void;
 }
 
+let sendTimer: ReturnType<typeof setTimeout> | undefined;
+
 export const useQueueStore = create<QueueState>((set, get) => ({
   queue: loadQueue(),
   config: loadConfig(),
   history: loadHistory(),
+  pendingSendAt: null,
 
   addItem: (item) => {
     set((s) => {
@@ -314,8 +327,38 @@ export const useQueueStore = create<QueueState>((set, get) => ({
   restoreFromHistory: (id) => {
     const entry = get().history.find((h) => h.id === id);
     if (!entry) return;
+    if (entry.restoredAt) {
+      useUIStore.getState().showToast('ล็อตนี้ดึงกลับเข้าคิวไปแล้ว', 'info');
+      return;
+    }
     entry.items.forEach((it) => get().addItem(it));
+    set((s) => {
+      const history = s.history.map((h) => (h.id === id ? { ...h, restoredAt: Date.now() } : h));
+      persistHistory(history);
+      return { history };
+    });
     useUIStore.getState().showToast(`ดึงกลับเข้าคิวแล้ว · ${entry.items.length} รายการ`, 'success');
+  },
+
+  requestSend: () => {
+    if (!get().queue.length || get().pendingSendAt || useUIStore.getState().sending) return;
+    clearTimeout(sendTimer);
+    set({ pendingSendAt: Date.now() + SEND_DELAY_MS });
+    sendTimer = setTimeout(() => get().sendNow(), SEND_DELAY_MS);
+  },
+
+  cancelSend: () => {
+    clearTimeout(sendTimer);
+    if (get().pendingSendAt) useUIStore.getState().showToast('ยกเลิกการส่งแล้ว — ป้ายยังอยู่ในคิว', 'info');
+    set({ pendingSendAt: null });
+  },
+
+  sendNow: () => {
+    clearTimeout(sendTimer);
+    set({ pendingSendAt: null });
+    void get().sendQueue().catch(() => {
+      /* toast แจ้งไปแล้วใน sendQueue — คิวยังอยู่ กดส่งใหม่ได้ */
+    });
   },
 
   removeHistory: (id) => {

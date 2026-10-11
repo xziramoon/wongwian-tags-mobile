@@ -4,6 +4,7 @@ import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { startScanning, stopScanning, hasTorch, setTorch, getZoomRange, setZoom } from '../lib/scan';
 import { feedback } from '../lib/feedback';
 import ConnectionStatus from './ConnectionStatus';
+import { IconClose, IconFlash, IconSearch, IconZoom } from './Icons';
 
 /* ไม่มีการสแกนนานเท่านี้ → ปิดกล้องกลับหน้าแรกเอง ประหยัดแบต/ไม่ให้กล้องค้าง */
 const IDLE_CLOSE_MS = 2 * 60 * 1000;
@@ -118,7 +119,9 @@ export default function CameraScanner() {
   };
 
   return (
-    <div className="camera-scanner">
+    /* แตะตรงไหนก็ได้ (ซูม/ไฟฉาย/จอ) = ยังใช้งานอยู่ เริ่มนับเวลาปิดอัตโนมัติใหม่
+     * เดิมนับแค่ตอนสแกนติด — คนกำลังเล็งบาร์โค้ดยาก ๆ อยู่โดนกล้องปิดกลางคัน */
+    <div className="camera-scanner" onPointerDownCapture={() => setLastActivity(Date.now())}>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video ref={videoRef} className="camera-video" autoPlay playsInline muted />
       <div className="viewfinder" aria-hidden="true">
@@ -134,7 +137,7 @@ export default function CameraScanner() {
           onClick={() => setCameraEnabled(false)}
           aria-label="ปิดกล้อง กลับหน้าแรก"
         >
-          ✕ ปิดกล้อง
+          <IconClose size={18} /> ปิดกล้อง
         </button>
         <ConnectionStatus inline />
         <button
@@ -143,7 +146,7 @@ export default function CameraScanner() {
           onClick={() => setManualSearchOpen(true)}
           aria-label="ค้นหาสินค้าด้วยตนเอง"
         >
-          🔍
+          <IconSearch size={20} />
         </button>
       </div>
       <div className="scanner-hint">เล็งบาร์โค้ดให้อยู่ในกรอบ</div>
@@ -154,13 +157,13 @@ export default function CameraScanner() {
           onClick={toggleTorch}
           aria-label={torchOn ? 'ปิดไฟฉาย' : 'เปิดไฟฉาย'}
         >
-          🔦
+          <IconFlash size={22} />
         </button>
       )}
       {zoomRange && (
         <div className="zoom-slider" role="group" aria-label="ซูมกล้อง">
-          <span className="zoom-slider-icon" aria-hidden="true">
-            🔎
+          <span className="zoom-slider-icon">
+            <IconZoom size={18} />
           </span>
           <input
             type="range"

@@ -22,7 +22,7 @@ export default function ScanResultSheet() {
   const closeScanSheet = useUIStore((s) => s.closeScanSheet);
   const openTagEditNew = useUIStore((s) => s.openTagEditNew);
   const addItem = useQueueStore((s) => s.addItem);
-  const sendQueue = useQueueStore((s) => s.sendQueue);
+  const requestSend = useQueueStore((s) => s.requestSend);
   const oosRecords = useOosStore((s) => s.records);
   const oosAdd = useOosStore((s) => s.add);
   const oosClear = useOosStore((s) => s.clear);
@@ -50,7 +50,7 @@ export default function ScanResultSheet() {
   const handlePrintNow = () => {
     addItem(item);
     closeScanSheet();
-    void sendQueue();
+    requestSend();
   };
 
   const handleCustomize = () => {

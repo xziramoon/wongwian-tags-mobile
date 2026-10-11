@@ -83,4 +83,6 @@ export interface SendHistoryEntry {
   id: string;
   ts: number; // Date.now() ตอนส่งสำเร็จ
   items: QueueItem[];
+  /** ดึงล็อตนี้กลับเข้าคิวไปแล้วเมื่อไร — กันกดซ้ำแล้วจำนวนป้ายบวกเพิ่มเป็น 2 เท่า */
+  restoredAt?: number;
 }

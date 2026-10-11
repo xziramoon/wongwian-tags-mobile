@@ -15,6 +15,7 @@ import ManualSearchSheet from './components/ManualSearchSheet';
 import SettingsSheet from './components/SettingsSheet';
 import TagEditSheet from './components/TagEditSheet';
 import ToastContainer from './components/ToastContainer';
+import PendingSendBar from './components/PendingSendBar';
 
 /* maps Ably's connection.state values to the coarser 3-state pill the UI shows */
 function toAblyStatus(state: AblyConnState): 'connecting' | 'connected' | 'offline' {
@@ -50,6 +51,15 @@ function App() {
       setAblyStatus(toAblyStatus(state));
     });
 
+    // กดส่งแล้วล็อกจอ/สลับแอประหว่างนับถอยหลัง → ส่งทันที เพราะมือถือหยุดตัวจับเวลาของหน้าที่ถูกพับ
+    // งานจะค้างไม่ออกจนกว่าจะเปิดจอใหม่ (ผู้ใช้ตั้งใจส่งและไม่ได้กดยกเลิก)
+    const flushPendingSend = () => {
+      if (document.visibilityState === 'hidden' && useQueueStore.getState().pendingSendAt) {
+        useQueueStore.getState().sendNow();
+      }
+    };
+    document.addEventListener('visibilitychange', flushPendingSend);
+
     // unlock audio playback on first user tap (browsers block autoplay pre-interaction)
     const unlockAudio = () => audioEngine.unlock();
     document.addEventListener('pointerdown', unlockAudio, { once: true });
@@ -57,6 +67,7 @@ function App() {
     return () => {
       unsubscribe();
       document.removeEventListener('pointerdown', unlockAudio);
+      document.removeEventListener('visibilitychange', flushPendingSend);
     };
   }, [setAblyStatus, showToast]);
 
@@ -77,6 +88,7 @@ function App() {
       <ManualSearchSheet />
       <SettingsSheet />
       <TagEditSheet />
+      <PendingSendBar />
       <ToastContainer />
     </div>
   );

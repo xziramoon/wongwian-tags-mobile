@@ -27,6 +27,10 @@ export const OOS_STORAGE_KEY = 'wongwianOosRegister_v1';
 export const HISTORY_STORAGE_KEY = 'wongwianMobileSendHistory_v1';
 export const HISTORY_MAX_BATCHES = 30;
 export const HISTORY_MAX_AGE_MS = 7 * 86400000;
+/* กดส่งแล้วหน่วงไว้ก่อนส่งจริง — ระหว่างนี้กด "ยกเลิก" ได้ (ป้ายที่พิมพ์ออกไปแล้วเรียกคืนไม่ได้) */
+export const SEND_DELAY_MS = 4000;
+/* ค่าตั้งของตัวแอปมือถือเอง (ไม่ใช่ Config ป้าย — Config ถูกส่งไปเครื่องพิมพ์ทุกครั้ง) */
+export const PREFS_STORAGE_KEY = 'wongwianMobilePrefs_v1';
 
 /* ⚠️ ห้ามแก้ค่า — default ตรงกับ wongwian-tags01/src/constants.ts DEFAULT_CONFIG
  * (ค่าตัวเลขคัดลอกมาจาก SLIDER_DEFS[...].def เดิม) — เป็นค่าเริ่มต้นก่อนผู้ใช้ปรับแต่งเอง
