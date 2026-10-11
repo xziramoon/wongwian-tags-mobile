@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUIStore } from '../store/uiStore';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
-import { startScanning, stopScanning, hasTorch, setTorch, getZoomRange, setZoom } from '../lib/scan';
+import { openCamera, closeCamera, startDecoding, stopDecoding, hasTorch, setTorch, getZoomRange, setZoom } from '../lib/scan';
 import { feedback } from '../lib/feedback';
 import ConnectionStatus from './ConnectionStatus';
 import { IconClose, IconFlash, IconSearch, IconZoom } from './Icons';
 
 /* ไม่มีการสแกนนานเท่านี้ → ปิดกล้องกลับหน้าแรกเอง ประหยัดแบต/ไม่ให้กล้องค้าง */
 const IDLE_CLOSE_MS = 2 * 60 * 1000;
+/* พักหลังปิดแผ่นผลสแกนก่อนอ่านต่อ — เท่ากับเวลาเปิดกล้องใหม่ของแบบเดิมโดยประมาณ ให้ทันยกมือถือออก */
+const RESUME_DELAY_MS = 1000;
 
 interface ZoomRange {
   min: number;
@@ -50,26 +52,21 @@ export default function CameraScanner() {
     [openScanSheet],
   );
 
-  useEffect(() => {
-    // pause the decode loop whenever a sheet/drawer covers the camera — resumes
-    // automatically when they close
-    const paused = scanSheetOpen || queueDrawerOpen || manualSearchOpen;
-    const videoEl = videoRef.current;
-    setTorchAvailable(false);
-    setTorchOn(false);
-    setZoomRange(null);
-    setZoomValue(1);
-    if (paused || !videoEl) {
-      stopScanning();
-      return;
-    }
+  const [cameraReady, setCameraReady] = useState(false);
+  const anySheetOpen = scanSheetOpen || queueDrawerOpen || manualSearchOpen || settingsOpen || tagEditOpen;
 
+  // เปิดกล้องครั้งเดียวตอนเข้าหน้าสแกน ปิดตอนออก — ไม่ปิด/เปิดใหม่ทุกครั้งที่สแกนติด
+  // (ดู lib/scan.ts: iOS PWA ถามสิทธิ์ซ้ำ, กล้องวอร์มช้า, ซูม/ไฟฉายหาย)
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
     let cancelled = false;
     setCameraStatus('starting');
-    startScanning(videoEl, handleDetect)
+    openCamera(videoEl)
       .then(() => {
         if (cancelled) return;
         setCameraStatus('active');
+        setCameraReady(true);
         setTorchAvailable(hasTorch());
         const range = getZoomRange();
         setZoomRange(range);
@@ -80,15 +77,30 @@ export default function CameraScanner() {
         const name = err instanceof Error ? err.name : '';
         setCameraStatus(name === 'NotAllowedError' ? 'denied' : 'error');
       });
-
     return () => {
       cancelled = true;
-      stopScanning();
+      setCameraReady(false);
+      closeCamera(videoEl);
     };
-  }, [scanSheetOpen, queueDrawerOpen, manualSearchOpen, handleDetect, setCameraStatus]);
+  }, [setCameraStatus]);
+
+  // หยุดแค่ตัวอ่านบาร์โค้ดระหว่างมีแผ่นเปิดทับ (กล้องยังเปิดอยู่) — ปิดแผ่นแล้วสแกนต่อได้ทันที
+  // ปิดแผ่นแล้วพักก่อนอ่านต่อ ไม่งั้นบาร์โค้ดที่ยังอยู่ในกรอบถูกอ่านซ้ำทันที (แผ่นเด้งกลับมา)
+  // ครั้งแรกตอนเปิดกล้องไม่ต้องพัก
+  const resumedOnce = useRef(false);
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!cameraReady || anySheetOpen || !videoEl) return;
+    const delay = resumedOnce.current ? RESUME_DELAY_MS : 0;
+    resumedOnce.current = true;
+    const t = window.setTimeout(() => startDecoding(videoEl, handleDetect), delay);
+    return () => {
+      window.clearTimeout(t);
+      stopDecoding();
+    };
+  }, [cameraReady, anySheetOpen, handleDetect]);
 
   // ปิดกล้องอัตโนมัติเมื่อไม่ได้ใช้ — นับเฉพาะตอนกล้องโชว์อยู่ (มีแผ่นไหนเปิดทับ = กำลังใช้งาน)
-  const anySheetOpen = scanSheetOpen || queueDrawerOpen || manualSearchOpen || settingsOpen || tagEditOpen;
   useEffect(() => {
     if (anySheetOpen) return;
     const t = window.setTimeout(() => {

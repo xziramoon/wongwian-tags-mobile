@@ -28,7 +28,7 @@ export const HISTORY_STORAGE_KEY = 'wongwianMobileSendHistory_v1';
 export const HISTORY_MAX_BATCHES = 30;
 export const HISTORY_MAX_AGE_MS = 7 * 86400000;
 /* กดส่งแล้วหน่วงไว้ก่อนส่งจริง — ระหว่างนี้กด "ยกเลิก" ได้ (ป้ายที่พิมพ์ออกไปแล้วเรียกคืนไม่ได้) */
-export const SEND_DELAY_MS = 4000;
+export const SEND_DELAY_MS = 5000; // 5 วิ = ค่าเริ่มต้นของ Undo Send ใน Gmail
 /* ค่าตั้งของตัวแอปมือถือเอง (ไม่ใช่ Config ป้าย — Config ถูกส่งไปเครื่องพิมพ์ทุกครั้ง) */
 export const PREFS_STORAGE_KEY = 'wongwianMobilePrefs_v1';
 
