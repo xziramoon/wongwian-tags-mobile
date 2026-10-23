@@ -100,3 +100,26 @@ export function buildFridgeHTML(item: QueueItem, config: Config): string {
     '</div>'
   );
 }
+
+/* จัดป้ายตู้แช่ลงแผ่น A4 แบบตาราง — คอลัมน์×แถว คำนวณจากขนาดป้าย (60×35 มม. = 3×8 = 24 ใบ/แผ่น)
+ * ขอบบน-ล่าง 4.5 มม. ซ้าย-ขวา 5 มม. ช่องไฟ 0.8 มม. ไว้ตัด — ตรงกับ .fr-sheet ใน tag-fridge.css */
+export const FR_SHEET = { pageW: 210, pageH: 297, padX: 5, padY: 4.5, gap: 0.8 };
+
+export function fridgeSheetLayout(config: Config): { cols: number; rows: number; perSheet: number } {
+  const w = (Number(config.fridgeW) || 6) * 10;
+  const h = (Number(config.fridgeH) || 3.5) * 10;
+  const cols = Math.max(1, Math.floor((FR_SHEET.pageW - 2 * FR_SHEET.padX + FR_SHEET.gap) / (w + FR_SHEET.gap)));
+  const rows = Math.max(1, Math.floor((FR_SHEET.pageH - 2 * FR_SHEET.padY + FR_SHEET.gap) / (h + FR_SHEET.gap)));
+  return { cols, rows, perSheet: cols * rows };
+}
+
+export function chunkSheets<T>(tags: T[], perSheet: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < tags.length; i += perSheet) out.push(tags.slice(i, i + perSheet));
+  return out;
+}
+
+/* ลำดับบนกระดาษ: ป้ายทั่วไป → แผ่นป้ายตู้แช่ (ขึ้นหน้าใหม่) → แถบสินค้าหมด */
+export function printRank(mode: string): number {
+  return mode === 'oos' ? 2 : mode === 'fridge' ? 1 : 0;
+}

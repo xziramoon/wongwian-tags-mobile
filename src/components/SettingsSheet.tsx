@@ -4,6 +4,7 @@ import type { QueueItem } from '../types';
 import TagPreview from './TagPreview';
 import SliderRow from './SliderRow';
 import { PRICE_FONTS, THEME_PRESETS } from '../constants';
+import { fridgeSheetLayout } from '../lib/fridge';
 
 /* placeholder shown in the embedded preview when the queue is still empty */
 const PLACEHOLDER_ITEM: QueueItem = {
@@ -70,6 +71,7 @@ export default function SettingsSheet() {
   if (!open) return null;
 
   const previewItem = queue[0] || PLACEHOLDER_ITEM;
+  const sheet = fridgeSheetLayout(config);
 
   return (
     <div className="sheet-backdrop" onClick={() => setOpen(false)}>
@@ -319,7 +321,9 @@ export default function SettingsSheet() {
               <SliderRow configKey="fridgeW" full />
               <SliderRow configKey="fridgeH" full />
             </div>
-            <span className="fold-hint">6.0 × 3.5 ซม. เป็นค่าประมาณ — วัดรางตู้จริงแล้วปรับให้พอดี</span>
+            <span className="fold-hint">
+              A4 ได้ {sheet.perSheet} ใบ/แผ่น ({sheet.cols} × {sheet.rows}) · 6.0 × 3.5 ซม. เป็นค่าประมาณ — วัดรางตู้จริงแล้วปรับให้พอดี
+            </span>
           </div>
         </details>
 

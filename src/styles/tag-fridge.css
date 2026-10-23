@@ -17,6 +17,12 @@
 .fr-digits { display: block; width: auto; flex-shrink: 0; }
 .fr-baht { font-size: 9cqh; font-weight: 700; line-height: 1; padding-bottom: 0.5cqh; }
 
+/* แผ่นป้ายตู้แช่ — ตารางเต็มแผ่น A4 ขึ้นหน้าใหม่ทุกแผ่น (ค่าตรงกับ FR_SHEET ใน fridge.ts)
+ * แผ่นแรกสุดของงาน: #print-area มี padding 2 มม. อยู่แล้ว เลยเว้นบนแค่ 2.5 มม. */
+.fr-sheet { flex: 0 0 100%; width: 100%; display: grid; gap: 0.8mm; justify-content: center; align-content: start; padding-top: 4.5mm; break-before: page; page-break-before: always; break-inside: avoid; page-break-inside: avoid; }
+#print-area > .fr-sheet:first-child { padding-top: 2.5mm; break-before: auto; page-break-before: auto; }
+@media screen { .fr-sheet { outline: 1px dashed #b9b9cc; outline-offset: 1.5mm; margin: 2mm 0; } }
+
 @media print {
   .price-tag-fridge, .fr-name, .fr-baht { color: #000 !important; }
   .fr-solid { background: #000 !important; color: #fff !important; }

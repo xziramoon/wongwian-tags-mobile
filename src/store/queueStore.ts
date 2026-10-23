@@ -13,6 +13,7 @@ import {
 import { database } from '../lib/database';
 import { printBridge } from '../lib/printBridge';
 import { autoFontSize, extractSize } from '../lib/utils';
+import { printRank } from '../lib/fridge';
 import { useUIStore } from './uiStore';
 
 /* ⚠️ ตรรกะฟิลด์เริ่มต้น (normalize) ต้องคงเดิม — ยกมาจาก
@@ -302,8 +303,7 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     try {
       // แถบสินค้าหมด (oos) สูงแค่ 1.4 ซม. ไม่เท่าป้ายอื่น (4.0 ซม.) — ถ้าปนกลางแถวใน A4
       // จะเกิดช่องว่างฟันหลอ เรียงแถบไปท้ายสุดของงานพิมพ์เสมอ — ป้ายตู้แช่ (3.5 ซม.) ก็สูงไม่เท่า จัดกลุ่มไว้ก่อนแถบ
-      const rank = (m: string) => (m === 'oos' ? 2 : m === 'fridge' ? 1 : 0);
-      const ordered = [...queue].sort((a, b) => rank(a.TagMode) - rank(b.TagMode));
+      const ordered = [...queue].sort((a, b) => printRank(a.TagMode) - printRank(b.TagMode));
       await printBridge.publish(config, ordered);
       set((s) => {
         persist([], s.config);

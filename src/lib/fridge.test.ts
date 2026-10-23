@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildFridgeHTML, fridgeDigitsSVG, fridgeFillDigits } from './fridge';
+import { buildFridgeHTML, chunkSheets, fridgeDigitsSVG, fridgeFillDigits, fridgeSheetLayout } from './fridge';
 import { DEFAULT_CONFIG } from '../constants';
 import type { QueueItem } from '../types';
 
@@ -43,5 +43,18 @@ describe('buildFridgeHTML', () => {
     const html = buildFridgeHTML(item, { ...DEFAULT_CONFIG, fridgeBar: 'bogus', fridgeDigits: 7 });
     expect(html).toContain('fr-line');
     expect((html.match(/<rect /g) || []).length).toBe(21);
+  });
+});
+
+describe('fridgeSheetLayout', () => {
+  it('fits 24 tags of 60x35 mm on A4', () => {
+    expect(fridgeSheetLayout(DEFAULT_CONFIG)).toEqual({ cols: 3, rows: 8, perSheet: 24 });
+  });
+  it('adapts to other sizes and never returns 0', () => {
+    expect(fridgeSheetLayout({ ...DEFAULT_CONFIG, fridgeW: 9, fridgeH: 5 })).toEqual({ cols: 2, rows: 5, perSheet: 10 });
+    expect(fridgeSheetLayout({ ...DEFAULT_CONFIG, fridgeW: 30, fridgeH: 40 }).perSheet).toBe(1);
+  });
+  it('chunks tags into sheets', () => {
+    expect(chunkSheets([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
   });
 });
