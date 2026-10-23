@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useUIStore } from '../store/uiStore';
+import TagPreview from './TagPreview';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { useOosStore } from '../store/oosStore';
-import type { QueueItem } from '../types';
+import type { QueueItem, TagMode } from '../types';
 import { isVeg } from '../lib/veg';
 
 /* Bottom sheet shown after a scan (or a manual-search tap). Shows the looked-up
@@ -14,6 +15,13 @@ import { isVeg } from '../lib/veg';
  * in oosStore. Already registered -> show a restock banner + one big "ของเข้าแล้ว"
  * button instead of the normal flow. Not registered -> normal flow, plus one more
  * action to put the barcode into the registry with an OOS strip. */
+const SCAN_MODE_OPTS: [TagMode, string][] = [
+  ['standard', 'ปกติ'],
+  ['dual', '2 ราคา'],
+  ['large', 'ป้ายใหญ่'],
+  ['fridge', '❄ ตู้แช่'],
+];
+
 export default function ScanResultSheet() {
   const open = useUIStore((s) => s.scanSheetOpen);
   const item = useUIStore((s) => s.scanSheetItem);
@@ -27,6 +35,7 @@ export default function ScanResultSheet() {
   const oosAdd = useOosStore((s) => s.add);
   const oosClear = useOosStore((s) => s.clear);
   const config = useQueueStore((s) => s.config);
+  const setScanTagMode = useUIStore((s) => s.setScanTagMode);
 
   const [oosFormOpen, setOosFormOpen] = useState(false);
   const [oosEta, setOosEta] = useState('');
@@ -51,12 +60,6 @@ export default function ScanResultSheet() {
     addItem(item);
     closeScanSheet();
     requestSend();
-  };
-
-  /* ป้ายตู้แช่: ชื่อพิมพ์ + 888 ให้ระบายราคาเอง — ใช้แค่ชื่อสินค้า กดทีเดียวลงคิว */
-  const handleAddFridge = () => {
-    addItem({ ...item, TagMode: 'fridge' });
-    closeScanSheet();
   };
 
   const handleCustomize = () => {
@@ -191,6 +194,33 @@ export default function ScanResultSheet() {
           </div>
         </div>
 
+        {/* ราคานี้ใช้ป้ายแบบไหน — ใช้ทั้งปุ่ม เพิ่มในคิว และ พิมพ์เลย, จำแบบล่าสุดไว้ให้สแกนชิ้นถัดไป */}
+        <div className="scan-mode">
+          <span className="veg-toggle-lbl">ใช้ป้ายแบบ</span>
+          <div className="mode-btns mode-btns-4">
+            {SCAN_MODE_OPTS.map(([mode, label]) => (
+              <button
+                key={mode}
+                type="button"
+                className={`mode-btn${item.TagMode === mode ? ' active' : ''}`}
+                aria-pressed={item.TagMode === mode}
+                onClick={() => setScanTagMode(mode)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <TagPreview item={item} config={config} maxWidth={item.TagMode === 'large' ? 300 : 230} />
+          {item.TagMode === 'fridge' && (
+            <span className="fold-hint">
+              {config.fridgeFill ? 'ถมขีดตามราคาให้แล้ว (ราคามีสตางค์ = เว้นว่างให้ระบาย)' : `ป้ายพิมพ์ 888 เปล่า — เอาเมจิกระบาย ${item.Price || '?'} บาท เอง`}
+            </span>
+          )}
+          {item.TagMode === 'dual' && !String(item.Price2 || '').trim() && (
+            <span className="fold-hint">สินค้านี้ยังไม่มีราคาส่ง — กด "ปรับแต่งป้าย" เพื่อใส่ราคาที่ 2</span>
+          )}
+        </div>
+
         <div className="qty-stepper">          <button type="button" className="qty-btn" onClick={() => stepQty(-1)} aria-label="ลดจำนวน">
             −
           </button>
@@ -212,10 +242,6 @@ export default function ScanResultSheet() {
             พิมพ์เลย
           </button>
         </div>
-
-        <button type="button" className="btn btn-secondary btn-block" onClick={handleAddFridge}>
-          ❄ ป้ายตู้แช่ (ระบายราคาเอง)
-        </button>
 
         {locFormOpen ? (
           <div className="q-field">

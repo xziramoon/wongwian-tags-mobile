@@ -1,22 +1,50 @@
 import { create } from 'zustand';
-import type { QueueItem, ToastType } from '../types';
+import type { QueueItem, TagMode, ToastType } from '../types';
 import { PREFS_STORAGE_KEY } from '../constants';
+import { autoFontSize } from '../lib/utils';
+
+/* แบบป้ายที่เลือกได้ในหน้าผลสแกน (แถบสินค้าหมดมีปุ่ม/ขั้นตอนของตัวเอง) */
+export const SCAN_TAG_MODES: TagMode[] = ['standard', 'dual', 'large', 'fridge'];
 
 interface Prefs {
   autoOpenCamera: boolean;
+  /* แบบป้ายล่าสุดที่เลือกตอนสแกน — สแกนป้ายตู้แช่ทั้งแถวไม่ต้องกดเลือกใหม่ทุกชิ้น */
+  lastTagMode: TagMode;
 }
+
+const DEFAULT_PREFS: Prefs = { autoOpenCamera: false, lastTagMode: 'standard' };
 
 function loadPrefs(): Prefs {
   try {
     const saved = localStorage.getItem(PREFS_STORAGE_KEY);
-    if (saved) return { autoOpenCamera: false, ...JSON.parse(saved) };
+    if (saved) {
+      const p = { ...DEFAULT_PREFS, ...JSON.parse(saved) } as Prefs;
+      if (!SCAN_TAG_MODES.includes(p.lastTagMode)) p.lastTagMode = 'standard';
+      return p;
+    }
   } catch {
     /* corrupted storage — defaults */
   }
-  return { autoOpenCamera: false };
+  return { ...DEFAULT_PREFS };
 }
 
 const initialPrefs = loadPrefs();
+let prefs = initialPrefs;
+function savePrefs(patch: Partial<Prefs>) {
+  prefs = { ...prefs, ...patch };
+  try {
+    localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(prefs));
+  } catch {
+    /* storage blocked — ค่าใช้ได้แค่รอบนี้ */
+  }
+}
+
+/* เปลี่ยนแบบป้าย — ขนาดชื่อที่คำนวณอัตโนมัติไว้ (ป้ายใหญ่ใช้สูตรต่าง) คำนวณใหม่ตามแบบ
+ * ถ้าผู้ใช้ตั้งขนาดชื่อเองทั้งร้าน (globalNameSz) ค่าจะไม่ตรงสูตร standard เลยไม่แตะ */
+export function withTagMode(item: QueueItem, mode: TagMode): QueueItem {
+  const autoSize = item.NameFontSize === autoFontSize(item.ProductName, item.TagMode);
+  return { ...item, TagMode: mode, NameFontSize: autoSize ? autoFontSize(item.ProductName, mode) : item.NameFontSize };
+}
 
 /* toast shape/pattern ported verbatim from wongwian-tags01/src/store/uiStore.ts */
 export interface Toast {
@@ -59,6 +87,8 @@ interface UIState {
   scanSheetItem: QueueItem | null;
   scanSheetFound: boolean;
   openScanSheet: (item: QueueItem, found: boolean) => void;
+  lastTagMode: TagMode;
+  setScanTagMode: (mode: TagMode) => void;
   updateScanSheetItem: (patch: Partial<QueueItem>) => void;
   closeScanSheet: () => void;
 
@@ -107,18 +137,21 @@ export const useUIStore = create<UIState>((set) => ({
 
   autoOpenCamera: initialPrefs.autoOpenCamera,
   setAutoOpenCamera: (autoOpenCamera) => {
-    try {
-      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify({ autoOpenCamera }));
-    } catch {
-      /* storage blocked — ค่าใช้ได้แค่รอบนี้ */
-    }
+    savePrefs({ autoOpenCamera });
     set({ autoOpenCamera });
+  },
+
+  lastTagMode: initialPrefs.lastTagMode,
+  setScanTagMode: (mode) => {
+    savePrefs({ lastTagMode: mode });
+    set((s) => ({ lastTagMode: mode, scanSheetItem: s.scanSheetItem ? withTagMode(s.scanSheetItem, mode) : s.scanSheetItem }));
   },
 
   scanSheetOpen: false,
   scanSheetItem: null,
   scanSheetFound: true,
-  openScanSheet: (item, found) => set({ scanSheetOpen: true, scanSheetItem: item, scanSheetFound: found }),
+  openScanSheet: (item, found) =>
+    set((s) => ({ scanSheetOpen: true, scanSheetItem: withTagMode(item, s.lastTagMode), scanSheetFound: found })),
   updateScanSheetItem: (patch) =>
     set((s) => ({ scanSheetItem: s.scanSheetItem ? { ...s.scanSheetItem, ...patch } : s.scanSheetItem })),
   closeScanSheet: () => set({ scanSheetOpen: false, scanSheetItem: null }),

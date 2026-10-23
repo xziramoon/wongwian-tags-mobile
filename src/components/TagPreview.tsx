@@ -15,12 +15,13 @@ const FRAME_MAX_WIDTH = 340;
 interface Props {
   item: QueueItem;
   config: Config;
+  maxWidth?: number;
 }
 
 /** Scale-to-fit preview wrapper around <PriceTag>. tag.css sizes the real tag in cm
  * (for print accuracy) — this scales the whole rendered tag down/up with a CSS
  * transform so it always fits a small on-screen preview card. */
-export default function TagPreview({ item, config }: Props) {
+export default function TagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -45,7 +46,7 @@ export default function TagPreview({ item, config }: Props) {
     <div
       className="tag-preview-frame"
       ref={frameRef}
-      style={{ width: '100%', maxWidth: FRAME_MAX_WIDTH, height: Math.ceil((tagHeightCm || 1) * PX_PER_CM * scale) + 2 }}
+      style={{ width: '100%', maxWidth, height: Math.ceil((tagHeightCm || 1) * PX_PER_CM * scale) + 2 }}
     >
       <div className="tag-preview-scale" style={{ transform: `scale(${scale})` }}>
         <PriceTag item={item} config={config} queueIndex={0} selected={false} />

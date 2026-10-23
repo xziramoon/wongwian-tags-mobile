@@ -822,6 +822,19 @@ input {
 .mode-btns-2 {
   grid-template-columns: 1fr 1fr;
 }
+.mode-btns-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.scan-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.scan-mode > .veg-toggle-lbl,
+.scan-mode > .mode-btns {
+  align-self: stretch;
+}
 
 .mode-btn {
   min-height: 44px;
