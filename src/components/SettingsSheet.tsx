@@ -34,6 +34,13 @@ const PLACEHOLDER_ITEM: QueueItem = {
   Veg: '',
 };
 
+const FRIDGE_SAMPLE: QueueItem = { ...PLACEHOLDER_ITEM, ProductName: 'เอ็ม-150', TagMode: 'fridge', Price: '12' };
+const FRIDGE_BAR_OPTS: [string, string][] = [
+  ['line', 'เส้นคู่ (ประหยัดหมึก)'],
+  ['solid', 'แถบดำทึบ'],
+  ['stripe', 'ลายทางเฉียง'],
+];
+
 /* global tag-design editor — reachable via the gear-icon pill (top-right, mirrors
  * .conn-status top-left / .queue-badge bottom-right so nothing overlaps). Presets +
  * always-visible basics up top, ~12 SliderRows tucked under a <details> fold so the
@@ -259,6 +266,62 @@ export default function SettingsSheet() {
           />
           <label htmlFor="print-mono">พิมพ์ขาว-ดำ — เปลี่ยนแดง/เหลืองเป็นโทนดำ (เครื่องพิมพ์ขาวดำ)</label>
         </div>
+
+        <details className="fold">
+          <summary>
+            ป้ายตู้แช่ (ระบายราคาเอง)<span className="fold-arrow">▾</span>
+          </summary>
+          <div className="fold-body">
+            <TagPreview item={{ ...FRIDGE_SAMPLE, ProductName: queue[0]?.ProductName || FRIDGE_SAMPLE.ProductName }} config={config} />
+            <div className="cfg-grid">
+              <div className="cfg-full">
+                <span className="cfg-lbl">แถบหัวป้าย (ขาว-ดำล้วน)</span>
+                <div className="mode-btns">
+                  {FRIDGE_BAR_OPTS.map(([v, lbl]) => (
+                    <button
+                      key={v}
+                      type="button"
+                      className={`mode-btn${(config.fridgeBar || 'line') === v ? ' active' : ''}`}
+                      onClick={() => updateConfig('fridgeBar', v)}
+                    >
+                      {lbl}
+                    </button>
+                  ))}
+                </div>
+                <span className="fold-hint">ชื่อร้าน/ชื่อจีนบนหัวป้ายใช้ช่องเดียวกับป้ายปกติด้านบน</span>
+              </div>
+              <div className="cfg-full">
+                <span className="cfg-lbl">จำนวนหลักให้ระบาย</span>
+                <div className="mode-btns mode-btns-2">
+                  {[3, 4].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`mode-btn${(Number(config.fridgeDigits) === 4 ? 4 : 3) === n ? ' active' : ''}`}
+                      onClick={() => updateConfig('fridgeDigits', n)}
+                    >
+                      {n} หลัก ({'8'.repeat(n)})
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="cb-wrap">
+              <input
+                type="checkbox"
+                id="fridge-fill"
+                checked={!!config.fridgeFill}
+                onChange={(e) => updateConfig('fridgeFill', e.target.checked)}
+              />
+              <label htmlFor="fridge-fill">พิมพ์ราคาจริง — ถมดำขีดตามราคาให้เลย ไม่ต้องระบาย</label>
+            </div>
+            <div className="slider-stack">
+              <SliderRow configKey="fridgeW" full />
+              <SliderRow configKey="fridgeH" full />
+            </div>
+            <span className="fold-hint">6.0 × 3.5 ซม. เป็นค่าประมาณ — วัดรางตู้จริงแล้วปรับให้พอดี</span>
+          </div>
+        </details>
 
         <details className="fold">
           <summary>

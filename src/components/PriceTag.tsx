@@ -3,6 +3,7 @@ import JsBarcode from 'jsbarcode';
 import type { Config, QueueItem } from '../types';
 import { fmtPrice } from '../lib/utils';
 import { isVeg } from '../lib/veg';
+import { buildFridgeHTML } from '../lib/fridge';
 
 interface Props {
   item: QueueItem;
@@ -120,6 +121,11 @@ export default function PriceTag({ item, config, selected }: Props) {
       /* invalid barcode value — leave svg empty */
     }
   }, [item.Barcode, isLarge, bcHeightStd, bcHeightLrg, isOos]);
+
+  /* ป้ายตู้แช่ — ใช้ HTML ชุดเดียวกับ TAG_PRINTER (buildFridgeHTML) พรีวิวจึงตรงกับที่พิมพ์ทุกขีด */
+  if (item.TagMode === 'fridge') {
+    return <div style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: buildFridgeHTML(item, config) }} />;
+  }
 
   if (isOos) {
     const stop = item.OosReason === 'stop';

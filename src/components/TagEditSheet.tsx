@@ -82,7 +82,27 @@ export default function TagEditSheet() {
           placeholder="ชื่อสินค้า"
         />
 
-        {item.TagMode !== 'oos' && (
+        {item.TagMode === 'fridge' && (
+          <div className="q-field">
+            <span className="fold-hint">
+              {config.fridgeFill
+                ? 'พิมพ์ราคาจริงเปิดอยู่ — ถมดำขีดตามราคานี้ให้เลย (ราคามีสตางค์หรือเกินจำนวนหลัก = เว้นว่างให้ระบายเอง)'
+                : 'ป้ายตู้แช่ไม่พิมพ์ราคา — พิมพ์ 888 เส้นกลวงให้เอาเมจิกระบายเอง (เปิด "พิมพ์ราคาจริง" ได้ในตั้งค่า)'}
+            </span>
+            {config.fridgeFill && (
+              <input
+                className="field-input"
+                type="number"
+                step="1"
+                value={item.Price}
+                onChange={(e) => setField('Price', e.target.value)}
+                placeholder="ราคา (บาท)"
+              />
+            )}
+          </div>
+        )}
+
+        {item.TagMode !== 'oos' && item.TagMode !== 'fridge' && (
           <div className="q-price-grid">
             <div className="q-field">
               <span className="q-lbl">ราคาขาย (บาท)</span>
@@ -147,6 +167,13 @@ export default function TagEditSheet() {
               onClick={() => setField('TagMode', 'oos')}
             >
               สินค้าหมด
+            </button>
+            <button
+              type="button"
+              className={`mode-btn${item.TagMode === 'fridge' ? ' active' : ''}`}
+              onClick={() => setField('TagMode', 'fridge')}
+            >
+              ตู้แช่
             </button>
           </div>
         </div>

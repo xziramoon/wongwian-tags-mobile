@@ -24,8 +24,9 @@ export default function TagPreview({ item, config }: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  const tagWidthCm = item.TagMode === 'large' ? config.largeW : config.w;
-  const tagHeightCm = item.TagMode === 'large' ? config.largeH : item.TagMode === 'oos' ? config.oosH : config.h;
+  const tagWidthCm = item.TagMode === 'large' ? config.largeW : item.TagMode === 'fridge' ? config.fridgeW : config.w;
+  const tagHeightCm =
+    item.TagMode === 'large' ? config.largeH : item.TagMode === 'oos' ? config.oosH : item.TagMode === 'fridge' ? config.fridgeH : config.h;
 
   useEffect(() => {
     const frame = frameRef.current;

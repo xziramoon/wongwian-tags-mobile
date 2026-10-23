@@ -75,7 +75,7 @@ export default function HomeScreen() {
                 <li key={`${item.Barcode}-${i}`}>
                   <span className="home-queue-name">{item.ProductName}</span>
                   <span className="home-queue-price">
-                    {item.Price} ฿{item.PrintQty > 1 ? ` ×${item.PrintQty}` : ''}
+                    {item.TagMode === 'fridge' ? '❄ ตู้แช่' : `${item.Price} ฿`}{item.PrintQty > 1 ? ` ×${item.PrintQty}` : ''}
                   </span>
                 </li>
               ))}

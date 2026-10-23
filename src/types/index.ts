@@ -1,4 +1,4 @@
-export type TagMode = 'standard' | 'dual' | 'large' | 'oos';
+export type TagMode = 'standard' | 'dual' | 'large' | 'oos' | 'fridge';
 export type DualStyle = 'A' | 'B';
 export type OosReason = 'temp' | 'stop'; // temp = หมดชั่วคราว, stop = เลิกจำหน่าย
 
@@ -64,6 +64,11 @@ export interface Config {
   tagTheme: string; // 'classic' | 'korean' | 'ink' — ธีมป้ายปกติ
   headerSub: string; // ข้อความขวาบนหัวป้าย (ธีมใหม่) เช่น ซุปเปอร์มาร์เก็ต
   branchLabel: string; // ชื่อสาขามุมล่างซ้าย (ธีมใหม่) เช่น สาขาวงเวียน
+  fridgeW: number; // ป้ายตู้แช่ (cm) — ค่าประมาณ ต้องวัดจากรางตู้จริง
+  fridgeH: number;
+  fridgeBar: string; // แถบหัวป้ายตู้แช่ 'line' | 'solid' | 'stripe'
+  fridgeDigits: number; // จำนวนหลัก 888 ให้ระบาย: 3 | 4
+  fridgeFill: boolean; // ถมดำขีดตามราคาจริงให้เลย (ไม่ต้องระบาย)
   [key: string]: string | number | boolean | undefined;
 }
 

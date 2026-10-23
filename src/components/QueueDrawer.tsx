@@ -105,7 +105,7 @@ export default function QueueDrawer() {
                       {item.Loc && <span className="queue-row-loc">{item.Loc}</span>}
                       {item.ProductName}
                     </div>
-                    <div className="queue-row-price">{item.Price} บาท</div>
+                    <div className="queue-row-price">{item.TagMode === 'fridge' ? '❄ ป้ายตู้แช่ (ระบายราคาเอง)' : `${item.Price} บาท`}</div>
                   </div>
                   <div className="queue-row-qty">
                     <button type="button" className="qty-btn" onClick={() => changeQty(index, -1)} aria-label="ลดจำนวน">

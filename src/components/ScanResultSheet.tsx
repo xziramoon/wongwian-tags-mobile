@@ -53,6 +53,12 @@ export default function ScanResultSheet() {
     requestSend();
   };
 
+  /* ป้ายตู้แช่: ชื่อพิมพ์ + 888 ให้ระบายราคาเอง — ใช้แค่ชื่อสินค้า กดทีเดียวลงคิว */
+  const handleAddFridge = () => {
+    addItem({ ...item, TagMode: 'fridge' });
+    closeScanSheet();
+  };
+
   const handleCustomize = () => {
     closeScanSheet();
     openTagEditNew(item);
@@ -206,6 +212,10 @@ export default function ScanResultSheet() {
             พิมพ์เลย
           </button>
         </div>
+
+        <button type="button" className="btn btn-secondary btn-block" onClick={handleAddFridge}>
+          ❄ ป้ายตู้แช่ (ระบายราคาเอง)
+        </button>
 
         {locFormOpen ? (
           <div className="q-field">
