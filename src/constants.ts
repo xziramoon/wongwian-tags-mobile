@@ -76,6 +76,7 @@ export const DEFAULT_CONFIG: Config = {
   fridgeBar: 'line',
   fridgeDigits: 3,
   fridgeFill: false,
+  fridgeGuide: 'full',
 };
 
 export interface SliderDef {

@@ -1,5 +1,5 @@
 import type { Config, QueueItem } from '../types';
-import { escapeHTML } from './utils';
+import { escapeHTML, fmtPrice } from './utils';
 
 /* ป้ายตู้แช่ — ชื่อสินค้าพิมพ์ + ตัวเลข 7 ส่วน "888" เส้นกลวงให้พนักงานเอาเมจิกระบายราคาเอง
  * ขาว-ดำล้วน (#000/#fff) เพราะเครื่องพิมพ์หมึกดำอย่างเดียว
@@ -41,26 +41,51 @@ export function fridgeFillDigits(price: unknown, digits: number): string {
   return s.length <= digits ? s : '';
 }
 
-export function fridgeDigitsSVG(digits: number, value: string): string {
+/* fill = ขีดที่ถมดำให้เลย · guide = ขีดที่ต้องระบาย ใส่จุดดำเล็กกลางขีด (ระบายทับแล้วจุดหายไปในสีเมจิก)
+ * heightPct = ความสูงตัวเลข (% ของป้าย) — ป้ายระบายเปล่าไม่มีแถวชื่อ ตัวเลขเลยใหญ่ขึ้น */
+export function fridgeDigitsSVG(digits: number, fill: string, guide = '', heightPct = 55): string {
   const vbW = digits * SEG_W + (digits - 1) * SEG_GAP;
-  const padded = value ? value.padStart(digits, ' ') : '';
+  const fillPad = fill ? fill.padStart(digits, ' ') : '';
+  const guidePad = guide ? guide.padStart(digits, ' ') : '';
   let rects = '';
+  let dots = '';
   for (let i = 0; i < digits; i++) {
-    const on = padded ? SEG_MAP[padded[i]] || '' : '';
+    const on = fillPad ? SEG_MAP[fillPad[i]] || '' : '';
+    const mark = guidePad ? SEG_MAP[guidePad[i]] || '' : '';
     const x0 = i * (SEG_W + SEG_GAP);
     for (const seg of 'abcdefg') {
       const [x, y, w, h] = SEG_GEO[seg];
       rects +=
         '<rect x="' + (x0 + x) + '" y="' + y + '" width="' + w + '" height="' + h +
         '" rx="6" fill="' + (on.indexOf(seg) >= 0 ? '#000' : '#fff') + '" stroke="#000" stroke-width="1.5"/>';
+      if (mark.indexOf(seg) >= 0 && on.indexOf(seg) < 0) {
+        dots += '<circle cx="' + (x0 + x + w / 2) + '" cy="' + (y + h / 2) + '" r="3.6" fill="#000"/>';
+      }
     }
   }
-  /* สูง 55% ของป้าย แต่ถ้า 4 หลักกว้างเกินช่อง ให้ย่อตามความกว้างแทน (ไม่ล้นทับคำว่า บาท) */
+  /* สูงตาม heightPct แต่ถ้า 4 หลักกว้างเกินช่อง ให้ย่อตามความกว้างแทน (ไม่ล้นทับคำว่า บาท) */
   const ratio = (vbW + 2) / (SEG_H + 2);
   return (
-    '<svg class="fr-digits" viewBox="-1 -1 ' + (vbW + 2) + ' ' + (SEG_H + 2) + '" style="height:min(55cqh, calc(76cqw / ' +
-    ratio.toFixed(3) + '));aspect-ratio:' + ratio.toFixed(3) + '">' + rects + '</svg>'
+    '<svg class="fr-digits" viewBox="-1 -1 ' + (vbW + 2) + ' ' + (SEG_H + 2) + '" style="height:min(' + heightPct + 'cqh, calc(76cqw / ' +
+    ratio.toFixed(3) + '));aspect-ratio:' + ratio.toFixed(3) + '">' + rects + dots + '</svg>'
   );
+}
+
+/* ป้ายระบายเปล่า = ป้ายตู้แช่ที่ไม่มีชื่อสินค้า — ไม่มีชื่อ ไม่มีจุดนำ ตัวเลขใหญ่ ไว้ใส่แทนป้ายเดิมตอนราคาเปลี่ยน */
+export function isFridgeBlank(item: QueueItem): boolean {
+  return !String(item.ProductName || '').trim();
+}
+
+/* ตัวช่วยระบาย: 'full' = จุดนำ + ราคาตัวเล็ก (ค่าเริ่มต้น) · 'dots' = จุดนำอย่างเดียว · 'none' = 888 เปล่า */
+export function fridgeGuideMode(config: Config): string {
+  const g = String(config.fridgeGuide || 'full');
+  return g === 'dots' || g === 'none' ? g : 'full';
+}
+
+function fridgeGuideText(price: unknown): string {
+  const n = parseFloat(String(price));
+  if (!Number.isFinite(n) || n <= 0) return '';
+  return Number.isInteger(n) ? 'ราคา ' + n + '.-' : 'ราคา ' + fmtPrice(n);
 }
 
 const SNOWFLAKE =
@@ -91,12 +116,24 @@ function fridgeHeadHTML(config: Config): string {
 
 export function buildFridgeHTML(item: QueueItem, config: Config): string {
   const digits = fridgeDigitCount(config);
+  if (isFridgeBlank(item)) {
+    return (
+      '<div class="price-tag price-tag-fridge fr-blank">' +
+      fridgeHeadHTML(config) +
+      '<div class="fr-price">' + fridgeDigitsSVG(digits, '', '', 70) + '<span class="fr-baht">บาท</span></div>' +
+      '</div>'
+    );
+  }
   const fill = config.fridgeFill ? fridgeFillDigits(item.Price, digits) : '';
+  const guide = fridgeGuideMode(config);
+  const guideDigits = !config.fridgeFill && guide !== 'none' ? fridgeFillDigits(item.Price, digits) : '';
+  const guideText = !config.fridgeFill && guide === 'full' ? fridgeGuideText(item.Price) : '';
   return (
     '<div class="price-tag price-tag-fridge">' +
     fridgeHeadHTML(config) +
-    '<div class="fr-name">' + escapeHTML(item.ProductName) + '</div>' +
-    '<div class="fr-price">' + fridgeDigitsSVG(digits, fill) + '<span class="fr-baht">บาท</span></div>' +
+    '<div class="fr-name"><span class="fr-nm">' + escapeHTML(item.ProductName) + '</span>' +
+    (guideText ? '<span class="fr-guide">' + guideText + '</span>' : '') + '</div>' +
+    '<div class="fr-price">' + fridgeDigitsSVG(digits, fill, guideDigits) + '<span class="fr-baht">บาท</span></div>' +
     '</div>'
   );
 }

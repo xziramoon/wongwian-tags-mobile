@@ -69,6 +69,7 @@ export interface Config {
   fridgeBar: string; // แถบหัวป้ายตู้แช่ 'line' | 'solid' | 'stripe'
   fridgeDigits: number; // จำนวนหลัก 888 ให้ระบาย: 3 | 4
   fridgeFill: boolean; // ถมดำขีดตามราคาจริงให้เลย (ไม่ต้องระบาย)
+  fridgeGuide: string; // ตัวช่วยระบาย 'full' (จุดนำ + ราคาตัวเล็ก) | 'dots' | 'none'
   [key: string]: string | number | boolean | undefined;
 }
 

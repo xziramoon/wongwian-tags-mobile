@@ -148,6 +148,8 @@ interface QueueState {
   addItem: (item: QueueItem) => void;
   /** convenience wrapper: look up + addItem in one call (mirrors desktop addFromBarcode) */
   addFromBarcode: (code: string, exp?: string) => { item: QueueItem; found: boolean };
+  /** ป้ายระบายเปล่า (ตู้แช่ ไม่มีชื่อ ไม่มีราคา) — ไม่ต้องสแกนสินค้า */
+  addBlankFridge: (qty: number) => void;
 
   changeQty: (index: number, delta: number) => void;
   remove: (index: number) => void;
@@ -194,7 +196,7 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     set((s) => {
       const queue = s.queue.slice();
       const existingIdx = queue.findIndex(
-        (i) => i.Barcode === item.Barcode && (i.Loc || '') === (item.Loc || ''),
+        (i) => i.Barcode === item.Barcode && (i.Loc || '') === (item.Loc || '') && i.TagMode === item.TagMode,
       );
       if (existingIdx !== -1) {
         const existing = queue[existingIdx];
@@ -211,6 +213,10 @@ export const useQueueStore = create<QueueState>((set, get) => ({
       persist(queue, s.config);
       return { queue };
     });
+  },
+
+  addBlankFridge: (qty) => {
+    get().addItem(normalize({ Barcode: '', ProductName: '', TagMode: 'fridge', Price: '', Unit: '', PrintQty: Math.max(1, qty) }));
   },
 
   addFromBarcode: (code, exp = '') => {

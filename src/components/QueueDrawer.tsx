@@ -103,7 +103,7 @@ export default function QueueDrawer() {
                   >
                     <div className="queue-row-name">
                       {item.Loc && <span className="queue-row-loc">{item.Loc}</span>}
-                      {item.ProductName}
+                      {item.ProductName || 'ป้ายระบายเปล่า (ไม่มีชื่อ)'}
                     </div>
                     <div className="queue-row-price">{item.TagMode === 'fridge' ? '❄ ป้ายตู้แช่ (ระบายราคาเอง)' : `${item.Price} บาท`}</div>
                   </div>

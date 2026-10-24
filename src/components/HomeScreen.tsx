@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useQueueStore } from '../store/queueStore';
+import { fridgeSheetLayout } from '../lib/fridge';
 import { useUIStore } from '../store/uiStore';
 import { useOosStore } from '../store/oosStore';
 import ConnectionStatus from './ConnectionStatus';
@@ -21,6 +23,10 @@ export default function HomeScreen() {
   const requestSend = useQueueStore((s) => s.requestSend);
   const restoreFromHistory = useQueueStore((s) => s.restoreFromHistory);
   const oosCount = useOosStore((s) => Object.keys(s.records).length);
+  const addBlankFridge = useQueueStore((s) => s.addBlankFridge);
+  const sheetSize = useQueueStore((s) => fridgeSheetLayout(s.config).perSheet);
+  /* null = ยังไม่ได้ปรับ ใช้จำนวนเต็มแผ่น (ตามขนาดป้ายในตั้งค่า) */
+  const [blankQty, setBlankQty] = useState<number | null>(null);
 
   const totalTags = queue.reduce((sum, i) => sum + i.PrintQty, 0);
   const last = history[0];
@@ -73,7 +79,7 @@ export default function HomeScreen() {
               .reverse()
               .map((item, i) => (
                 <li key={`${item.Barcode}-${i}`}>
-                  <span className="home-queue-name">{item.ProductName}</span>
+                  <span className="home-queue-name">{item.ProductName || 'ป้ายระบายเปล่า'}</span>
                   <span className="home-queue-price">
                     {item.TagMode === 'fridge' ? '❄ ตู้แช่' : `${item.Price} ฿`}{item.PrintQty > 1 ? ` ×${item.PrintQty}` : ''}
                   </span>
@@ -93,6 +99,33 @@ export default function HomeScreen() {
             disabled={!queue.length || sending || !!pendingSendAt}
           >
             {sending ? 'กำลังส่ง...' : 'ส่งพิมพ์ทั้งหมด'}
+          </button>
+        </div>
+      </section>
+
+      {/* ป้ายระบายเปล่า — ไม่มีชื่อสินค้า ไว้ใส่แทนป้ายเดิมตอนราคาเปลี่ยน ค่าเริ่มต้น = เต็ม 1 แผ่น A4 */}
+      <section className="home-card blank-card">
+        <div className="home-row-info">
+          <div className="home-card-title">❄ ป้ายระบายเปล่า</div>
+          <div className="home-row-meta">ป้ายตู้แช่ไม่มีชื่อสินค้า ไว้ระบายเองหรือใส่แทนตอนราคาเปลี่ยน · {sheetSize} ใบ = 1 แผ่น A4</div>
+        </div>
+        <div className="blank-qty">
+          <button type="button" className="qty-btn" onClick={() => setBlankQty((q) => Math.max(1, (q ?? sheetSize) - 1))} aria-label="ลดจำนวน">
+            −
+          </button>
+          <span className="qty-value">{blankQty ?? sheetSize}</span>
+          <button type="button" className="qty-btn" onClick={() => setBlankQty((q) => (q ?? sheetSize) + 1)} aria-label="เพิ่มจำนวน">
+            +
+          </button>
+          <button
+            type="button"
+            className="home-row-btn blank-add"
+            onClick={() => {
+              addBlankFridge(blankQty ?? sheetSize);
+              setBlankQty(null);
+            }}
+          >
+            ลงคิว
           </button>
         </div>
       </section>

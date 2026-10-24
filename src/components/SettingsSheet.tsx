@@ -36,6 +36,11 @@ const PLACEHOLDER_ITEM: QueueItem = {
 };
 
 const FRIDGE_SAMPLE: QueueItem = { ...PLACEHOLDER_ITEM, ProductName: 'เอ็ม-150', TagMode: 'fridge', Price: '12' };
+const FRIDGE_GUIDE_OPTS: [string, string][] = [
+  ['full', 'จุดนำ + ราคาเล็ก'],
+  ['dots', 'จุดนำอย่างเดียว'],
+  ['none', '888 เปล่า'],
+];
 const FRIDGE_BAR_OPTS: [string, string][] = [
   ['line', 'เส้นคู่ (ประหยัดหมึก)'],
   ['solid', 'แถบดำทึบ'],
@@ -307,6 +312,22 @@ export default function SettingsSheet() {
                   ))}
                 </div>
               </div>
+            </div>
+            <div className="cfg-full">
+              <span className="cfg-lbl">ตัวช่วยระบาย (บอกพนักงานว่าต้องระบายเลขอะไร)</span>
+              <div className="mode-btns">
+                {FRIDGE_GUIDE_OPTS.map(([v, lbl]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={`mode-btn${(config.fridgeGuide || 'full') === v ? ' active' : ''}`}
+                    onClick={() => updateConfig('fridgeGuide', v)}
+                  >
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+              <span className="fold-hint">จุดดำกลางขีด = ขีดที่ต้องระบาย ระบายทับแล้วจุดหายไปในสีเมจิก · ป้ายระบายเปล่าไม่มีจุดนำ</span>
             </div>
             <div className="cb-wrap">
               <input

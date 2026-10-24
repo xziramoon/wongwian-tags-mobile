@@ -3,7 +3,7 @@ import { buildFridgeHTML, chunkSheets, fridgeDigitsSVG, fridgeFillDigits, fridge
 import { DEFAULT_CONFIG } from '../constants';
 import type { QueueItem } from '../types';
 
-const filled = (svg: string) => (svg.match(/fill="#000"/g) || []).length;
+const filled = (svg: string) => (svg.match(/<rect [^>]*fill="#000"/g) || []).length; // ขีดที่ถมดำ (ไม่นับจุดนำ)
 
 describe('fridgeFillDigits', () => {
   it('fills whole-baht prices that fit', () => {
@@ -56,5 +56,45 @@ describe('fridgeSheetLayout', () => {
   });
   it('chunks tags into sheets', () => {
     expect(chunkSheets([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
+  });
+});
+
+const dots = (html: string) => (html.match(/<circle /g) || []).length;
+
+describe('guide (บอกว่าต้องระบายอะไร)', () => {
+  const item = { ProductName: 'เอ็ม-150', Price: '12' } as QueueItem;
+  it('puts a dot on every segment to fill + small price text by default', () => {
+    const html = buildFridgeHTML(item, DEFAULT_CONFIG);
+    expect(dots(html)).toBe(2 + 5);
+    expect(filled(html)).toBe(0);
+    expect(html).toContain('ราคา 12.-');
+  });
+  it('dots-only and none modes', () => {
+    expect(buildFridgeHTML(item, { ...DEFAULT_CONFIG, fridgeGuide: 'dots' })).not.toContain('fr-guide');
+    expect(dots(buildFridgeHTML(item, { ...DEFAULT_CONFIG, fridgeGuide: 'dots' }))).toBe(7);
+    expect(dots(buildFridgeHTML(item, { ...DEFAULT_CONFIG, fridgeGuide: 'none' }))).toBe(0);
+  });
+  it('satang price: no dots, but the text still tells the price', () => {
+    const html = buildFridgeHTML({ ...item, Price: '12.50' }, DEFAULT_CONFIG);
+    expect(dots(html)).toBe(0);
+    expect(html).toContain('ราคา 12.50');
+  });
+  it('fill mode replaces the guide', () => {
+    const html = buildFridgeHTML(item, { ...DEFAULT_CONFIG, fridgeFill: true });
+    expect(dots(html)).toBe(0);
+    expect(html).not.toContain('fr-guide');
+  });
+});
+
+describe('ป้ายระบายเปล่า', () => {
+  it('has no name row, no guide, no fill', () => {
+    const html = buildFridgeHTML({ ProductName: '  ', Price: '12' } as QueueItem, { ...DEFAULT_CONFIG, fridgeFill: true });
+    expect(html).toContain('fr-blank');
+    expect(html).not.toContain('fr-name');
+    expect(dots(html) + filled(html)).toBe(0);
+    expect(html).toContain('height:min(70cqh');
+  });
+  it('draws dots only for segments that are not already filled', () => {
+    expect((fridgeDigitsSVG(3, '', '8').match(/<circle /g) || []).length).toBe(7);
   });
 });

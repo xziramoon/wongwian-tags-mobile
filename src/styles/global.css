@@ -1263,6 +1263,24 @@ input {
   min-width: 0;
 }
 
+.blank-qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.blank-qty .blank-add {
+  margin-left: auto;
+  min-width: 96px;
+}
+.blank-card .home-row-meta {
+  white-space: normal;
+}
+.blank-qty .qty-value {
+  min-width: 28px;
+  text-align: center;
+}
+
 .home-row-meta {
   font-size: 13px;
   color: var(--txt2);
