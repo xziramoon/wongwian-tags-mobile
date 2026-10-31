@@ -20,6 +20,7 @@ const SCAN_MODE_OPTS: [TagMode, string][] = [
   ['dual', '2 ราคา'],
   ['large', 'ป้ายใหญ่'],
   ['fridge', '❄ ตู้แช่'],
+  ['hamper', '🎁 กระเช้า'],
 ];
 
 export default function ScanResultSheet() {
@@ -197,7 +198,7 @@ export default function ScanResultSheet() {
         {/* ราคานี้ใช้ป้ายแบบไหน — ใช้ทั้งปุ่ม เพิ่มในคิว และ พิมพ์เลย, จำแบบล่าสุดไว้ให้สแกนชิ้นถัดไป */}
         <div className="scan-mode">
           <span className="veg-toggle-lbl">ใช้ป้ายแบบ</span>
-          <div className="mode-btns mode-btns-4">
+          <div className="mode-btns mode-btns-5">
             {SCAN_MODE_OPTS.map(([mode, label]) => (
               <button
                 key={mode}
@@ -215,6 +216,9 @@ export default function ScanResultSheet() {
             <span className="fold-hint">
               {config.fridgeFill ? 'ถมขีดตามราคาให้แล้ว (ราคามีสตางค์ = เว้นว่างให้ระบาย)' : `ป้ายพิมพ์ 888 เปล่า — เอาเมจิกระบาย ${item.Price || '?'} บาท เอง`}
             </span>
+          )}
+          {item.TagMode === 'hamper' && (
+            <span className="fold-hint">ป้ายพับ 2 หน้า แดง-เหลือง — กด "ปรับแต่งป้าย" เพื่อแก้หัวป้าย / ของในกระเช้า / คำอวยพร / ราคาเดิม</span>
           )}
           {item.TagMode === 'dual' && !String(item.Price2 || '').trim() && (
             <span className="fold-hint">สินค้านี้ยังไม่มีราคาส่ง — กด "ปรับแต่งป้าย" เพื่อใส่ราคาที่ 2</span>

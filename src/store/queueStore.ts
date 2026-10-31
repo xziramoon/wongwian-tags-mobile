@@ -46,6 +46,10 @@ function normalize(q: Partial<QueueItem>): QueueItem {
     Loc: '',
     Printed: '',
     Veg: '',
+    HamperLabel: '',
+    HamperNote: '',
+    HamperGreet: '',
+    HamperGreetCN: '',
     ...q,
   };
 }

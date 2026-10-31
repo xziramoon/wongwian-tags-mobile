@@ -156,7 +156,7 @@ export function chunkSheets<T>(tags: T[], perSheet: number): T[][] {
   return out;
 }
 
-/* ลำดับบนกระดาษ: ป้ายทั่วไป → แผ่นป้ายตู้แช่ (ขึ้นหน้าใหม่) → แถบสินค้าหมด */
+/* ลำดับบนกระดาษ: ป้ายทั่วไป → แผ่นป้ายตู้แช่ (ขึ้นหน้าใหม่) → แผ่นป้ายกระเช้า (ขึ้นหน้าใหม่) → แถบสินค้าหมด */
 export function printRank(mode: string): number {
-  return mode === 'oos' ? 2 : mode === 'fridge' ? 1 : 0;
+  return mode === 'oos' ? 3 : mode === 'hamper' ? 2 : mode === 'fridge' ? 1 : 0;
 }

@@ -825,6 +825,16 @@ input {
 .mode-btns-4 {
   grid-template-columns: repeat(4, 1fr);
 }
+/* 5 ปุ่ม: แถวบน 3 แถวล่าง 2 (ปุ่มแถวล่างกว้างขึ้น) */
+.mode-btns-5 {
+  grid-template-columns: repeat(6, 1fr);
+}
+.mode-btns-5 > .mode-btn {
+  grid-column: span 2;
+}
+.mode-btns-5 > .mode-btn:nth-child(n + 4) {
+  grid-column: span 3;
+}
 .scan-mode {
   display: flex;
   flex-direction: column;

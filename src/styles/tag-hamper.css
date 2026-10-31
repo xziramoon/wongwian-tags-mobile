@@ -1,0 +1,66 @@
+/* ============ ป้ายแขวนกระเช้า (TagMode 'hamper') — แถบพับครึ่ง 2 หน้า แดง-เหลือง ============
+ * ขนาดทุกอย่างเป็น cqw ของหน้าป้าย (กว้าง --hamper-w) ปรับขนาดแล้วสเกลตามเอง
+ * ใช้คลาส .hamper-tag ไม่ใช่ .price-tag — เพราะ @media print ของ .price-tag บังคับพื้นขาวขอบดำ 2px
+ * .hp-mono (config.printMono) = แดง→ดำ เหลือง→ขาว สำหรับเครื่องพิมพ์หมึกดำ
+ * ⚠️ ต้องตรงกับ wongwian-tags01/src/styles/tag-hamper.css และ public/TAG_PRINTER.html ทุกตัวอักษร — แก้ที่นี่ต้องแก้ที่นั่นด้วย */
+.hamper-tag { --hp-red: #C8151D; --hp-yel: #FFD43B; --hp-ink: #1a1a1a; position: relative; width: var(--hamper-w); height: calc(var(--hamper-h) * 2); box-sizing: border-box; border: 0.25mm solid #000; background: #fff; color: var(--hp-ink); font-family: 'Kanit', sans-serif; overflow: hidden; display: flex; flex-direction: column; container-type: inline-size; cursor: pointer; break-inside: avoid; page-break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.hamper-tag * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.hamper-tag.hp-mono { --hp-red: #000; --hp-yel: #fff; }
+.hamper-tag.selected { box-shadow: 0 0 0 3px var(--ac, #4f46e5); }
+
+.hp-face { flex: 0 0 var(--hamper-h); height: var(--hamper-h); box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; container-type: inline-size; }
+.hp-fold { flex: 0 0 0; border-top: 0.3mm dashed #000; position: relative; z-index: 1; }
+.hp-fill { flex: 1 1 auto; min-height: 0; }
+
+/* รูร้อยเชือก — วงประ = ที่แปะห่วงเสริม · วงใน = จุดเจาะ 5 มม. */
+.hp-hole { width: 13.8cqw; height: 13.8cqw; box-sizing: border-box; border: 0.8cqw dashed var(--hp-yel); border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center; }
+.hp-hole > div { width: 7.7cqw; height: 7.7cqw; box-sizing: border-box; border: 0.6cqw solid var(--hp-ink); border-radius: 50%; }
+.hp-mono .hp-hole { border-color: #000; }
+
+/* ---- หน้าหลัง (กลับหัว) ---- */
+.hp-back { transform: rotate(180deg); background: var(--hp-red); align-items: center; padding-top: 5.7cqw; }
+.hp-fu { margin-top: 10cqw; width: 28.5cqw; height: 28.5cqw; background: var(--hp-yel); transform: rotate(45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1.2cqw var(--hp-red), 0 0 0 2cqw var(--hp-yel); flex-shrink: 0; }
+.hp-fu > span { transform: rotate(-45deg); color: var(--hp-red); font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 19.5cqw; line-height: 1; }
+.hp-greet { margin-top: 7cqw; color: #fff; font-size: 8.9cqw; font-weight: 800; line-height: 1.2; text-align: center; padding: 0 4cqw; }
+.hp-greet-cn { color: var(--hp-yel); font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 5.3cqw; letter-spacing: 2cqw; line-height: 1.6; text-align: center; }
+.hp-back-shop { width: 100%; text-align: center; color: #fff; font-size: 4.5cqw; font-weight: 700; padding: 1.6cqw 0 2.4cqw; line-height: 1.3; }
+.hp-back-shop .hp-cn { font-family: 'Noto Serif SC', serif; font-weight: 900; }
+
+/* ---- หน้าหน้า ---- */
+.hp-top { background: var(--hp-red); display: flex; flex-direction: column; align-items: center; padding: 4.9cqw 0 3.25cqw; }
+.hp-label { margin-top: 2.4cqw; display: flex; align-items: center; gap: 2.4cqw; color: #fff; font-size: 8.1cqw; font-weight: 800; line-height: 1.15; padding: 0 3cqw; text-align: center; }
+.hp-fu-chip { background: var(--hp-yel); color: var(--hp-red); font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 6.1cqw; padding: 0.4cqw 1.6cqw; border-radius: 1.2cqw; flex-shrink: 0; }
+.hp-mono .hp-fu-chip { background: #fff; color: #000; }
+.hp-body { padding: 0 4.9cqw; display: flex; flex-direction: column; align-items: center; gap: 2.4cqw; }
+.hp-name { font-weight: 800; line-height: 1.18; text-align: center; color: var(--hp-ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+.hp-note { border: 0.6cqw solid var(--hp-red); color: var(--hp-red); border-radius: 999px; padding: 0.4cqw 4.9cqw; font-size: 5.7cqw; font-weight: 700; line-height: 1.4; text-align: center; max-width: 100%; box-sizing: border-box; }
+
+/* แถบราคาเหลือง — จุดที่สายตาต้องหยุด */
+.hp-band { position: relative; background: var(--hp-yel); border-top: 1.2cqw solid var(--hp-red); border-bottom: 1.2cqw solid var(--hp-red); display: flex; flex-direction: column; align-items: center; padding: 2.4cqw 0; }
+.hp-band-back { flex-direction: row; justify-content: center; align-items: flex-end; gap: 1.6cqw; width: 100%; border-color: var(--hp-yel); padding: 4cqw 0 3.2cqw; }
+.hp-mono .hp-band-back { border-color: #000; }
+.hp-price { display: flex; align-items: flex-end; gap: 1.6cqw; }
+.hp-num { display: inline-block; font-family: 'Potta One', cursive; line-height: .95; color: var(--hp-red); transform: rotate(-3deg); white-space: nowrap; }
+.hp-baht, .hp-pre { font-size: 7.3cqw; font-weight: 800; padding-bottom: 2.4cqw; color: var(--hp-ink); line-height: 1; }
+.hp-band-back .hp-baht, .hp-band-back .hp-pre { font-size: 6cqw; }
+.hp-sale { position: absolute; left: 3.25cqw; top: 1.6cqw; background: var(--hp-red); color: #fff; font-size: 4.9cqw; font-weight: 800; padding: 0 3.25cqw; border-radius: 1.2cqw; transform: rotate(-6deg); line-height: 1.5; white-space: nowrap; }
+.hp-old { font-size: 4.9cqw; font-weight: 700; line-height: 1.3; color: var(--hp-ink); }
+
+.hp-foot { display: flex; align-items: center; justify-content: space-between; gap: 2.4cqw; padding: 1.6cqw 3cqw 2cqw; min-height: 0; }
+.hp-shop { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.hp-shop b { font-size: 4.9cqw; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hp-shop .hp-cn { font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 4.5cqw; color: var(--hp-red); letter-spacing: 0.4cqw; }
+.hp-foot .bc-svg { display: block; flex-shrink: 0; max-height: 16cqw; }
+.hp-foot .bc-svg:not([width]) { width: 0; height: 0; } /* ยังไม่วาดบาร์โค้ด = ไม่กินที่ */
+
+/* แผ่นป้ายกระเช้า — ตาราง A4 ขึ้นหน้าใหม่ (ค่าตรงกับ HP_SHEET ใน hamper.ts) */
+.hp-sheet { flex: 0 0 100%; width: 100%; display: grid; gap: 2mm; justify-content: center; align-content: start; padding-top: 4.5mm; break-before: page; page-break-before: always; break-inside: avoid; page-break-inside: avoid; }
+#print-area > .hp-sheet:first-child { padding-top: 2.5mm; break-before: auto; page-break-before: auto; }
+@media screen { .hp-sheet { outline: 1px dashed #b9b9cc; outline-offset: 1.5mm; margin: 2mm 0; } }
+
+@media print {
+  .hamper-tag { border: 0.25mm solid #000 !important; box-shadow: none !important; }
+  .hp-back, .hp-top, .hp-sale { background: var(--hp-red) !important; }
+  .hp-band, .hp-fu, .hp-fu-chip { background: var(--hp-yel) !important; }
+  .hp-mono .hp-fu-chip { background: #fff !important; }
+}

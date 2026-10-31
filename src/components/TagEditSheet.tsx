@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQueueStore } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
 import { autoFontSize } from '../lib/utils';
+import { HAMPER_DEFAULTS } from '../lib/hamper';
 import type { DualStyle, QueueItem } from '../types';
 import TagPreview from './TagPreview';
 
@@ -102,7 +103,84 @@ export default function TagEditSheet() {
           </div>
         )}
 
-        {item.TagMode !== 'oos' && item.TagMode !== 'fridge' && (
+        {item.TagMode === 'hamper' && (
+          <div>
+            <span className="fold-hint">
+              ป้ายพับ 2 หน้า สีแดง-เหลือง · พับครึ่งตามเส้นประ เจาะรูทะลุ 2 ชั้น ร้อยเชือก · ช่องว่าง = ใช้คำเริ่มต้น · ใส่ - = ซ่อนบรรทัดนั้น
+            </span>
+            <div className="q-grid2">
+              <div className="q-field">
+                <span className="q-lbl">ราคาขาย (บาท)</span>
+                <input
+                  className="field-input"
+                  type="number"
+                  step=".01"
+                  value={item.Price}
+                  onChange={(e) => setField('Price', e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+              <div className="q-field">
+                <span className="q-lbl">ราคาเดิม (ใส่ = ขึ้น ลดพิเศษ)</span>
+                <input
+                  className="field-input"
+                  type="number"
+                  step=".01"
+                  value={item.OldPrice || ''}
+                  onChange={(e) => setField('OldPrice', e.target.value)}
+                  placeholder="—"
+                />
+              </div>
+              <div className="q-field">
+                <span className="q-lbl">หัวป้าย</span>
+                <input
+                  className="field-input"
+                  value={item.HamperLabel || ''}
+                  onChange={(e) => setField('HamperLabel', e.target.value)}
+                  placeholder={HAMPER_DEFAULTS.label}
+                />
+              </div>
+              <div className="q-field">
+                <span className="q-lbl">ในกระเช้ามี (สั้นๆ)</span>
+                <input
+                  className="field-input"
+                  value={item.HamperNote || ''}
+                  onChange={(e) => setField('HamperNote', e.target.value)}
+                  placeholder="เช่น 12 ขวด · พร้อมถุงหิ้ว"
+                />
+              </div>
+              <div className="q-field">
+                <span className="q-lbl">คำอวยพร (หลังป้าย)</span>
+                <input
+                  className="field-input"
+                  value={item.HamperGreet || ''}
+                  onChange={(e) => setField('HamperGreet', e.target.value)}
+                  placeholder={HAMPER_DEFAULTS.greet}
+                />
+              </div>
+              <div className="q-field">
+                <span className="q-lbl">คำจีน (หลังป้าย)</span>
+                <input
+                  className="field-input"
+                  value={item.HamperGreetCN || ''}
+                  onChange={(e) => setField('HamperGreetCN', e.target.value)}
+                  placeholder={HAMPER_DEFAULTS.greetCN}
+                />
+              </div>
+              <div className="q-field">
+                <span className="q-lbl">ป้ายมุมแถบราคา</span>
+                <input
+                  className="field-input"
+                  value={item.Ribbon || ''}
+                  onChange={(e) => setField('Ribbon', e.target.value)}
+                  placeholder="ว่าง = ลดพิเศษ (เมื่อมีราคาเดิม)"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {item.TagMode !== 'oos' && item.TagMode !== 'fridge' && item.TagMode !== 'hamper' && (
           <div className="q-price-grid">
             <div className="q-field">
               <span className="q-lbl">ราคาขาย (บาท)</span>
@@ -174,6 +252,13 @@ export default function TagEditSheet() {
               onClick={() => setField('TagMode', 'fridge')}
             >
               ตู้แช่
+            </button>
+            <button
+              type="button"
+              className={`mode-btn${item.TagMode === 'hamper' ? ' active' : ''}`}
+              onClick={() => setField('TagMode', 'hamper')}
+            >
+              🎁 แขวนกระเช้า
             </button>
           </div>
         </div>
