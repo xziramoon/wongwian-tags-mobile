@@ -5,6 +5,7 @@ import TagPreview from './TagPreview';
 import SliderRow from './SliderRow';
 import { PRICE_FONTS, THEME_PRESETS } from '../constants';
 import { fridgeSheetLayout } from '../lib/fridge';
+import { hamperSheetLayout } from '../lib/hamper';
 
 /* placeholder shown in the embedded preview when the queue is still empty */
 const PLACEHOLDER_ITEM: QueueItem = {
@@ -33,9 +34,21 @@ const PLACEHOLDER_ITEM: QueueItem = {
   Loc: '',
   Printed: '',
   Veg: '',
+  HamperLabel: '',
+  HamperNote: '',
+  HamperGreet: '',
+  HamperGreetCN: '',
 };
 
 const FRIDGE_SAMPLE: QueueItem = { ...PLACEHOLDER_ITEM, ProductName: 'เอ็ม-150', TagMode: 'fridge', Price: '12' };
+const HAMPER_SAMPLE: QueueItem = {
+  ...PLACEHOLDER_ITEM,
+  ProductName: 'กระเช้าซุปไก่สกัด',
+  TagMode: 'hamper',
+  Price: '1095',
+  OldPrice: '1250',
+  HamperNote: '12 ขวด · พร้อมถุงหิ้ว',
+};
 const FRIDGE_GUIDE_OPTS: [string, string][] = [
   ['full', 'จุดนำ + ราคาเล็ก'],
   ['dots', 'จุดนำอย่างเดียว'],
@@ -77,6 +90,7 @@ export default function SettingsSheet() {
 
   const previewItem = queue[0] || PLACEHOLDER_ITEM;
   const sheet = fridgeSheetLayout(config);
+  const hpSheet = hamperSheetLayout(config);
 
   return (
     <div className="sheet-backdrop" onClick={() => setOpen(false)}>
@@ -344,6 +358,22 @@ export default function SettingsSheet() {
             </div>
             <span className="fold-hint">
               A4 ได้ {sheet.perSheet} ใบ/แผ่น ({sheet.cols} × {sheet.rows}) · 6.0 × 3.5 ซม. เป็นค่าประมาณ — วัดรางตู้จริงแล้วปรับให้พอดี
+            </span>
+          </div>
+        </details>
+
+        <details className="fold">
+          <summary>
+            ป้ายแขวนกระเช้า (พับ 2 หน้า)<span className="fold-arrow">▾</span>
+          </summary>
+          <div className="fold-body">
+            <TagPreview item={HAMPER_SAMPLE} config={config} />
+            <div className="slider-stack">
+              <SliderRow configKey="hamperW" full />
+              <SliderRow configKey="hamperH" full />
+            </div>
+            <span className="fold-hint">
+              A4 ได้ {hpSheet.perSheet} ใบ/แผ่น · แถบยาว {((Number(config.hamperH) || 9.5) * 2).toFixed(1)} ซม. พับครึ่ง · พิมพ์สีแดง-เหลือง (เปิด "พิมพ์ขาว-ดำ" = ดำล้วน) · ชื่อร้าน/ชื่อจีนใช้ช่องเดียวกับป้ายปกติ
             </span>
           </div>
         </details>

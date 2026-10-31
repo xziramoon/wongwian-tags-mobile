@@ -29,4 +29,6 @@ export function applyCSSVars(config: Config) {
   set('--oos-sz', config.oosSz || 22, 'px');
   set('--fridge-w', config.fridgeW || 6.0, 'cm');
   set('--fridge-h', config.fridgeH || 3.5, 'cm');
+  set('--hamper-w', config.hamperW || 6.5, 'cm');
+  set('--hamper-h', config.hamperH || 9.5, 'cm');
 }

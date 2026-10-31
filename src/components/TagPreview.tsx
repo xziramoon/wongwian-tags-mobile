@@ -11,6 +11,8 @@ const PX_PER_CM = 37.795;
  * see TagPreview's own verification notes for the math. */
 /* กรอบตัวอย่างกว้างเกือบเต็มชีต (สูงสุด 340px) และสูงตามสัดส่วนป้ายจริง — เดิม 230×180 ตายตัว ดูเล็ก/ไม่พอดี */
 const FRAME_MAX_WIDTH = 340;
+/* ป้ายกระเช้าเป็นแถบยาว 19 ซม. — จำกัดความสูงพรีวิว ไม่ให้ยาวเกินจอ (กว้างลดตามสัดส่วน) */
+const HAMPER_MAX_HEIGHT = 460;
 
 interface Props {
   item: QueueItem;
@@ -25,9 +27,20 @@ export default function TagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }:
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  const tagWidthCm = item.TagMode === 'large' ? config.largeW : item.TagMode === 'fridge' ? config.fridgeW : config.w;
+  const isHamper = item.TagMode === 'hamper';
+  const tagWidthCm =
+    item.TagMode === 'large' ? config.largeW : item.TagMode === 'fridge' ? config.fridgeW : isHamper ? config.hamperW || 6.5 : config.w;
   const tagHeightCm =
-    item.TagMode === 'large' ? config.largeH : item.TagMode === 'oos' ? config.oosH : item.TagMode === 'fridge' ? config.fridgeH : config.h;
+    item.TagMode === 'large'
+      ? config.largeH
+      : item.TagMode === 'oos'
+        ? config.oosH
+        : item.TagMode === 'fridge'
+          ? config.fridgeH
+          : isHamper
+            ? (config.hamperH || 9.5) * 2
+            : config.h;
+  const frameMaxWidth = isHamper ? Math.min(maxWidth, Math.round((HAMPER_MAX_HEIGHT * tagWidthCm) / tagHeightCm)) : maxWidth;
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -46,7 +59,7 @@ export default function TagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }:
     <div
       className="tag-preview-frame"
       ref={frameRef}
-      style={{ width: '100%', maxWidth, height: Math.ceil((tagHeightCm || 1) * PX_PER_CM * scale) + 2 }}
+      style={{ width: '100%', maxWidth: frameMaxWidth, height: Math.ceil((tagHeightCm || 1) * PX_PER_CM * scale) + 2 }}
     >
       <div className="tag-preview-scale" style={{ transform: `scale(${scale})` }}>
         <PriceTag item={item} config={config} queueIndex={0} selected={false} />

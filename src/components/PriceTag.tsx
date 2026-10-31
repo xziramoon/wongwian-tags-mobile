@@ -4,6 +4,7 @@ import type { Config, QueueItem } from '../types';
 import { fmtPrice } from '../lib/utils';
 import { isVeg } from '../lib/veg';
 import { buildFridgeHTML } from '../lib/fridge';
+import { buildHamperHTML } from '../lib/hamper';
 
 interface Props {
   item: QueueItem;
@@ -122,9 +123,30 @@ export default function PriceTag({ item, config, selected }: Props) {
     }
   }, [item.Barcode, isLarge, bcHeightStd, bcHeightLrg, isOos]);
 
+  /* ป้ายกระเช้าเป็น HTML string (ชุดเดียวกับ TAG_PRINTER) — วาดบาร์โค้ดลง .bc-svg หลัง render ทุกครั้ง */
+  const hamperRef = useRef<HTMLDivElement>(null);
+  const hamperHTML = item.TagMode === 'hamper' ? buildHamperHTML(item, config) : '';
+  useEffect(() => {
+    if (!hamperHTML || !hamperRef.current) return;
+    hamperRef.current.querySelectorAll<SVGSVGElement>('.bc-svg').forEach((svg) => {
+      try {
+        JsBarcode(svg, svg.getAttribute('data-barcode') || '', {
+          format: 'CODE128', width: 1.4, height: parseFloat(svg.getAttribute('data-bch') || '18') || 18,
+          displayValue: true, fontSize: 11, font: 'sans-serif', fontOptions: 'bold', textMargin: 1, margin: 1,
+        });
+      } catch {
+        /* invalid barcode value — leave svg empty */
+      }
+    });
+  }, [hamperHTML]);
+
   /* ป้ายตู้แช่ — ใช้ HTML ชุดเดียวกับ TAG_PRINTER (buildFridgeHTML) พรีวิวจึงตรงกับที่พิมพ์ทุกขีด */
   if (item.TagMode === 'fridge') {
     return <div style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: buildFridgeHTML(item, config) }} />;
+  }
+
+  if (item.TagMode === 'hamper') {
+    return <div ref={hamperRef} style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: hamperHTML }} />;
   }
 
   if (isOos) {
