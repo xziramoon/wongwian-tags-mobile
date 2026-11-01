@@ -26,7 +26,7 @@ export function FlipSendKindPicker() {
   const update = useFlipStore((s) => s.updateSetting);
   return (
     <div>
-      <span className="q-lbl">เมื่อส่งพิมพ์ ให้พิมพ์</span>
+      <span className="q-lbl">เมื่อปริ้น ให้พิมพ์</span>
       <div className="flip-kind-row">
         {SEND_KINDS.map((k) => (
           <button
@@ -98,16 +98,16 @@ export default function FlipMobileOptions({ item }: { item: QueueItem }) {
       {memberOf && variant !== 'group' && (
         <div className="flip-hint-box">
           <span>
-            สินค้านี้อยู่ในกลุ่ม <b>{memberOf.name}</b> — พิมพ์ป้ายกลุ่มแทนไหม?
+            สินค้านี้อยู่ในกลุ่ม <b>{memberOf.name}</b> — ปริ้นป้ายกลุ่มแทนไหม?
           </span>
           <button type="button" className="btn btn-secondary" onClick={() => chooseGroup(memberOf.id)}>
-            พิมพ์ป้ายกลุ่มแทน
+            ปริ้นป้ายกลุ่มแทน
           </button>
         </div>
       )}
 
       {variant === 'narrow' && (
-        <span className="fold-hint">ป้ายแคบไม่พิมพ์บาร์โค้ด/ราคายกลัง/คำมุมขวา · แถบราคา 43 × 21 มม. พับบน-ล่าง</span>
+        <span className="fold-hint">ป้ายแคบไม่ปริ้นบาร์โค้ด/ราคายกลัง/คำมุมขวา · แถบราคา 43 × 21 มม. พับบน-ล่าง</span>
       )}
 
       {variant === 'full' &&

@@ -9,7 +9,7 @@ import CameraScanner from './components/CameraScanner';
 import CameraPermissionDenied from './components/CameraPermissionDenied';
 import HomeScreen from './components/HomeScreen';
 import ScanResultSheet from './components/ScanResultSheet';
-import QueueBadge from './components/QueueBadge';
+import TagTypePicker from './components/TagTypePicker';
 import QueueDrawer from './components/QueueDrawer';
 import ManualSearchSheet from './components/ManualSearchSheet';
 import SettingsSheet from './components/SettingsSheet';
@@ -43,7 +43,7 @@ function App() {
   useEffect(() => {
     // product DB sync — needed before any barcode lookup will succeed
     database.sync().catch(() => {
-      showToast('ซิงค์ฐานข้อมูลสินค้าไม่สำเร็จ — ลองใหม่ภายหลัง', 'error');
+      showToast('โหลดรายการสินค้าไม่สำเร็จ — ลองใหม่ภายหลัง', 'error');
     });
 
     // live Ably connection-status pill
@@ -81,7 +81,6 @@ function App() {
       ) : (
         <>
           <CameraScanner />
-          <QueueBadge />
         </>
       )}
       <ScanResultSheet />
@@ -89,6 +88,7 @@ function App() {
       <ManualSearchSheet />
       <SettingsSheet />
       <TagEditSheet />
+      <TagTypePicker />
       <FlipTodaySheet />
       <PendingSendBar />
       <ToastContainer />

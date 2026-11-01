@@ -57,7 +57,7 @@ export default function FlipSettingsFold() {
   const sample = useMemo(() => SAMPLE, []);
 
   return (
-    <details className="fold">
+    <details className="fold" open>
       <summary>
         ป้ายดำแดง (แถบพลิก)<span className="fold-arrow">▾</span>
       </summary>
@@ -83,7 +83,7 @@ export default function FlipSettingsFold() {
 
         <div className="cb-wrap">
           <input type="checkbox" id="flip-mono" checked={settings.mono} onChange={(e) => updateSetting('mono', e.target.checked)} />
-          <label htmlFor="flip-mono">โหมดขาวดำ (แดงเป็นดำ) — หรือเปิด "พิมพ์ขาว-ดำ" ด้านบนของตั้งค่า</label>
+          <label htmlFor="flip-mono">โหมดขาวดำ (แดงเป็นดำ) — หรือเปิด "ปริ้นขาว-ดำ" ด้านบนของตั้งค่า</label>
         </div>
 
         <FlipSendKindPicker />
@@ -128,7 +128,7 @@ export default function FlipSettingsFold() {
         )}
 
         <button type="button" className="btn btn-secondary btn-block" onClick={() => sendFlipStandalone('stickers', [])}>
-          📡 ส่งสติกเกอร์ "หมด" 1 แผ่น (14 × 8 มม.)
+          ส่งสติกเกอร์ "หมด" 1 แผ่น (14 × 8 มม.)
         </button>
 
         <FlipGroupsMobile dbVersion={dbVersion} />

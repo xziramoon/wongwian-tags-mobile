@@ -145,7 +145,7 @@ export function previewFromBarcode(code: string, exp = ''): { item: QueueItem; f
 interface QueueState {
   queue: QueueItem[];
   config: Config;
-  /** ล็อตที่ส่งพิมพ์สำเร็จแล้ว (ใหม่สุดก่อน) — เผื่อกดส่งผิด */
+  /** ล็อตที่ปริ้นสำเร็จแล้ว (ใหม่สุดก่อน) — เผื่อกดส่งผิด */
   history: SendHistoryEntry[];
 
   /** merges `item` into the queue: same Barcode already present → PrintQty bump by
@@ -338,7 +338,7 @@ export const useQueueStore = create<QueueState>((set, get) => ({
         persistHistory(history);
         return { queue: [], history };
       });
-      useUIStore.getState().showToast(`ส่งพิมพ์แล้ว · ${queue.length} รายการ`, 'success');
+      useUIStore.getState().showToast(`ส่งปริ้นแล้ว · ${queue.reduce((n, i) => n + Math.max(1, i.PrintQty || 1), 0)} ใบ`, 'success');
     } catch (err) {
       useUIStore.getState().showToast('ส่งไม่สำเร็จ กรุณาลองใหม่', 'error');
       throw err;
@@ -351,7 +351,7 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     const entry = get().history.find((h) => h.id === id);
     if (!entry) return;
     if (entry.restoredAt) {
-      useUIStore.getState().showToast('ล็อตนี้ดึงกลับเข้าคิวไปแล้ว', 'info');
+      useUIStore.getState().showToast('ล็อตนี้เอากลับมาแล้ว', 'info');
       return;
     }
     entry.items.forEach((it) => get().addItem(it));
@@ -360,7 +360,7 @@ export const useQueueStore = create<QueueState>((set, get) => ({
       persistHistory(history);
       return { history };
     });
-    useUIStore.getState().showToast(`ดึงกลับเข้าคิวแล้ว · ${entry.items.length} รายการ`, 'success');
+    useUIStore.getState().showToast(`เอากลับมาแล้ว · ${entry.items.length} อย่าง`, 'success');
   },
 
   requestSend: () => {
@@ -372,7 +372,7 @@ export const useQueueStore = create<QueueState>((set, get) => ({
 
   cancelSend: () => {
     clearTimeout(sendTimer);
-    if (get().pendingSendAt) useUIStore.getState().showToast('ยกเลิกการส่งแล้ว — ป้ายยังอยู่ในคิว', 'info');
+    if (get().pendingSendAt) useUIStore.getState().showToast('ยกเลิกแล้ว — ป้ายยังอยู่ในรายการรอปริ้น', 'info');
     set({ pendingSendAt: null });
   },
 

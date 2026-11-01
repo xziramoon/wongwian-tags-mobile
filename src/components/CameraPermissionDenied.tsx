@@ -1,8 +1,7 @@
 import { useUIStore } from '../store/uiStore';
 import { IconCamera } from './Icons';
 
-/* full-screen fallback shown when the camera is unavailable (permission denied, or
- * any other getUserMedia error) — keeps the app usable via manual product search */
+/* หน้าเมื่อเปิดกล้องไม่ได้ (ไม่อนุญาต หรือเครื่องมีปัญหา) — บอกวิธีเปิดสิทธิ์ ลองใหม่ หรือกรอกเลขแทน (ใช้งานต่อได้ไม่ต้องมีกล้อง) */
 export default function CameraPermissionDenied() {
   const cameraStatus = useUIStore((s) => s.cameraStatus);
   const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
@@ -11,23 +10,33 @@ export default function CameraPermissionDenied() {
   const isDenied = cameraStatus === 'denied';
 
   return (
-    <div className="camera-denied">
+    <div className="camera-denied dz-denied">
       <div className="camera-denied-icon">
         <IconCamera size={48} />
       </div>
-      <h1 className="camera-denied-title">{isDenied ? 'ไม่ได้รับอนุญาตให้ใช้กล้อง' : 'ไม่สามารถเปิดกล้องได้'}</h1>
+      <h1 className="camera-denied-title">{isDenied ? 'ยังเปิดกล้องไม่ได้' : 'กล้องเปิดไม่ติด'}</h1>
       <p className="camera-denied-text">
         {isDenied
-          ? 'แอปนี้ต้องใช้กล้องเพื่อสแกนบาร์โค้ดสินค้า กรุณาอนุญาตการใช้กล้องในตั้งค่าเบราว์เซอร์ แล้วกดลองอีกครั้ง'
-          : 'เกิดข้อผิดพลาดในการเปิดกล้อง คุณยังสามารถค้นหาสินค้าด้วยตนเองได้'}
+          ? 'แอปต้องใช้กล้องส่องบาร์โค้ดสินค้า — เปิดสิทธิ์กล้องแล้วกดลองใหม่'
+          : 'กล้องมีปัญหา ลองปิดแอปอื่นที่ใช้กล้องอยู่ แล้วกดลองใหม่ — หรือกรอกเลขแทนได้เลย'}
       </p>
-      <button type="button" className="btn btn-primary" onClick={() => setManualSearchOpen(true)}>
-        ค้นหาสินค้าด้วยตนเอง
+      {isDenied && (
+        <ol className="dz-steps">
+          <li>
+            <b>iPhone:</b> ตั้งค่า → Safari → กล้อง → เลือก "อนุญาต"
+          </li>
+          <li>
+            <b>Android:</b> แตะรูปกุญแจข้างชื่อเว็บ → สิทธิ์ → กล้อง → อนุญาต
+          </li>
+        </ol>
+      )}
+      <button type="button" className="dz-btn dz-btn-primary dz-btn-lg" onClick={() => setCameraEnabled(true)}>
+        ลองใหม่
       </button>
-      <button type="button" className="btn btn-secondary" onClick={() => setCameraEnabled(true)}>
-        ลองเปิดกล้องอีกครั้ง
+      <button type="button" className="dz-btn" onClick={() => setManualSearchOpen(true)}>
+        กรอกเลขแทน
       </button>
-      <button type="button" className="btn btn-secondary" onClick={() => setCameraEnabled(false)}>
+      <button type="button" className="dz-btn" onClick={() => setCameraEnabled(false)}>
         กลับหน้าแรก
       </button>
     </div>

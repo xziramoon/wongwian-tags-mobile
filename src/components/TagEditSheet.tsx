@@ -6,6 +6,7 @@ import { HAMPER_DEFAULTS } from '../lib/hamper';
 import type { DualStyle, QueueItem } from '../types';
 import TagPreview from './TagPreview';
 import FlipMobileOptions from '../flip/FlipMobileOptions';
+import { IconClose } from './Icons';
 
 /* Shared new/edit tag-design sheet, driven by uiStore.tagEditTarget:
  *  - mode 'new': fields are buffered in local state (there's no queue index yet)
@@ -71,7 +72,7 @@ export default function TagEditSheet() {
         <div className="queue-drawer-header">
           <span>{target.mode === 'new' ? 'เพิ่มป้ายใหม่' : 'แก้ไขป้าย'}</span>
           <button type="button" className="sheet-close" onClick={closeTagEdit} aria-label="ปิด">
-            ✕
+            <IconClose size={20} />
           </button>
         </div>
 
@@ -88,8 +89,8 @@ export default function TagEditSheet() {
           <div className="q-field">
             <span className="fold-hint">
               {config.fridgeFill
-                ? 'พิมพ์ราคาจริงเปิดอยู่ — ถมดำขีดตามราคานี้ให้เลย (ราคามีสตางค์หรือเกินจำนวนหลัก = เว้นว่างให้ระบายเอง)'
-                : 'ป้ายตู้แช่ไม่พิมพ์ราคา — พิมพ์ 888 ให้ระบายเอง มีจุดนำ/ราคาเล็กบอกว่าต้องระบายเลขอะไร · ลบชื่อสินค้าออก = ป้ายระบายเปล่า'}
+                ? 'ปริ้นราคาจริงเปิดอยู่ — ถมดำขีดตามราคานี้ให้เลย (ราคามีสตางค์หรือเกินจำนวนหลัก = เว้นว่างให้ระบายเอง)'
+                : 'ป้ายตู้แช่ไม่ปริ้นราคา — ปริ้น 888 ให้ระบายเอง มีจุดนำ/ราคาเล็กบอกว่าต้องระบายเลขอะไร · ลบชื่อสินค้าออก = ป้ายระบายเปล่า'}
             </span>
             {config.fridgeFill && (
               <input
@@ -259,7 +260,7 @@ export default function TagEditSheet() {
               className={`mode-btn${item.TagMode === 'hamper' ? ' active' : ''}`}
               onClick={() => setField('TagMode', 'hamper')}
             >
-              🎁 แขวนกระเช้า
+              แขวนกระเช้า
             </button>
             <button
               type="button"
@@ -458,7 +459,7 @@ export default function TagEditSheet() {
 
         <div className="sheet-actions">
           <button type="button" className="btn btn-primary btn-block" onClick={handleSave}>
-            {target.mode === 'new' ? 'บันทึกลงคิว' : 'เสร็จสิ้น'}
+            {target.mode === 'new' ? 'เก็บเข้ารายการรอปริ้น' : 'เสร็จสิ้น'}
           </button>
         </div>
       </div>

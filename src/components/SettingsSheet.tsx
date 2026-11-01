@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQueueStore } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
 import type { QueueItem } from '../types';
@@ -7,6 +8,7 @@ import { PRICE_FONTS, THEME_PRESETS } from '../constants';
 import { fridgeSheetLayout } from '../lib/fridge';
 import { hamperSheetLayout } from '../lib/hamper';
 import FlipSettingsFold from '../flip/FlipSettingsFold';
+import { IconClose } from './Icons';
 
 /* placeholder shown in the embedded preview when the queue is still empty */
 const PLACEHOLDER_ITEM: QueueItem = {
@@ -66,6 +68,16 @@ const FRIDGE_BAR_OPTS: [string, string][] = [
  * always-visible basics up top, ~12 SliderRows tucked under a <details> fold so the
  * common case (pick a preset, maybe change the header text) doesn't need scrolling
  * past a wall of sliders. */
+type SettingsCat = 'general' | 'normal' | 'fridge' | 'hamper' | 'flip' | 'advanced';
+const CATS: [SettingsCat, string][] = [
+  ['general', 'ทั่วไป'],
+  ['normal', 'ป้ายปกติ'],
+  ['fridge', 'ตู้แช่'],
+  ['hamper', 'กระเช้า'],
+  ['flip', 'ดำแดง'],
+  ['advanced', 'ขั้นสูง'],
+];
+
 export default function SettingsSheet() {
   const open = useUIStore((s) => s.settingsSheetOpen);
   const setOpen = useUIStore((s) => s.setSettingsSheetOpen);
@@ -73,6 +85,7 @@ export default function SettingsSheet() {
   const updateConfig = useQueueStore((s) => s.updateConfig);
   const applyPreset = useQueueStore((s) => s.applyPreset);
   const queue = useQueueStore((s) => s.queue);
+  const [cat, setCat] = useState<SettingsCat>('general');
 
   /* ใส่ค่าตั้งของธีมครบชุดเฉพาะตอนเปลี่ยนจากแบบเดิม และไม่ทับช่องที่กรอกเองไว้แล้ว (ยกเว้น tagTheme)
      สลับระหว่างธีมใหม่ด้วยกัน = เปลี่ยนแค่ tagTheme ช่องที่ผู้ใช้ลบทิ้งจะไม่ถูกเติมกลับ */
@@ -95,18 +108,26 @@ export default function SettingsSheet() {
 
   return (
     <div className="sheet-backdrop" onClick={() => setOpen(false)}>
-      <div className="sheet sheet-full settings-sheet" onClick={(e) => e.stopPropagation()}>
+      <div className="sheet sheet-full settings-sheet" data-cat={cat} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
         <div className="queue-drawer-header">
           <span>ออกแบบป้ายราคา</span>
           <button type="button" className="sheet-close" onClick={() => setOpen(false)} aria-label="ปิด">
-            ✕
+            <IconClose size={20} />
           </button>
         </div>
 
         <TagPreview item={previewItem} config={config} />
 
-        <div className="preset-row">
+        <div className="dz-cats" role="tablist" aria-label="หมวดตั้งค่า">
+          {CATS.map(([key, label]) => (
+            <button key={key} type="button" role="tab" className="dz-chip" aria-selected={cat === key} aria-pressed={cat === key} onClick={() => setCat(key)}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="preset-row" data-cat="general">
           <button type="button" className="btn btn-preset" onClick={() => applyPreset('S')}>
             เล็ก
           </button>
@@ -122,12 +143,12 @@ export default function SettingsSheet() {
         </div>
 
         <div className="cfg-grid">
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="general">
             <span className="cfg-lbl">ชื่อร้านบนหัวป้าย</span>
             <input className="inp" value={config.header} onChange={(e) => updateConfig('header', e.target.value)} />
           </div>
 
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="general">
             <span className="cfg-lbl">ฟอนต์ตัวหนังสือบนป้าย</span>
             <select className="inp" value={config.font} onChange={(e) => updateConfig('font', e.target.value)}>
               <option value="'Kanit',sans-serif">Kanit</option>
@@ -137,7 +158,7 @@ export default function SettingsSheet() {
             </select>
           </div>
 
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">ธีมป้ายปกติ</span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               <button
@@ -166,11 +187,11 @@ export default function SettingsSheet() {
               </button>
             </div>
             <span className="fold-hint">
-              ธีมใหม่ใช้สีแดง ต้องพิมพ์ด้วยเครื่องพิมพ์สี · ตรา SALE / 特价 ขึ้นเองเมื่อสินค้ามี "ราคาเดิม"
+              ธีมใหม่ใช้สีแดง ต้องปริ้นด้วยเครื่องปริ้นสี · ตรา SALE / 特价 ขึ้นเองเมื่อสินค้ามี "ราคาเดิม"
             </span>
           </div>
 
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">ข้อความขวาบนหัวป้าย (เว้นว่าง = ไม่แสดง)</span>
             <input
               className="inp"
@@ -179,7 +200,7 @@ export default function SettingsSheet() {
               placeholder="ซุปเปอร์มาร์เก็ต"
             />
           </div>
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">ชื่อสาขา มุมล่างซ้าย (เว้นว่าง = ไม่แสดง)</span>
             <input
               className="inp"
@@ -189,7 +210,7 @@ export default function SettingsSheet() {
             />
           </div>
 
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">ชื่อจีนบนหัวป้าย (เว้นว่าง = ไม่แสดง)</span>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
@@ -205,7 +226,7 @@ export default function SettingsSheet() {
             </div>
           </div>
 
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">ฟอนต์ตัวเลขราคา (หมึกพู่กัน)</span>
             <select
               className="inp"
@@ -221,7 +242,7 @@ export default function SettingsSheet() {
             </select>
           </div>
 
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">สีตัวเลขราคา</span>
             <select
               className="inp"
@@ -229,19 +250,19 @@ export default function SettingsSheet() {
               onChange={(e) => updateConfig('priceInk', e.target.value)}
             >
               <option value="black">ดำ (เดิม)</option>
-              <option value="red">แดงหมึก — ต้องใช้เครื่องพิมพ์สี</option>
+              <option value="red">แดงหมึก — ต้องใช้เครื่องปริ้นสี</option>
             </select>
           </div>
 
-          <div>
+          <div data-cat="normal">
             <span className="cfg-lbl">คำนำหน้า "ขนาด"</span>
             <input className="inp" value={config.labelSize} onChange={(e) => updateConfig('labelSize', e.target.value)} />
           </div>
-          <div>
+          <div data-cat="normal">
             <span className="cfg-lbl">คำนำหน้า "บรรจุ"</span>
             <input className="inp" value={config.labelUnit} onChange={(e) => updateConfig('labelUnit', e.target.value)} />
           </div>
-          <div className="cfg-full">
+          <div className="cfg-full" data-cat="normal">
             <span className="cfg-lbl">คำว่า "ปลีก" (ป้ายโชว์ 2 ราคา แบบ A)</span>
             <input
               className="inp"
@@ -252,7 +273,7 @@ export default function SettingsSheet() {
           </div>
         </div>
 
-        <div className="cb-wrap">
+        <div className="cb-wrap" data-cat="normal">
           <input
             type="checkbox"
             id="invert-baht"
@@ -261,7 +282,7 @@ export default function SettingsSheet() {
           />
           <label htmlFor="invert-baht">ถมดำพื้นหลังคำว่า "บาท"</label>
         </div>
-        <div className="cb-wrap">
+        <div className="cb-wrap" data-cat="normal">
           <input
             type="checkbox"
             id="ink-tilt"
@@ -270,7 +291,7 @@ export default function SettingsSheet() {
           />
           <label htmlFor="ink-tilt">เอียงตัวเลขราคาแบบหมึกพู่กัน</label>
         </div>
-        <div className="cb-wrap">
+        <div className="cb-wrap" data-cat="normal">
           <input
             type="checkbox"
             id="veg-auto"
@@ -279,19 +300,21 @@ export default function SettingsSheet() {
           />
           <label htmlFor="veg-auto">ติดป้าย 齋 เจ อัตโนมัติเมื่อชื่อสินค้ามีคำว่า "เจ"</label>
         </div>
-        <div className="cb-wrap">
+        <div className="cb-wrap" data-cat="general">
           <input
             type="checkbox"
             id="print-mono"
             checked={!!config.printMono}
             onChange={(e) => updateConfig('printMono', e.target.checked)}
           />
-          <label htmlFor="print-mono">พิมพ์ขาว-ดำ — เปลี่ยนแดง/เหลืองเป็นโทนดำ (เครื่องพิมพ์ขาวดำ)</label>
+          <label htmlFor="print-mono">ปริ้นขาว-ดำ — เปลี่ยนแดง/เหลืองเป็นโทนดำ (เครื่องปริ้นขาวดำ)</label>
         </div>
 
-        <FlipSettingsFold />
+        <div data-cat="flip">
+          <FlipSettingsFold />
+        </div>
 
-        <details className="fold">
+        <details className="fold" open data-cat="fridge">
           <summary>
             ป้ายตู้แช่ (ระบายราคาเอง)<span className="fold-arrow">▾</span>
           </summary>
@@ -353,7 +376,7 @@ export default function SettingsSheet() {
                 checked={!!config.fridgeFill}
                 onChange={(e) => updateConfig('fridgeFill', e.target.checked)}
               />
-              <label htmlFor="fridge-fill">พิมพ์ราคาจริง — ถมดำขีดตามราคาให้เลย ไม่ต้องระบาย</label>
+              <label htmlFor="fridge-fill">ปริ้นราคาจริง — ถมดำขีดตามราคาให้เลย ไม่ต้องระบาย</label>
             </div>
             <div className="slider-stack">
               <SliderRow configKey="fridgeW" full />
@@ -365,7 +388,7 @@ export default function SettingsSheet() {
           </div>
         </details>
 
-        <details className="fold">
+        <details className="fold" open data-cat="hamper">
           <summary>
             ป้ายแขวนกระเช้า (พับ 2 หน้า)<span className="fold-arrow">▾</span>
           </summary>
@@ -376,12 +399,12 @@ export default function SettingsSheet() {
               <SliderRow configKey="hamperH" full />
             </div>
             <span className="fold-hint">
-              A4 ได้ {hpSheet.perSheet} ใบ/แผ่น · แถบยาว {((Number(config.hamperH) || 9.5) * 2).toFixed(1)} ซม. พับครึ่ง · พิมพ์สีแดง-เหลือง (เปิด "พิมพ์ขาว-ดำ" = ดำล้วน) · ชื่อร้าน/ชื่อจีนใช้ช่องเดียวกับป้ายปกติ
+              A4 ได้ {hpSheet.perSheet} ใบ/แผ่น · แถบยาว {((Number(config.hamperH) || 9.5) * 2).toFixed(1)} ซม. พับครึ่ง · ปริ้นสีแดง-เหลือง (เปิด "ปริ้นขาว-ดำ" = ดำล้วน) · ชื่อร้าน/ชื่อจีนใช้ช่องเดียวกับป้ายปกติ
             </span>
           </div>
         </details>
 
-        <details className="fold">
+        <details className="fold" open data-cat="advanced">
           <summary>
             ตั้งค่าขั้นสูง<span className="fold-arrow">▾</span>
           </summary>
