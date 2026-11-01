@@ -22,7 +22,7 @@ export const tagSize = (d: FlipData): Size =>
     ? { w: NARROW.w, h: NARROW.h }
     : d.variant === 'group' && d.group
       ? { w: d.group.slots * NARROW.w, h: TAG.h }
-      : { w: TAG.w, h: TAG.h };
+      : { w: d.tagW || TAG.w, h: TAG.h };
 
 export const stripSize = (d: FlipData): Size =>
   d.variant === 'narrow' ? { w: NARROW.stripW, h: NARROW.stripH * 2 } : { w: TAG.slotW * 2, h: TAG.stripH };

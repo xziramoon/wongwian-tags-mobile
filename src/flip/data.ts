@@ -41,6 +41,8 @@ export interface FlipData {
   lot: string;
   qty: number;
   variant: FlipVariant;
+  tagW?: number; // ความกว้างตัวป้ายเต็ม (มม.) — ว่าง = 90
+  nameSz?: number; // ขนาดชื่อ (มม.) — 0/ว่าง = อัตโนมัติ
   group?: FlipGroupData;
   sig?: string; // ลายเซ็นของป้ายกลุ่ม (ชื่อ+สมาชิก) ไว้เทียบว่าต้องพิมพ์ตัวป้ายใหม่ไหม
 }
@@ -52,6 +54,8 @@ export interface FlipOverride {
   pack?: string;
   variant?: FlipVariant;
   groupId?: string;
+  tagW?: number;
+  nameSz?: number;
 }
 export type FlipOverrides = Record<string, FlipOverride>;
 
@@ -155,6 +159,8 @@ export function fromQueueItem(
     lot: (item.Loc || '').trim() || database.find(item.Barcode)?.Lot || '',
     qty,
     variant: ov.variant === 'narrow' ? 'narrow' : 'full',
+    tagW: ov.tagW ?? settings.tagW,
+    nameSz: ov.nameSz ?? settings.nameSz,
   };
 }
 
@@ -193,6 +199,8 @@ export function fromProduct(p: Product, label: string, settings: FlipSettings, o
     lot: p.Lot || '',
     qty: 1,
     variant: ov.variant === 'narrow' ? 'narrow' : 'full',
+    tagW: ov.tagW ?? settings.tagW,
+    nameSz: ov.nameSz ?? settings.nameSz,
   };
 }
 

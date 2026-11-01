@@ -45,7 +45,7 @@ interface FlipState {
   groups: FlipGroup[];
 
   updateSetting: <K extends keyof FlipSettings>(key: K, value: FlipSettings[K]) => void;
-  setOverride: (barcode: string, key: keyof FlipOverride, value: string) => void;
+  setOverride: (barcode: string, key: keyof FlipOverride, value: string | number) => void;
   clearOverride: (barcode: string, key: keyof FlipOverride) => void;
   markStripsPrinted: (items: FlipData[]) => void;
   markTagsPrinted: (items: FlipData[]) => void;

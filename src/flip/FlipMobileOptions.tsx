@@ -1,7 +1,8 @@
 import type { QueueItem } from '../types';
 import { fromQueueItem, type FlipVariant } from './data';
-import type { FlipSendKind } from './config';
+import { NAME_SZ_RANGE, TAG_W_RANGE, type FlipSendKind } from './config';
 import { useFlipStore } from './store';
+import FlipSizeSlider, { autoNameSize } from './FlipSizeSlider';
 
 type TextKey = 'corner' | 'footer' | 'pack';
 const FIELDS: { key: TextKey; label: string; hint: string }[] = [
@@ -108,6 +109,32 @@ export default function FlipMobileOptions({ item }: { item: QueueItem }) {
 
       {variant === 'narrow' && (
         <span className="fold-hint">ป้ายแคบไม่ปริ้นบาร์โค้ด/ราคายกลัง/คำมุมขวา · แถบราคา 43 × 21 มม. พับบน-ล่าง</span>
+      )}
+
+      {variant !== 'group' && (
+        <>
+          {variant === 'full' && (
+            <FlipSizeSlider
+              label="ความกว้างป้าย"
+              unit="มม."
+              {...TAG_W_RANGE}
+              value={overrides?.tagW ?? settings.tagW}
+              overridden={overrides?.tagW !== undefined}
+              onChange={(v) => setOverride(item.Barcode, 'tagW', v)}
+              onReset={() => clearOverride(item.Barcode, 'tagW')}
+            />
+          )}
+          <FlipSizeSlider
+            label={variant === 'narrow' ? 'ขนาดตัวอักษรชื่อ (ป้ายแคบย่อ 70%)' : 'ขนาดตัวอักษรชื่อ'}
+            unit="มม."
+            {...NAME_SZ_RANGE}
+            value={overrides?.nameSz ?? settings.nameSz}
+            autoValue={autoNameSize(item.ProductName, settings.font, overrides?.tagW ?? settings.tagW)}
+            overridden={overrides?.nameSz !== undefined}
+            onChange={(v) => (v ? setOverride(item.Barcode, 'nameSz', v) : clearOverride(item.Barcode, 'nameSz'))}
+            onReset={() => clearOverride(item.Barcode, 'nameSz')}
+          />
+        </>
       )}
 
       {variant === 'full' &&

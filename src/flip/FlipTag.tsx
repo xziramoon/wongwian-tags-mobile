@@ -42,10 +42,11 @@ export function FlipTag({ data, settings }: Props) {
   const family = fontStack(settings.font);
   const tick = useFontsTick(...FONT_WAIT);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const nameSz = useMemo(() => fitName(data.name, family), [data.name, family, tick]);
+  const autoSz = useMemo(() => fitName(data.name, family, data.tagW || TAG.w), [data.name, family, data.tagW, tick]);
+  const nameSz = data.nameSz || autoSz;
 
   return (
-    <div className={wrapClass(settings, 'ft')} style={flipVars(settings)}>
+    <div className={wrapClass(settings, 'ft')} style={{ ...flipVars(settings), width: `${data.tagW || TAG.w}mm` }}>
       <div className="ft-head">
         <span className="ft-cn">{settings.shopCn}</span>
         <span className="ft-th">{settings.shopTh}</span>
@@ -141,7 +142,9 @@ export function FlipNarrowTag({ data, settings }: Props) {
   const price = flipNum(data.price);
   const maxW = settings.theme === 'ink' ? 38 : 41; // ธีมเอียง -4° เผื่อมุม
   /* eslint-disable react-hooks/exhaustive-deps */
-  const nameSz = useMemo(() => fitNarrowName(data.name, family, !!data.size), [data.name, data.size, family, tick]);
+  const autoNameSz = useMemo(() => fitNarrowName(data.name, family, !!data.size), [data.name, data.size, family, tick]);
+  // ป้ายแคบกว้างแค่ 45 มม. — ขนาดที่ตั้งเองย่อเป็น 70% (2.5–4.5 มม.)
+  const nameSz = data.nameSz ? Math.min(4.5, Math.max(2.5, data.nameSz * 0.7)) : autoNameSz;
   const priceSz = useMemo(
     () => fitWidth(price, priceFamily, priceWeight, maxW, 15, 10),
     [price, priceFamily, priceWeight, maxW, tick],

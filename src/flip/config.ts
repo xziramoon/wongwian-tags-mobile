@@ -70,6 +70,8 @@ export interface FlipSettings {
   font: string;
   red: string;
   mono: boolean;
+  tagW: number; // ความกว้างตัวป้ายเต็ม (มม.) — ช่องแถบราคาคงที่ 40 มม. ส่วนที่เหลือเป็นที่ของชื่อ
+  nameSz: number; // ขนาดตัวอักษรชื่อสินค้า (มม.) — 0 = อัตโนมัติ (ลดให้พอดี 2 บรรทัด)
 }
 
 export const DEFAULT_FLIP_SETTINGS: FlipSettings = {
@@ -84,7 +86,12 @@ export const DEFAULT_FLIP_SETTINGS: FlipSettings = {
   font: 'Kanit',
   red: '#D0021B',
   mono: false,
+  tagW: 90,
+  nameSz: 0,
 };
+
+export const TAG_W_RANGE = { min: 65, max: 120, step: 1 };
+export const NAME_SZ_RANGE = { min: 2.5, max: 7, step: 0.25 };
 
 export const FLIP_FONTS = ['Kanit', 'Prompt', 'Chakra Petch', 'Mitr'];
 export const FLIP_REDS = [

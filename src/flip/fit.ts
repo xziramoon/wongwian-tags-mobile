@@ -14,8 +14,8 @@ const textEm = (text: string, family: string, weight: number): number => {
 const round = (n: number, step = 0.05) => Math.floor(n / step) * step;
 
 /* ชื่อสินค้า: เริ่ม 5 มม. ลดลงจนไม่เกิน 2 บรรทัด ต่ำสุด 3.5 มม. */
-export function fitName(name: string, family: string): number {
-  const avail = TAG.w - TAG.border * 2 - TAG.slotW - 2 * 2.5;
+export function fitName(name: string, family: string, tagW: number = TAG.w): number {
+  const avail = tagW - TAG.border * 2 - TAG.slotW - 2 * 2.5;
   const em = textEm(name, family, 800);
   for (let size = 5; size > 3.5; size -= 0.25) {
     if (Math.ceil((em * size * 1.06) / avail) <= 2) return size;

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { QueueItem } from '../types';
-import { FLIP_FONTS, FLIP_REDS, FLIP_THEMES, type FlipSettings } from './config';
+import { FLIP_FONTS, FLIP_REDS, FLIP_THEMES, NAME_SZ_RANGE, TAG_W_RANGE, type FlipSettings } from './config';
+import FlipSizeSlider, { autoNameSize } from './FlipSizeSlider';
 import FlipGroupsMobile from './FlipGroupsMobile';
 import FlipMobilePreview from './FlipMobilePreview';
 import { FlipSendKindPicker } from './FlipMobileOptions';
@@ -94,6 +95,24 @@ export default function FlipSettingsFold() {
             <input className="field-input" value={String(settings[key])} onChange={(e) => updateSetting(key, e.target.value as never)} />
           </div>
         ))}
+
+        <FlipSizeSlider
+          label="ความกว้างป้าย (ค่าตั้งต้นทุกสินค้า)"
+          unit="มม."
+          {...TAG_W_RANGE}
+          value={settings.tagW}
+          onChange={(v) => updateSetting('tagW', v)}
+          onReset={() => updateSetting('tagW', 90)}
+          overridden={settings.tagW !== 90}
+        />
+        <FlipSizeSlider
+          label="ขนาดตัวอักษรชื่อสินค้า (ค่าตั้งต้น)"
+          unit="มม."
+          {...NAME_SZ_RANGE}
+          value={settings.nameSz}
+          autoValue={autoNameSize(sample.ProductName, settings.font, settings.tagW)}
+          onChange={(v) => updateSetting('nameSz', v)}
+        />
 
         <div>
           <span className="cfg-lbl">ฟอนต์</span>
