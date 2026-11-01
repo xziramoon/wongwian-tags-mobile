@@ -23,7 +23,7 @@
 .th-body > :first-child { flex:1 1 auto; min-height:16px; overflow:hidden; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start; }
 .th-body > :first-child > * { width:100%; flex:0 0 auto; }
 .th-name { font-weight:700; color:#000; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; }
-.th-sizeline { font-size:var(--meta-sz); color:#333; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.th-sizeline { font-size:min(var(--meta-sz), 5.2cqw); color:#333; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; } /* ป้ายแคบ: ย่อตัวอักษร/ขึ้นบรรทัดใหม่ แทนการตัดเป็น … */
 
 .th-row { flex:0 0 auto; display:flex; justify-content:space-between; align-items:flex-end; gap:4px; min-width:0; }
 .th-badges { display:flex; flex-direction:column; align-items:flex-start; gap:2px; font-size:calc(var(--meta-sz) - 1px); font-weight:700; min-width:0; overflow:hidden; padding-bottom:1px; }

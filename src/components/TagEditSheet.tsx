@@ -423,15 +423,39 @@ export default function TagEditSheet() {
                   placeholder="—"
                 />
               </div>
-              <div className="q-field">
-                <span className="q-lbl">ขนาดตัวหนังสือชื่อ</span>
-                <input
-                  className="field-input"
-                  type="number"
-                  value={fs}
-                  onChange={(e) => setField('NameFontSize', +e.target.value)}
-                  title="ขนาดฟอนต์ชื่อ"
-                />
+              <div className="q-field slider-row">
+                <div className="slider-header">
+                  <span className="q-lbl">ขนาดตัวหนังสือชื่อ</span>
+                  <span className="slider-val">
+                    {fs}px
+                    {fs !== autoFontSize(item.ProductName, item.TagMode) && (
+                      <button
+                        type="button"
+                        className="flip-x"
+                        title="กลับเป็นขนาดอัตโนมัติ"
+                        onClick={() => setField('NameFontSize', autoFontSize(item.ProductName, item.TagMode))}
+                      >
+                        ↺
+                      </button>
+                    )}
+                  </span>
+                </div>
+                <div className="stepper">
+                  <button type="button" className="step-btn" onClick={() => setField('NameFontSize', Math.max(5, fs - 0.5))}>
+                    −
+                  </button>
+                  <input
+                    type="range"
+                    min={5}
+                    max={30}
+                    step={0.5}
+                    value={fs}
+                    onChange={(e) => setField('NameFontSize', parseFloat(e.target.value))}
+                  />
+                  <button type="button" className="step-btn" onClick={() => setField('NameFontSize', Math.min(30, fs + 0.5))}>
+                    +
+                  </button>
+                </div>
               </div>
               <div className="q-field">
                 <span className="q-lbl">เลื่อนราคา ซ้าย-ขวา</span>
