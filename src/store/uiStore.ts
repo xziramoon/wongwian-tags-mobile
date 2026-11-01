@@ -4,7 +4,7 @@ import { PREFS_STORAGE_KEY } from '../constants';
 import { autoFontSize } from '../lib/utils';
 
 /* แบบป้ายที่เลือกได้ในหน้าผลสแกน (แถบสินค้าหมดมีปุ่ม/ขั้นตอนของตัวเอง) */
-export const SCAN_TAG_MODES: TagMode[] = ['standard', 'dual', 'large', 'fridge', 'hamper'];
+export const SCAN_TAG_MODES: TagMode[] = ['standard', 'dual', 'large', 'fridge', 'hamper', 'flip'];
 
 interface Prefs {
   autoOpenCamera: boolean;
@@ -104,6 +104,10 @@ interface UIState {
   settingsSheetOpen: boolean;
   setSettingsSheetOpen: (open: boolean) => void;
 
+  /** รายการป้ายดำแดง (แถบพลิก) ที่ต้องเปลี่ยนวันนี้ */
+  flipTodayOpen: boolean;
+  setFlipTodayOpen: (open: boolean) => void;
+
   /** TagEditSheet — either creating a new item from a scan/search preview, or
    * editing an existing queue row by index. null when the sheet is closed. */
   tagEditTarget: { mode: 'new'; item: QueueItem } | { mode: 'edit'; index: number } | null;
@@ -167,6 +171,9 @@ export const useUIStore = create<UIState>((set) => ({
 
   settingsSheetOpen: false,
   setSettingsSheetOpen: (settingsSheetOpen) => set({ settingsSheetOpen }),
+
+  flipTodayOpen: false,
+  setFlipTodayOpen: (flipTodayOpen) => set({ flipTodayOpen }),
 
   tagEditTarget: null,
   openTagEditNew: (item) => set({ tagEditTarget: { mode: 'new', item } }),

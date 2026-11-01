@@ -5,6 +5,7 @@ import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { useOosStore } from '../store/oosStore';
 import type { QueueItem, TagMode } from '../types';
 import { isVeg } from '../lib/veg';
+import FlipMobileOptions from '../flip/FlipMobileOptions';
 
 /* Bottom sheet shown after a scan (or a manual-search tap). Shows the looked-up
  * product with a qty stepper when found; falls back to a "ไม่พบสินค้า" state with
@@ -21,6 +22,7 @@ const SCAN_MODE_OPTS: [TagMode, string][] = [
   ['large', 'ป้ายใหญ่'],
   ['fridge', '❄ ตู้แช่'],
   ['hamper', '🎁 กระเช้า'],
+  ['flip', 'ดำแดง'],
 ];
 
 export default function ScanResultSheet() {
@@ -198,7 +200,7 @@ export default function ScanResultSheet() {
         {/* ราคานี้ใช้ป้ายแบบไหน — ใช้ทั้งปุ่ม เพิ่มในคิว และ พิมพ์เลย, จำแบบล่าสุดไว้ให้สแกนชิ้นถัดไป */}
         <div className="scan-mode">
           <span className="veg-toggle-lbl">ใช้ป้ายแบบ</span>
-          <div className="mode-btns mode-btns-5">
+          <div className="mode-btns mode-btns-6">
             {SCAN_MODE_OPTS.map(([mode, label]) => (
               <button
                 key={mode}
@@ -212,6 +214,7 @@ export default function ScanResultSheet() {
             ))}
           </div>
           <TagPreview item={item} config={config} maxWidth={item.TagMode === 'large' ? 300 : 230} />
+          {item.TagMode === 'flip' && <FlipMobileOptions item={item} />}
           {item.TagMode === 'fridge' && (
             <span className="fold-hint">
               {config.fridgeFill ? 'ถมขีดตามราคาให้แล้ว (ราคามีสตางค์ = เว้นว่างให้ระบาย)' : `ป้ายพิมพ์ 888 เปล่า — เอาเมจิกระบาย ${item.Price || '?'} บาท เอง`}

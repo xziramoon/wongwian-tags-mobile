@@ -70,7 +70,8 @@ class DatabaseService {
       colPrice = 3,
       colPrice2 = 4,
       colImage = 5,
-      colSize = -1;
+      colSize = -1,
+      colLot = -1;
     let dataRows = rawRows;
 
     if (looksLikeHeader) {
@@ -89,6 +90,8 @@ class DatabaseService {
       if (im >= 0) colImage = im;
       const sz = findCol(['size', 'ขนาด']);
       if (sz >= 0) colSize = sz;
+      const lt = findCol(['lot', 'ล็อค', 'ล็อก', 'lock', 'ตำแหน่ง', 'shelf']);
+      if (lt >= 0) colLot = lt;
       dataRows = rawRows.slice(1); // drop header row
     }
 
@@ -104,6 +107,7 @@ class DatabaseService {
           Price2: g(row, colPrice2),
           Image: g(row, colImage),
           Size: colSize >= 0 ? g(row, colSize) : '',
+          Lot: colLot >= 0 ? g(row, colLot) : '',
         }),
       )
       .filter((p) => p.Barcode);

@@ -5,6 +5,7 @@ import { autoFontSize } from '../lib/utils';
 import { HAMPER_DEFAULTS } from '../lib/hamper';
 import type { DualStyle, QueueItem } from '../types';
 import TagPreview from './TagPreview';
+import FlipMobileOptions from '../flip/FlipMobileOptions';
 
 /* Shared new/edit tag-design sheet, driven by uiStore.tagEditTarget:
  *  - mode 'new': fields are buffered in local state (there's no queue index yet)
@@ -260,8 +261,17 @@ export default function TagEditSheet() {
             >
               🎁 แขวนกระเช้า
             </button>
+            <button
+              type="button"
+              className={`mode-btn${item.TagMode === 'flip' ? ' active' : ''}`}
+              onClick={() => setField('TagMode', 'flip')}
+            >
+              ดำแดง (แถบพลิก)
+            </button>
           </div>
         </div>
+
+        {item.TagMode === 'flip' && <FlipMobileOptions item={item} />}
 
         {item.TagMode === 'dual' && (
           <div className="mode-btns mode-btns-2">

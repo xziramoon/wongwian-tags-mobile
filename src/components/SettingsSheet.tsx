@@ -6,6 +6,7 @@ import SliderRow from './SliderRow';
 import { PRICE_FONTS, THEME_PRESETS } from '../constants';
 import { fridgeSheetLayout } from '../lib/fridge';
 import { hamperSheetLayout } from '../lib/hamper';
+import FlipSettingsFold from '../flip/FlipSettingsFold';
 
 /* placeholder shown in the embedded preview when the queue is still empty */
 const PLACEHOLDER_ITEM: QueueItem = {
@@ -287,6 +288,8 @@ export default function SettingsSheet() {
           />
           <label htmlFor="print-mono">พิมพ์ขาว-ดำ — เปลี่ยนแดง/เหลืองเป็นโทนดำ (เครื่องพิมพ์ขาวดำ)</label>
         </div>
+
+        <FlipSettingsFold />
 
         <details className="fold">
           <summary>

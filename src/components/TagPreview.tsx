@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Config, QueueItem } from '../types';
 import PriceTag from './PriceTag';
+import FlipMobilePreview from '../flip/FlipMobilePreview';
 
 /* CSS's fixed physical-unit ratio (96dpi / 2.54 cm-per-inch) — tag.css sizes tags in
  * real cm via --tag-w/--tag-h/--large-w/--large-h, which must NOT be touched, so this
@@ -23,7 +24,7 @@ interface Props {
 /** Scale-to-fit preview wrapper around <PriceTag>. tag.css sizes the real tag in cm
  * (for print accuracy) — this scales the whole rendered tag down/up with a CSS
  * transform so it always fits a small on-screen preview card. */
-export default function TagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }: Props) {
+function PriceTagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -66,4 +67,10 @@ export default function TagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }:
       </div>
     </div>
   );
+}
+
+/* ป้ายดำแดง (แถบพลิก) มีตัวป้าย + แถบราคา วาดแยก (src/flip) — แบบอื่นใช้พรีวิวป้ายเดิม */
+export default function TagPreview(props: Props) {
+  if (props.item.TagMode === 'flip') return <FlipMobilePreview item={props.item} />;
+  return <PriceTagPreview {...props} />;
 }
