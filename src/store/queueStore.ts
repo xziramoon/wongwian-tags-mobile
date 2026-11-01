@@ -12,6 +12,7 @@ import {
 } from '../constants';
 import { database } from '../lib/database';
 import { printBridge } from '../lib/printBridge';
+import { sendFlipFromQueue } from '../flip/flipSend';
 import { autoFontSize, extractSize } from '../lib/utils';
 import { printRank } from '../lib/fridge';
 import { useUIStore } from './uiStore';
@@ -313,8 +314,21 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     try {
       // แถบสินค้าหมด (oos) สูงแค่ 1.4 ซม. ไม่เท่าป้ายอื่น (4.0 ซม.) — ถ้าปนกลางแถวใน A4
       // จะเกิดช่องว่างฟันหลอ เรียงแถบไปท้ายสุดของงานพิมพ์เสมอ — ป้ายตู้แช่ (3.5 ซม.) ก็สูงไม่เท่า จัดกลุ่มไว้ก่อนแถบ
-      const ordered = [...queue].sort((a, b) => printRank(a.TagMode) - printRank(b.TagMode));
-      await printBridge.publish(config, ordered);
+      // ป้ายดำแดง (แถบพลิก) ส่งเป็นงานแยก — ตัวรับพิมพ์ A4 ขอบ 5 มม. คนละแบบกับป้ายทั่วไป
+      const stdItems = queue.filter((i) => i.TagMode !== 'flip');
+      const flipItems = queue.filter((i) => i.TagMode === 'flip');
+      if (stdItems.length) {
+        const ordered = [...stdItems].sort((a, b) => printRank(a.TagMode) - printRank(b.TagMode));
+        await printBridge.publish(config, ordered);
+        if (flipItems.length) {
+          // ส่งป้ายทั่วไปสำเร็จแล้ว — ถ้าส่งป้ายดำแดงไม่สำเร็จ คิวต้องเหลือแต่ป้ายดำแดง กันกดส่งซ้ำแล้วป้ายทั่วไปออกซ้ำ
+          set((s) => {
+            persist(flipItems, s.config);
+            return { queue: flipItems };
+          });
+        }
+      }
+      if (flipItems.length) await sendFlipFromQueue(flipItems);
       set((s) => {
         persist([], s.config);
         const history = [{ id: `${Date.now()}`, ts: Date.now(), items: queue }, ...s.history].slice(

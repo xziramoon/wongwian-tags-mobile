@@ -1,0 +1,106 @@
+/* ป้ายดำแดง (แถบพลิก) — ส่วนวาดป้าย คัดลอกจาก wongwian-tags01/src/styles/flip.css (ทุกขนาดเป็น mm) */
+/* ============================================================
+ * ป้ายดำแดง (แถบพลิก) — ทุกขนาดเป็น mm เพื่อให้พิมพ์ตรงขนาดจริง (ห้ามใช้ px)
+ * ตัวแปร: --ft-red (สีแดง / ดำในโหมดขาวดำ), --ft-font (ฟอนต์หลัก)
+ * ============================================================ */
+
+.ft, .fs, .fs-face {
+  font-family: var(--ft-font, 'Kanit', sans-serif);
+  box-sizing: border-box;
+  color: #111;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---------- ตัวป้ายถาวร 90 × 40 ---------- */
+.ft { width: 90mm; height: 40mm; border: 0.75mm solid #111; background: #fff; display: flex; flex-direction: column; overflow: hidden; line-height: 1.15; flex-shrink: 0; }
+.ft-head { flex: 0 0 7.5mm; height: 7.5mm; background: #111; color: #fff; display: flex; align-items: center; overflow: hidden; }
+.ft-cn { height: 100%; padding: 0 2mm; display: flex; align-items: center; background: var(--ft-red); color: #fff; font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 4.25mm; white-space: nowrap; flex: 0 0 auto; }
+.ft-th { padding-left: 2.5mm; font-size: 4mm; font-weight: 800; white-space: nowrap; flex: 0 0 auto; }
+.ft-corner { flex: 1 1 0; min-width: 0; text-align: right; padding: 0 2.5mm; font-size: 3mm; font-weight: 400; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ft-body { flex: 1 1 auto; min-height: 0; display: flex; }
+.ft-info { flex: 1 1 0; min-width: 0; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; }
+.ft-name { font-weight: 800; line-height: 1.2; color: #111; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; }
+.ft-size { font-size: 3.5mm; font-weight: 400; color: #333; margin-top: 0.4mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ft-spacer { flex: 1 1 auto; }
+.ft-bc { display: block; width: 29mm; height: 4mm; max-width: 100%; }
+.ft-foot { font-size: 2.75mm; font-weight: 400; color: #555; margin-top: 0.4mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+.ft-slot { flex: 0 0 40mm; width: 40mm; border-left: 0.75mm solid #111; padding: 1.5mm; display: flex; }
+.ft-slot-box { flex: 1; border: 0.3mm dashed #888; display: flex; align-items: center; justify-content: center; font-size: 3mm; color: #888; }
+
+/* ---------- แถบราคา (ด้านละ 40 × 31) ---------- */
+.fs { display: flex; position: relative; background: #fff; flex-shrink: 0; }
+.fs-face { flex: 0 0 40mm; width: 40mm; height: 31mm; display: flex; flex-direction: column; overflow: hidden; background: #fff; line-height: 1.1; }
+.fs-fold { position: absolute; left: 40mm; top: 0; bottom: 0; border-left: 0.25mm dashed #666; pointer-events: none; }
+.fs-pw { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 2mm; }
+.fs-price { font-family: var(--ft-price-font, inherit); font-weight: var(--ft-price-weight, 800); color: var(--ft-red); line-height: 1; white-space: nowrap; }
+.fs-unit { font-size: 4.25mm; font-weight: 800; color: #111; line-height: 1.2; }
+.fs-pack { flex: 0 0 auto; background: #111; color: #fff; font-size: 3mm; font-weight: 600; text-align: center; padding: 0.9mm 1mm; white-space: nowrap; overflow: hidden; line-height: 1.25; }
+.fs-back { background: var(--ft-red); color: #fff; align-items: center; justify-content: center; text-align: center; }
+.fs-out { font-weight: 800; line-height: 1.2; white-space: nowrap; }
+.fs-outsub { font-size: 3mm; font-weight: 400; margin-top: 1mm; }
+
+/* ธีมเดียวกับป้ายปกติของแอป (src/styles/tag-theme.css): หมึกแดง = ตัวเลขเอียง -4° / เกาหลี = หัวแดง + เงาเหลือง */
+.ft-theme-ink .fs-price { display: inline-block; transform: rotate(-4deg); text-shadow: 0 0 0.3mm currentColor; line-height: 0.95; }
+.ft-theme-korean .fs-price { letter-spacing: -0.3mm; text-shadow: 0.6mm 0.6mm 0 #FFD43B; }
+.ft-theme-korean .ft-head { background: var(--ft-red); }
+.ft-theme-korean:not(.flip-mono) .ft-cn { background: transparent; }
+
+/* โหมดขาวดำ: ไม่มีแดงเหลือ (ตราจีนกลับสีเป็นขาวบนหัวดำ) */
+.flip-mono .ft-cn { background: #fff; color: #111; }
+.flip-mono.fs-front .fs-price, .flip-mono .fs-price { color: #111; }
+.flip-mono.ft-theme-korean .fs-price { text-shadow: 0.6mm 0.6mm 0 #b5b5b5; } /* เงาเทาแทนเหลือง เหมือน tag-mono.css */
+
+
+/* ---------- ป้ายแคบ 45 × 40 (สเปกข้อ 12.1) ---------- */
+.ftn { width: 45mm; }
+.ftn .ft-cn { font-size: 3.25mm; padding: 0 1.25mm; }
+.ftn-head { flex: 0 0 6mm; height: 6mm; }
+.ftn-th { flex: 1 1 0; min-width: 0; text-align: center; font-size: 3.25mm; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 1mm; }
+.ftn-name { flex: 0 0 11mm; height: 11mm; padding: 1mm 1.75mm; overflow: hidden; }
+.ftn-nm { font-weight: 800; line-height: 1.15; color: #111; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; text-overflow: ellipsis; }
+.ftn-sz { font-size: 2.75mm; color: #333; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ftn-price { flex: 1 1 auto; min-height: 0; border-top: 0.75mm solid #111; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+.ftn-unit { font-size: 3.5mm; font-weight: 800; color: #111; line-height: 1.2; }
+
+/* แถบป้ายแคบ: ด้านละ 43 × 21 พับแนวบน-ล่าง (กางออก 43 × 42) · ด้านสินค้าหมดพิมพ์กลับหัว 180° */
+.fsn { position: relative; width: 43mm; height: 42mm; display: flex; flex-direction: column; background: #fff; box-sizing: border-box; flex-shrink: 0; font-family: var(--ft-font, 'Kanit', sans-serif); color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.fsn-face { flex: 0 0 21mm; width: 43mm; height: 21mm; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; line-height: 1.1; }
+.fsn-back { background: var(--ft-red); color: #fff; text-align: center; transform: rotate(180deg); }
+.fsn-fold { position: absolute; left: 0; right: 0; top: 21mm; border-top: 0.25mm dashed #666; pointer-events: none; }
+
+/* ---------- ป้ายกลุ่ม n × 45 × 40 (สเปกข้อ 12.2) ---------- */
+.ftg-boxes { display: flex; flex-wrap: wrap; gap: 1mm; align-content: flex-end; overflow: hidden; }
+.ftg-box { border: 0.4mm solid #111; padding: 0.4mm 1.5mm; display: flex; flex-direction: column; align-items: center; line-height: 1.15; background: #fff; }
+.ftg-lb { font-size: 3mm; font-weight: 600; color: #111; white-space: nowrap; }
+.ftg-code { font-size: 2.75mm; color: #555; letter-spacing: 0.1mm; }
+.fs-chip { background: #111; color: #fff; font-size: 3mm; font-weight: 600; padding: 0.5mm 2mm; border-radius: 0.6mm; margin-bottom: 0.8mm; line-height: 1.25; white-space: nowrap; }
+
+/* สติกเกอร์แดง "หมด" 14 × 8 */
+.fst { width: 14mm; height: 8mm; box-sizing: border-box; background: var(--ft-red); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--ft-font, 'Kanit', sans-serif); font-weight: 800; font-size: 4.5mm; line-height: 1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+
+/* ---------- ส่วนของมือถือ ---------- */
+.flip-scale { width: 100%; overflow: hidden; }
+.flip-scale-inner { transform-origin: top left; width: max-content; }
+.flip-prev { display: flex; flex-direction: column; gap: 10px; align-items: stretch; width: 100%; }
+.flip-prev-cap { font-size: 12px; color: var(--txt2, #767690); margin-top: 2px; }
+.flip-variant-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0; }
+.flip-hint-box { background: rgba(75, 71, 230, 0.08); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
+.flip-warn { padding: 8px 10px; background: rgba(228, 60, 60, 0.1); color: #c62828; border-radius: 10px; font-size: 13.5px; font-weight: 600; }
+.flip-row-line { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid rgba(128, 128, 150, 0.25); }
+.flip-row-line.warn { color: #c62828; }
+.flip-row-line input[type='checkbox'] { width: 22px; height: 22px; flex-shrink: 0; }
+.flip-row-main { min-width: 0; flex: 1; }
+.flip-row-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flip-row-sub { font-size: 13px; opacity: 0.75; }
+.flip-grp { border-top: 1px solid rgba(128, 128, 150, 0.25); padding: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+.flip-grp-member { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center; }
+.flip-grp-code { font-size: 12.5px; opacity: 0.7; }
+.flip-grp-price { font-size: 13.5px; font-weight: 700; min-width: 38px; text-align: right; }
+.flip-x { border: none; background: none; color: inherit; font-size: 18px; padding: 4px 8px; cursor: pointer; }
+.flip-results { display: flex; flex-direction: column; border: 1px solid rgba(128, 128, 150, 0.3); border-radius: 12px; overflow: hidden; }
+.flip-results button { text-align: left; border: none; background: none; color: inherit; padding: 10px 12px; font-size: 14.5px; border-top: 1px solid rgba(128, 128, 150, 0.2); }
+.flip-results button:first-child { border-top: none; }
+.flip-kind-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mode-btns-6 { grid-template-columns: repeat(3, 1fr); }

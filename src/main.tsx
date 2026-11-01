@@ -8,6 +8,7 @@ import './styles/tag-veg.css'
 import './styles/tag-mono.css'
 import './styles/tag-fridge.css'
 import './styles/tag-hamper.css'
+import './styles/flip.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

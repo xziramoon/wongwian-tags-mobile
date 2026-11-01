@@ -1,12 +1,23 @@
 import * as Ably from 'ably';
 import type { Config, QueueItem } from '../types';
+import type { FlipPrintKind } from '../flip/store';
+import type { FlipData } from '../flip/data';
+import type { FlipSettings } from '../flip/config';
 import { ABLY_API_KEY, PRINT_TAGS_CHANNEL, PRINT_EVENT_NAME, PRINT_PAYLOAD_VERSION } from '../constants';
+
+/* ป้ายดำแดง (แถบพลิก) ส่งเป็นงานแยก ฟิลด์ flip — ตัวรับ TAG_PRINTER.html วาดและพิมพ์ A4 เอง */
+export interface FlipPayload {
+  kind: FlipPrintKind;
+  settings: FlipSettings;
+  items: FlipData[];
+}
 
 export interface PrintPayload {
   v: number;
   ts: number;
   config: Config;
   items: QueueItem[];
+  flip?: FlipPayload;
 }
 
 export type AblyConnState = 'connecting' | 'connected' | 'disconnected' | 'suspended' | 'failed' | 'closed';
@@ -65,6 +76,12 @@ class PrintBridge {
     const payload: PrintPayload = { v: PRINT_PAYLOAD_VERSION, ts: Date.now(), config, items };
     const channel = this.client.channels.get(PRINT_TAGS_CHANNEL);
     await channel.publish(PRINT_EVENT_NAME, payload);
+  }
+
+  async publishFlip(config: Config, flip: FlipPayload): Promise<void> {
+    await this.waitConnected();
+    const payload: PrintPayload = { v: PRINT_PAYLOAD_VERSION, ts: Date.now(), config, items: [], flip };
+    await this.client.channels.get(PRINT_TAGS_CHANNEL).publish(PRINT_EVENT_NAME, payload);
   }
 }
 

@@ -1,4 +1,4 @@
-export type TagMode = 'standard' | 'dual' | 'large' | 'oos' | 'fridge' | 'hamper';
+export type TagMode = 'standard' | 'dual' | 'large' | 'oos' | 'fridge' | 'hamper' | 'flip';
 export type DualStyle = 'A' | 'B';
 export type OosReason = 'temp' | 'stop'; // temp = หมดชั่วคราว, stop = เลิกจำหน่าย
 
@@ -88,6 +88,7 @@ export interface Product {
   Price2: string;
   Image: string;
   Size: string;
+  Lot?: string; // ล็อค/ตำแหน่งชั้น (ถ้าชีตมีคอลัมน์) — ใช้เรียงป้ายดำแดง
 }
 
 export type ToastType = 'info' | 'success' | 'error';

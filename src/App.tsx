@@ -16,6 +16,7 @@ import SettingsSheet from './components/SettingsSheet';
 import TagEditSheet from './components/TagEditSheet';
 import ToastContainer from './components/ToastContainer';
 import PendingSendBar from './components/PendingSendBar';
+import FlipTodaySheet from './flip/FlipTodaySheet';
 
 /* maps Ably's connection.state values to the coarser 3-state pill the UI shows */
 function toAblyStatus(state: AblyConnState): 'connecting' | 'connected' | 'offline' {
@@ -88,6 +89,7 @@ function App() {
       <ManualSearchSheet />
       <SettingsSheet />
       <TagEditSheet />
+      <FlipTodaySheet />
       <PendingSendBar />
       <ToastContainer />
     </div>

@@ -4,6 +4,7 @@ import { fridgeSheetLayout } from '../lib/fridge';
 import { useUIStore } from '../store/uiStore';
 import { useOosStore } from '../store/oosStore';
 import ConnectionStatus from './ConnectionStatus';
+import { useFlipLists } from '../flip/useFlipLists';
 import { IconBox, IconScan, IconSearch, IconSettings, IconUndo } from './Icons';
 
 /* หน้าแรกของแอป — กล้องจะไม่เปิดเองตอนเข้าแอป (ขอกล้องตอนผู้ใช้ตั้งใจจะสแกน
@@ -14,6 +15,8 @@ export default function HomeScreen() {
   const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
   const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
   const setQueueDrawerOpen = useUIStore((s) => s.setQueueDrawerOpen);
+  const setFlipTodayOpen = useUIStore((s) => s.setFlipTodayOpen);
+  const flipLists = useFlipLists();
   const autoOpenCamera = useUIStore((s) => s.autoOpenCamera);
   const setAutoOpenCamera = useUIStore((s) => s.setAutoOpenCamera);
   const sending = useUIStore((s) => s.sending);
@@ -102,6 +105,20 @@ export default function HomeScreen() {
           </button>
         </div>
       </section>
+
+      {/* ป้ายดำแดง (แถบพลิก): ราคาเปลี่ยนก็พิมพ์ใหม่เฉพาะแถบ — รายการที่ต้องเปลี่ยนวันนี้ */}
+      <button type="button" className="home-card home-row-card" onClick={() => setFlipTodayOpen(true)}>
+        <span className="home-row-info">
+          <span className="home-card-title">ป้ายดำแดง (แถบพลิก)</span>
+          <span className="home-row-meta">
+            {flipLists.today.length ? `ต้องเปลี่ยนวันนี้ ${flipLists.today.length} รายการ` : 'ราคาบนชั้นตรงกับชีต'}
+            {flipLists.needTags.length ? ` · ตัวป้ายที่ต้องพิมพ์ ${flipLists.needTags.length}` : ''}
+          </span>
+        </span>
+        <span className="home-chevron" aria-hidden="true">
+          ›
+        </span>
+      </button>
 
       {/* ป้ายระบายเปล่า — ไม่มีชื่อสินค้า ไว้ใส่แทนป้ายเดิมตอนราคาเปลี่ยน ค่าเริ่มต้น = เต็ม 1 แผ่น A4 */}
       <section className="home-card blank-card">
