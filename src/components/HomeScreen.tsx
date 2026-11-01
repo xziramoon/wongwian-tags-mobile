@@ -1,194 +1,179 @@
-import { useState } from 'react';
 import { useQueueStore } from '../store/queueStore';
 import { fridgeSheetLayout } from '../lib/fridge';
 import { useUIStore } from '../store/uiStore';
 import { useOosStore } from '../store/oosStore';
-import ConnectionStatus from './ConnectionStatus';
 import { useFlipLists } from '../flip/useFlipLists';
-import { IconBox, IconScan, IconSearch, IconSettings, IconUndo } from './Icons';
+import { summarizeByType, totalTags, typeDef } from '../lib/tagTypes';
+import { usePaperSheets } from '../lib/usePaper';
+import ConnectionStatus from './ConnectionStatus';
+import PrinterOfflineBar from './PrinterOfflineBar';
+import TypeBar from './TypeBar';
+import { IconBox, IconScan, IconSearch, IconSettings, IconPrinter } from './Icons';
 
-/* หน้าแรกของแอป — กล้องจะไม่เปิดเองตอนเข้าแอป (ขอกล้องตอนผู้ใช้ตั้งใจจะสแกน
- * เท่านั้น ตามแนวทาง permission-in-context) เว้นแต่เปิดค่าตั้ง "เปิดกล้องทันที" ไว้
- * หน้านี้รวมทางเข้าหลัก: สแกน / ค้นหา / คิวรอพิมพ์ / ส่งล่าสุด / สินค้าหมด / ตั้งค่าป้าย */
+/* หน้าแรก (ดีไซน์ใหม่ 1a): จำนวนป้ายที่รอปริ้นตัวใหญ่ + แถบสีแยกตามแบบ + การ์ดทางลัด + แถบล่าง หาชื่อ / สแกน / รอปริ้น
+ * กล้องไม่เปิดเองตอนเข้าแอป (ขอกล้องตอนผู้ใช้ตั้งใจสแกน) เว้นแต่เปิดค่า "เปิดกล้องทันที" */
 export default function HomeScreen() {
   const setCameraEnabled = useUIStore((s) => s.setCameraEnabled);
   const setManualSearchOpen = useUIStore((s) => s.setManualSearchOpen);
   const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
   const setQueueDrawerOpen = useUIStore((s) => s.setQueueDrawerOpen);
   const setFlipTodayOpen = useUIStore((s) => s.setFlipTodayOpen);
-  const flipLists = useFlipLists();
   const autoOpenCamera = useUIStore((s) => s.autoOpenCamera);
   const setAutoOpenCamera = useUIStore((s) => s.setAutoOpenCamera);
+  const lastTagMode = useUIStore((s) => s.lastTagMode);
   const sending = useUIStore((s) => s.sending);
   const queue = useQueueStore((s) => s.queue);
   const history = useQueueStore((s) => s.history);
   const pendingSendAt = useQueueStore((s) => s.pendingSendAt);
   const requestSend = useQueueStore((s) => s.requestSend);
   const restoreFromHistory = useQueueStore((s) => s.restoreFromHistory);
-  const oosCount = useOosStore((s) => Object.keys(s.records).length);
   const addBlankFridge = useQueueStore((s) => s.addBlankFridge);
   const sheetSize = useQueueStore((s) => fridgeSheetLayout(s.config).perSheet);
-  /* null = ยังไม่ได้ปรับ ใช้จำนวนเต็มแผ่น (ตามขนาดป้ายในตั้งค่า) */
-  const [blankQty, setBlankQty] = useState<number | null>(null);
+  const oosCount = useOosStore((s) => Object.keys(s.records).length);
+  const flipLists = useFlipLists();
+  const paper = usePaperSheets();
 
-  const totalTags = queue.reduce((sum, i) => sum + i.PrintQty, 0);
+  const total = totalTags(queue);
+  const types = summarizeByType(queue);
   const last = history[0];
-  const lastTime = last
-    ? new Date(last.ts).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
-    : '';
+  const lastTime = last ? new Date(last.ts).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
 
   return (
-    <div className="home">
-      <header className="home-header">
-        <div className="home-title">
-          <div className="home-title-main">วงเวียน สแกนพิมพ์ป้าย</div>
+    <div className="dz-home">
+      <div className="dz-home-body">
+      <header className="dz-home-header">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div className="dz-home-title">ทำป้ายราคา</div>
           <ConnectionStatus inline />
         </div>
-        <button
-          type="button"
-          className="home-icon-btn"
-          onClick={() => setSettingsSheetOpen(true)}
-          aria-label="ออกแบบป้ายราคา"
-        >
-          <IconSettings />
+        <button type="button" className="dz-icon-btn" onClick={() => setSettingsSheetOpen(true)} aria-label="ตั้งค่าป้าย">
+          <IconSettings size={22} />
         </button>
       </header>
 
-      <button type="button" className="home-scan-btn" onClick={() => setCameraEnabled(true)}>
-        <span className="home-scan-icon">
-          <IconScan size={56} />
-        </span>
-        <span className="home-scan-label">สแกนบาร์โค้ด</span>
-        <span className="home-scan-sub">แตะเพื่อเปิดกล้อง</span>
-      </button>
+      <PrinterOfflineBar />
 
-      <button type="button" className="home-search-btn" onClick={() => setManualSearchOpen(true)}>
-        <IconSearch size={20} /> ค้นหาด้วยชื่อหรือรหัสสินค้า
-      </button>
-
-      <section className="home-card">
-        <div className="home-card-head">
-          <span className="home-card-title">คิวรอพิมพ์</span>
-          <span className="home-card-count">
-            {queue.length} รายการ{totalTags > queue.length ? ` · ${totalTags} ป้าย` : ''}
-          </span>
-        </div>
-        {queue.length === 0 ? (
-          <div className="home-card-empty">ยังไม่มีป้ายในคิว — สแกนสินค้าเพื่อเริ่ม</div>
-        ) : (
-          <ul className="home-queue-preview">
-            {queue
-              .slice(-3)
-              .reverse()
-              .map((item, i) => (
-                <li key={`${item.Barcode}-${i}`}>
-                  <span className="home-queue-name">{item.ProductName || 'ป้ายระบายเปล่า'}</span>
-                  <span className="home-queue-price">
-                    {item.TagMode === 'fridge' ? '❄ ตู้แช่' : `${item.Price} ฿`}{item.PrintQty > 1 ? ` ×${item.PrintQty}` : ''}
-                  </span>
-                </li>
-              ))}
-            {queue.length > 3 && <li className="home-queue-more">และอีก {queue.length - 3} รายการ</li>}
-          </ul>
-        )}
-        <div className="home-card-actions">
-          <button type="button" className="btn btn-secondary" onClick={() => setQueueDrawerOpen(true)}>
-            ดู / แก้คิว
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={requestSend}
-            disabled={!queue.length || sending || !!pendingSendAt}
-          >
-            {sending ? 'กำลังส่ง...' : 'ส่งพิมพ์ทั้งหมด'}
-          </button>
-        </div>
-      </section>
-
-      {/* ป้ายดำแดง (แถบพลิก): ราคาเปลี่ยนก็พิมพ์ใหม่เฉพาะแถบ — รายการที่ต้องเปลี่ยนวันนี้ */}
-      <button type="button" className="home-card home-row-card" onClick={() => setFlipTodayOpen(true)}>
-        <span className="home-row-info">
-          <span className="home-card-title">ป้ายดำแดง (แถบพลิก)</span>
-          <span className="home-row-meta">
-            {flipLists.today.length ? `ต้องเปลี่ยนวันนี้ ${flipLists.today.length} รายการ` : 'ราคาบนชั้นตรงกับชีต'}
-            {flipLists.needTags.length ? ` · ตัวป้ายที่ต้องพิมพ์ ${flipLists.needTags.length}` : ''}
-          </span>
-        </span>
-        <span className="home-chevron" aria-hidden="true">
-          ›
-        </span>
-      </button>
-
-      {/* ป้ายระบายเปล่า — ไม่มีชื่อสินค้า ไว้ใส่แทนป้ายเดิมตอนราคาเปลี่ยน ค่าเริ่มต้น = เต็ม 1 แผ่น A4 */}
-      <section className="home-card blank-card">
-        <div className="home-row-info">
-          <div className="home-card-title">❄ ป้ายระบายเปล่า</div>
-          <div className="home-row-meta">ป้ายตู้แช่ไม่มีชื่อสินค้า ไว้ระบายเองหรือใส่แทนตอนราคาเปลี่ยน · {sheetSize} ใบ = 1 แผ่น A4</div>
-        </div>
-        <div className="blank-qty">
-          <button type="button" className="qty-btn" onClick={() => setBlankQty((q) => Math.max(1, (q ?? sheetSize) - 1))} aria-label="ลดจำนวน">
-            −
-          </button>
-          <span className="qty-value">{blankQty ?? sheetSize}</span>
-          <button type="button" className="qty-btn" onClick={() => setBlankQty((q) => (q ?? sheetSize) + 1)} aria-label="เพิ่มจำนวน">
-            +
-          </button>
-          <button
-            type="button"
-            className="home-row-btn blank-add"
-            onClick={() => {
-              addBlankFridge(blankQty ?? sheetSize);
-              setBlankQty(null);
-            }}
-          >
-            ลงคิว
-          </button>
-        </div>
-      </section>
-
-      {last && (
-        <section className="home-card home-row-card">
-          <div className="home-row-info">
-            <div className="home-card-title">ส่งล่าสุด {lastTime}</div>
-            <div className="home-row-meta">
-              {last.items.length} รายการ · {last.items[0]?.ProductName}
-              {last.items.length > 1 ? ' ...' : ''}
+      <section className="dz-summary" aria-label="ป้ายที่รอปริ้น">
+        <div className="dz-summary-top">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span className="dz-muted" style={{ fontSize: 13 }}>
+              ป้ายที่รอปริ้น
+            </span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span className="dz-count">{total}</span>
+              <span style={{ fontSize: 15, color: '#d4d4d8' }}>ใบ</span>
             </div>
           </div>
-          <button
-            type="button"
-            className="home-row-btn"
-            onClick={() => restoreFromHistory(last.id)}
-            disabled={!!last.restoredAt}
-          >
-            <IconUndo size={16} /> {last.restoredAt ? 'ดึงแล้ว' : 'ดึงกลับเข้าคิว'}
+          {total > 0 && <span className="dz-pill">ใช้กระดาษ {paper} แผ่น</span>}
+        </div>
+        {total === 0 ? (
+          <div className="dz-muted" style={{ fontSize: 14 }}>
+            ยังไม่มีป้าย — กดสแกนเพื่อเริ่ม
+          </div>
+        ) : (
+          <TypeBar types={types} legend />
+        )}
+        <div className="dz-summary-actions">
+          <button type="button" className="dz-btn" onClick={() => setQueueDrawerOpen(true)}>
+            ดูรายการ
           </button>
-        </section>
-      )}
+          <button type="button" className="dz-btn dz-btn-primary" onClick={requestSend} disabled={!queue.length || sending || !!pendingSendAt}>
+            <IconPrinter size={18} />
+            {sending ? 'กำลังส่ง...' : 'สั่งปริ้น'}
+          </button>
+        </div>
+      </section>
 
-      {oosCount > 0 && (
-        <button type="button" className="home-card home-row-card home-oos" onClick={() => setQueueDrawerOpen(true, 'oos')}>
-          <span className="home-oos-icon">
-            <IconBox size={22} />
+      <div className="dz-cards">
+        <button type="button" className="dz-card" onClick={() => setFlipTodayOpen(true)}>
+          <span className="dz-card-top">
+            <span className="dz-card-ic" style={{ background: '#2a1311', color: '#ff6b5e' }}>
+              <IconPrinter size={18} />
+            </span>
+            <span className="dz-card-num" style={{ color: '#ff6b5e' }}>
+              {flipLists.today.length}
+            </span>
           </span>
-          <span className="home-row-info">
-            <span className="home-card-title">สินค้าหมดบนชั้น</span>
-            <span className="home-row-meta">{oosCount} รายการรอของเข้า</span>
-          </span>
-          <span className="home-chevron" aria-hidden="true">
-            ›
+          <span className="dz-card-title">ราคาเปลี่ยนวันนี้</span>
+          <span className="dz-card-sub">
+            {flipLists.today.length ? 'ไปเปลี่ยนแถบบนชั้น' : 'ราคาบนชั้นตรงกับชีต'}
+            {flipLists.needTags.length ? ` · ของใหม่ ${flipLists.needTags.length} อย่าง` : ''}
           </span>
         </button>
-      )}
 
-      <label className="home-pref">
+        <button type="button" className="dz-card" onClick={() => setQueueDrawerOpen(true, 'oos')}>
+          <span className="dz-card-top">
+            <span className="dz-card-ic" style={{ background: '#2b2410', color: '#fbbf24' }}>
+              <IconBox size={18} />
+            </span>
+            <span className="dz-card-num" style={{ color: '#fbbf24' }}>
+              {oosCount}
+            </span>
+          </span>
+          <span className="dz-card-title">ของหมด</span>
+          <span className="dz-card-sub">รอของเข้า</span>
+        </button>
+
+        <div className="dz-card" style={{ cursor: 'default' }}>
+          <span className="dz-card-top">
+            <span className="dz-card-ic" style={{ background: '#0e2a30', color: '#22d3ee' }}>
+              888
+            </span>
+            <button
+              type="button"
+              className="dz-mini-btn"
+              style={{ borderColor: '#22d3ee', color: '#22d3ee' }}
+              onClick={() => addBlankFridge(sheetSize)}
+              aria-label={`เพิ่มป้ายตู้แช่เปล่า 1 แผ่น (${sheetSize} ใบ)`}
+            >
+              + 1 แผ่น
+            </button>
+          </span>
+          <span className="dz-card-title">ป้ายตู้แช่เปล่า</span>
+          <span className="dz-card-sub">ไว้เขียนราคาเอง · {sheetSize} ใบ/แผ่น</span>
+        </div>
+
+        <div className="dz-card" style={{ cursor: 'default' }}>
+          <span className="dz-card-top">
+            <span className="dz-card-ic" style={{ background: 'var(--dz-raised)', color: '#d4d4d8' }}>
+              <IconPrinter size={18} />
+            </span>
+            <button type="button" className="dz-mini-btn" disabled={!last || !!last.restoredAt} onClick={() => last && restoreFromHistory(last.id)}>
+              {last?.restoredAt ? 'เอากลับมาแล้ว' : 'เอากลับมา'}
+            </button>
+          </span>
+          <span className="dz-card-title">{last ? `ปริ้นไปเมื่อ ${lastTime}` : 'ยังไม่เคยปริ้น'}</span>
+          <span className="dz-card-sub">{last ? 'ส่งผิด? เอากลับมาแก้ได้' : 'ปริ้นแล้วจะเห็นตรงนี้'}</span>
+        </div>
+      </div>
+
+      <label className="dz-pref">
         <input type="checkbox" checked={autoOpenCamera} onChange={(e) => setAutoOpenCamera(e.target.checked)} />
         <span>
           เปิดกล้องทันทีเมื่อเข้าแอป
           <small>สำหรับคนสแกนต่อเนื่องทั้งวัน ไม่ต้องกดปุ่มสแกนก่อน</small>
         </span>
       </label>
+
+      </div>
+
+      <nav className="dz-nav" aria-label="ทางลัดหลัก">
+        <button type="button" className="dz-nav-side" onClick={() => setManualSearchOpen(true)} aria-label="ค้นหาด้วยชื่อหรือรหัส">
+          <IconSearch size={24} />
+          หาชื่อ
+        </button>
+        <button type="button" className="dz-scan" onClick={() => setCameraEnabled(true)}>
+          <IconScan size={34} />
+          <span style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="dz-scan-label">สแกน</span>
+            <span className="dz-scan-sub">ทำป้ายแบบ{typeDef(lastTagMode).label}</span>
+          </span>
+        </button>
+        <button type="button" className="dz-nav-side" onClick={() => setQueueDrawerOpen(true)} aria-label={`ดูป้ายที่รอปริ้น ${total} ใบ`}>
+          <span className="dz-nav-num">{total}</span>
+          รอปริ้น
+        </button>
+      </nav>
     </div>
   );
 }

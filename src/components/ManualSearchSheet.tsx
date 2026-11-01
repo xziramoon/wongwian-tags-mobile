@@ -4,6 +4,7 @@ import { previewFromBarcode } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
 import { debounce } from '../lib/utils';
 import type { Product } from '../types';
+import { IconClose } from './Icons';
 
 /* text search fallback for when the camera is unavailable/denied, or just faster
  * than scanning. Tapping a result routes through the same preview -> ScanResultSheet
@@ -59,7 +60,7 @@ export default function ManualSearchSheet() {
               {results.length > 0 ? ` (${results.length}${results.length >= SEARCH_RESULT_CAP ? '+' : ''})` : ''}
             </span>
             <button type="button" className="sheet-close" onClick={handleClose} aria-label="ปิด">
-              ✕
+              <IconClose size={20} />
             </button>
           </div>
           <input
@@ -72,7 +73,7 @@ export default function ManualSearchSheet() {
           />
         </div>
         <div className="search-results">
-          {tooShort && <div className="queue-empty">พิมพ์อย่างน้อย {MIN_QUERY_LENGTH} ตัวอักษร</div>}
+          {tooShort && <div className="queue-empty">กรอกอย่างน้อย {MIN_QUERY_LENGTH} ตัวอักษร</div>}
           {!tooShort && trimmedQuery && results.length === 0 && (
             <div className="queue-empty">ไม่พบสินค้าที่ค้นหา</div>
           )}

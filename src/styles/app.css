@@ -1,0 +1,1420 @@
+/* ============================================================
+ * app.css — ดีไซน์ใหม่ของแอปมือถือ (โทนมืด แดงหมึก) ตาม HANDOFF
+ * โหลดต่อจาก global.css: ทับค่าตัวแปรสีเดิม (ทุกหน้าที่ใช้ตัวแปรจึงเป็นโทนมืดตาม) แล้วเพิ่มคลาส dz-* ของหน้าจอที่ออกแบบใหม่
+ * ไม่แตะป้ายที่ปริ้นออกมา (tag-*.css / PriceTag) — ฟอนต์ Kanit 800 ของ UI ใช้ 700 ที่โหลดอยู่ เพื่อไม่ให้ป้ายเดิมหนาขึ้น
+ * ============================================================ */
+
+:root {
+  /* โทเคนดีไซน์ใหม่ */
+  --dz-bg: #0c0c0e;
+  --dz-card: #161619;
+  --dz-raised: #1f1f23;
+  --dz-border: #2a2a30;
+  --dz-border2: #3a3a42;
+  --dz-text: #f4f4f5;
+  --dz-muted: #a1a1aa;
+  --dz-primary: #e1251b;
+  --dz-ok: #34d399;
+  --dz-err-bg: #2a1412;
+  --dz-err-tx: #ff4d3d;
+  --dz-head: 'Kanit', 'IBM Plex Sans Thai', sans-serif;
+  --dz-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ทับตัวแปรเดิมของ global.css → ทุกหน้าที่ยังไม่ได้เขียนใหม่ (ตั้งค่า / แก้ป้าย / ค้นหา / toast) กลายเป็นโทนมืด */
+  --ac: #e1251b;
+  --ac-d: #c41e15;
+  --ac-tint: rgba(225, 37, 27, 0.12);
+  --ink: #f4f4f5;
+  --txt: #f4f4f5;
+  --txt2: #a1a1aa;
+  --surface: #161619;
+  --surface2: #1f1f23;
+  --canvas: #0c0c0e;
+  --ln: #2a2a30;
+  --ln2: #3a3a42;
+  --g: #34d399;
+  --g-soft: rgba(52, 211, 153, 0.12);
+  --r: #ff4d3d;
+  --r-soft: #2a1412;
+  --o: #fbbf24;
+  --f-ui: 'IBM Plex Sans Thai', 'Kanit', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  background: var(--dz-bg);
+  color: var(--dz-text);
+}
+.app-shell {
+  background: var(--dz-bg);
+}
+.sheet {
+  background: var(--dz-bg);
+  color: var(--dz-text);
+  border-top: 1px solid var(--dz-border);
+}
+.sheet-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+input,
+select,
+textarea {
+  color-scheme: dark;
+}
+.field-input,
+.inp,
+.qi {
+  background: var(--dz-card);
+  color: var(--dz-text);
+  border-color: var(--dz-border2);
+}
+.field-input::placeholder,
+.inp::placeholder {
+  color: #71717a;
+}
+.btn-primary {
+  background: var(--dz-primary);
+  color: #fff;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--dz-text);
+  border: 1px solid var(--dz-border2);
+}
+.btn-preset {
+  background: var(--dz-card);
+  color: var(--dz-text);
+  border: 1px solid var(--dz-border2);
+}
+.btn-preset[aria-pressed='true'],
+.mode-btn.active {
+  background: var(--dz-raised);
+  color: var(--dz-text);
+  border-color: var(--dz-text);
+}
+.mode-btn {
+  background: var(--dz-card);
+  color: #d4d4d8;
+  border: 1px solid var(--dz-border);
+}
+.tag-preview-frame {
+  background: var(--dz-raised);
+  border: 1px solid var(--dz-border);
+}
+.flip-warn {
+  color: var(--dz-err-tx) !important;
+  background: var(--dz-err-bg) !important;
+}
+.flip-row-line.warn {
+  color: var(--dz-err-tx);
+}
+
+/* ---------- ปุ่ม ---------- */
+.dz-btn {
+  min-height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--dz-border2);
+  background: transparent;
+  color: var(--dz-text);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dz-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.dz-btn-primary {
+  background: var(--dz-primary);
+  border-color: var(--dz-primary);
+  color: #fff;
+}
+.dz-btn-white {
+  background: var(--dz-text);
+  border-color: var(--dz-text);
+  color: var(--dz-bg);
+}
+.dz-btn-lg {
+  min-height: 60px;
+  border-radius: 18px;
+  font-size: 18px;
+}
+.dz-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--dz-border);
+  background: var(--dz-card);
+  color: var(--dz-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dz-head {
+  font-family: var(--dz-head);
+  font-weight: 700;
+}
+.dz-muted {
+  color: var(--dz-muted);
+}
+
+/* ---------- แถบสีสรุปแบบป้าย ---------- */
+.dz-typebar {
+  display: flex;
+  height: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  gap: 2px;
+}
+.dz-typebar > span {
+  min-width: 4px;
+}
+.dz-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--dz-muted);
+}
+.dz-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dz-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ---------- แถบแดง: เครื่องปริ้นหลุด ---------- */
+.dz-offline {
+  background: var(--dz-err-bg);
+  border: 1px solid var(--dz-primary);
+  color: var(--dz-err-tx);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dz-offline-title {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 16px;
+}
+.dz-offline ol {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #fca5a5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dz-offline-note {
+  font-size: 12px;
+  color: #d4d4d8;
+}
+
+/* ============ 1 · หน้าแรก ============ */
+.dz-home {
+  position: absolute;
+  inset: 0;
+  background: var(--dz-bg);
+  color: var(--dz-text);
+  font-family: var(--f-ui);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  overflow: hidden;
+}
+.dz-home-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dz-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dz-home-title {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.2px;
+}
+.dz-printer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--dz-muted);
+}
+.dz-printer .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dz-ok);
+}
+.dz-printer.connecting .dot {
+  background: #fbbf24;
+}
+.dz-printer.offline .dot {
+  background: var(--dz-err-tx);
+}
+.dz-summary {
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+  border-radius: 22px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dz-summary-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.dz-count {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+}
+.dz-pill {
+  font-size: 12px;
+  color: var(--dz-muted);
+  border: 1px solid var(--dz-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.dz-summary-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.dz-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.dz-card {
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 112px;
+  color: var(--dz-text);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dz-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dz-card-ic {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 13px;
+}
+.dz-card-num {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 26px;
+}
+.dz-card-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.dz-card-sub {
+  font-size: 12px;
+  color: var(--dz-muted);
+}
+.dz-mini-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--dz-border2);
+  background: transparent;
+  color: var(--dz-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dz-mini-btn:disabled {
+  opacity: 0.45;
+}
+.dz-pref {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: #d4d4d8;
+}
+.dz-pref input {
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  accent-color: var(--dz-primary);
+}
+.dz-pref small {
+  display: block;
+  color: var(--dz-muted);
+  font-size: 12px;
+}
+.dz-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.dz-nav-side {
+  width: 64px;
+  height: 88px;
+  border-radius: 22px;
+  border: 1px solid var(--dz-border);
+  background: var(--dz-card);
+  color: var(--dz-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dz-nav-num {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+}
+.dz-scan {
+  flex: 1;
+  height: 88px;
+  border-radius: 22px;
+  border: none;
+  background: var(--dz-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dz-scan-label {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.1;
+  text-align: left;
+}
+.dz-scan-sub {
+  font-size: 12px;
+  opacity: 0.9;
+  text-align: left;
+}
+
+/* ============ 2 · กล้อง ============ */
+.dz-cam-top {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+.dz-cam-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: none;
+  background: rgba(12, 12, 14, 0.72);
+  color: var(--dz-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dz-cam-btn.torch-on {
+  color: #fbbf24;
+}
+.dz-cam-chip {
+  flex: 1;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(12, 12, 14, 0.72);
+  color: var(--dz-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 0;
+}
+.dz-cam-modes {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 76px);
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+.dz-mode {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(12, 12, 14, 0.72);
+  color: #d4d4d8;
+  font-family: inherit;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.dz-mode.active {
+  background: var(--dz-primary);
+  border-color: var(--dz-primary);
+  color: #fff;
+  font-weight: 600;
+}
+.dz-frame {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: min(78vw, 320px);
+  height: 190px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.dz-frame i {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 0 solid #ff4d3d;
+}
+.dz-frame i:nth-child(1) { left: 0; top: 0; border-left-width: 4px; border-top-width: 4px; border-radius: 10px 0 0 0; }
+.dz-frame i:nth-child(2) { right: 0; top: 0; border-right-width: 4px; border-top-width: 4px; border-radius: 0 10px 0 0; }
+.dz-frame i:nth-child(3) { left: 0; bottom: 0; border-left-width: 4px; border-bottom-width: 4px; border-radius: 0 0 0 10px; }
+.dz-frame i:nth-child(4) { right: 0; bottom: 0; border-right-width: 4px; border-bottom-width: 4px; border-radius: 0 0 10px 0; }
+.dz-frame .line {
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  height: 2px;
+  width: auto;
+  background: #ff4d3d;
+  box-shadow: 0 0 12px #ff4d3d;
+  border: none;
+}
+.dz-cam-hint {
+  position: absolute;
+  top: calc(38% + 112px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #d4d4d8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+.dz-zoom {
+  position: absolute;
+  right: 16px;
+  top: 38%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 160px;
+  border-radius: 22px;
+  background: rgba(12, 12, 14, 0.72);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 12px;
+  color: #d4d4d8;
+  z-index: 5;
+}
+.dz-zoom-track {
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+.dz-zoom-track input {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 90px;
+  height: 28px;
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  accent-color: #f4f4f5;
+}
+.dz-cam-bottom {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 5;
+}
+.dz-kept {
+  background: rgba(22, 22, 25, 0.94);
+  border: 1px solid var(--dz-border);
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dz-kept-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #0f2a1e;
+  color: var(--dz-ok);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dz-kept-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dz-kept-name {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dz-kept-price {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 22px;
+}
+.dz-recent {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--dz-muted);
+  padding: 0 4px;
+  flex-wrap: wrap;
+}
+.dz-recent b {
+  font-weight: 400;
+  color: #d4d4d8;
+}
+.dz-cam-row {
+  display: flex;
+  gap: 10px;
+}
+.dz-cam-key {
+  width: 64px;
+  height: 80px;
+  border-radius: 22px;
+  border: 1px solid var(--dz-border);
+  background: rgba(22, 22, 25, 0.94);
+  color: var(--dz-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dz-cam-wait {
+  flex: 1;
+  height: 80px;
+  border-radius: 22px;
+  border: none;
+  background: var(--dz-text);
+  color: var(--dz-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dz-cam-wait .t1 {
+  font-size: 13px;
+  color: #52525b;
+  text-align: left;
+}
+.dz-cam-wait .t2 {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.1;
+  text-align: left;
+}
+
+/* ============ แผ่นเลือกแบบป้าย ============ */
+.dz-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+}
+.dz-picker {
+  width: 100%;
+  background: var(--dz-bg);
+  border-top: 1px solid var(--dz-border);
+  border-radius: 28px 28px 0 0;
+  padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dz-grabber {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: #3f3f46;
+  align-self: center;
+}
+.dz-types {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.dz-types.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.dz-type {
+  min-height: 56px;
+  border-radius: 12px;
+  border: 1px solid var(--dz-border);
+  background: var(--dz-card);
+  color: #d4d4d8;
+  font-family: inherit;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.dz-type[aria-pressed='true'] {
+  border: 2px solid var(--dz-text);
+  background: #26262b;
+  color: var(--dz-text);
+  font-weight: 600;
+}
+.dz-type i {
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+  display: block;
+}
+.dz-type.dashed {
+  grid-column: span 2;
+  border: 1px dashed var(--dz-border2);
+  background: transparent;
+  flex-direction: row;
+  gap: 6px;
+}
+
+/* ============ 3 · ผลสแกน ============ */
+.dz-result {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  background: var(--dz-bg);
+  border-top: 1px solid var(--dz-border);
+  border-radius: 28px 28px 0 0;
+  padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  color: var(--dz-text);
+  font-family: var(--f-ui);
+}
+.dz-res-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.dz-res-name {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.dz-mono {
+  font-family: var(--dz-mono);
+  font-size: 12px;
+  color: var(--dz-muted);
+}
+.dz-res-price {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 1;
+}
+.dz-res-pack {
+  font-size: 12px;
+  color: var(--dz-muted);
+  text-align: right;
+}
+.dz-prevbox {
+  background: var(--dz-raised);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+}
+.dz-prevbox .tag-preview-frame {
+  background: transparent;
+  border: none;
+}
+.dz-label {
+  font-size: 13px;
+  color: var(--dz-muted);
+}
+.dz-small-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.dz-small {
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--dz-border);
+  background: var(--dz-card);
+  color: #d4d4d8;
+  font-family: inherit;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0 6px;
+}
+.dz-small[aria-pressed='true'] {
+  border-color: var(--dz-text);
+  color: var(--dz-text);
+  background: #26262b;
+}
+.dz-bottom {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.dz-stepper {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  border-radius: 16px;
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+}
+.dz-stepper button {
+  width: 48px;
+  height: 58px;
+  border: none;
+  background: transparent;
+  color: var(--dz-text);
+  font-size: 24px;
+  cursor: pointer;
+}
+.dz-stepper span {
+  width: 30px;
+  text-align: center;
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 22px;
+}
+.dz-bottom .dz-btn {
+  flex: 1;
+  height: 60px;
+  border-radius: 16px;
+}
+.dz-banner {
+  background: #2b2410;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fbbf24;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
+}
+.dz-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+/* ============ 4 · ป้ายที่รอปริ้น ============ */
+.dz-queue {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  background: var(--dz-bg);
+  color: var(--dz-text);
+  font-family: var(--f-ui);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.dz-q-header {
+  padding: 16px 16px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dz-q-title {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 22px;
+}
+.dz-tabs {
+  margin: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  background: var(--dz-card);
+  border-radius: 14px;
+}
+.dz-tab {
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #d4d4d8;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.dz-tab[aria-selected='true'] {
+  background: var(--dz-text);
+  color: var(--dz-bg);
+  font-weight: 600;
+}
+.dz-filters {
+  padding: 12px 16px 0;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.dz-chip {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--dz-border);
+  background: transparent;
+  color: #d4d4d8;
+  font-family: inherit;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dz-chip[aria-pressed='true'] {
+  background: #26262b;
+  border-color: #26262b;
+  color: var(--dz-text);
+}
+.dz-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+.dz-row {
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+  border-radius: 16px;
+  padding: 10px 10px 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dz-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  color: var(--dz-text);
+  font-family: inherit;
+  cursor: pointer;
+}
+.dz-row-name {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dz-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--dz-muted);
+}
+.dz-row-meta .ty {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #d4d4d8;
+}
+.dz-row-price {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 20px;
+  min-width: 44px;
+  text-align: right;
+}
+.dz-qty {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--dz-raised);
+}
+.dz-qty button {
+  width: 34px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--dz-text);
+  font-size: 18px;
+  cursor: pointer;
+}
+.dz-qty span {
+  width: 22px;
+  text-align: center;
+  font-weight: 600;
+}
+.dz-row-del {
+  width: 36px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--dz-muted);
+  cursor: pointer;
+}
+.dz-empty {
+  text-align: center;
+  color: var(--dz-muted);
+  padding: 32px 0;
+  font-size: 14px;
+}
+.dz-q-foot {
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  border-top: 1px solid var(--dz-raised);
+  background: var(--dz-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dz-foot-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--dz-muted);
+}
+
+/* ============ 5 · กำลังจะปริ้น ============ */
+.dz-send {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  background: var(--dz-bg);
+  color: var(--dz-text);
+  font-family: var(--f-ui);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 56px) 24px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  gap: 28px;
+  overflow-y: auto;
+}
+.dz-ring {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dz-ring-in {
+  width: 208px;
+  height: 208px;
+  border-radius: 50%;
+  background: var(--dz-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.dz-ring-num {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 104px;
+  line-height: 1;
+}
+.dz-send-title {
+  font-family: var(--dz-head);
+  font-weight: 700;
+  font-size: 26px;
+  text-align: center;
+}
+.dz-send-card {
+  width: 100%;
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #d4d4d8;
+}
+.dz-send-card > span {
+  display: flex;
+  justify-content: space-between;
+}
+.dz-send-card .l {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dz-send-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 10px;
+  margin-top: auto;
+}
+.dz-send-actions .dz-btn {
+  height: 64px;
+  border-radius: 18px;
+}
+
+/* ============ 6 · ราคาเปลี่ยนวันนี้ ============ */
+.dz-today {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  background: var(--dz-bg);
+  color: var(--dz-text);
+  font-family: var(--f-ui);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.dz-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 12px;
+}
+.dz-progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--dz-raised);
+  overflow: hidden;
+}
+.dz-progress-bar > div {
+  height: 8px;
+  background: #ff4d3d;
+  transition: width 0.2s;
+}
+.dz-today-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dz-lot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dz-lot-head {
+  font-size: 13px;
+  color: var(--dz-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dz-lot-head b {
+  background: #2a1311;
+  color: #ff6b5e;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+.dz-item {
+  background: var(--dz-card);
+  border: 1px solid var(--dz-border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dz-item.done {
+  opacity: 0.55;
+}
+.dz-item.warn {
+  background: var(--dz-err-bg);
+  border-color: var(--dz-primary);
+}
+.dz-item input {
+  width: 26px;
+  height: 26px;
+  accent-color: var(--dz-ok);
+  flex-shrink: 0;
+}
+.dz-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dz-item-name {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dz-item-note {
+  font-size: 12px;
+  color: var(--dz-muted);
+}
+.dz-item.warn .dz-item-note {
+  color: #fca5a5;
+}
+.dz-old {
+  font-size: 14px;
+  color: #71717a;
+  text-decoration: line-through;
+}
+.dz-new {
+  font-family: var(--dz-head);
+  font-weight: 800;
+  font-size: 24px;
+  color: #ff6b5e;
+}
+.dz-newtag {
+  background: var(--dz-card);
+  border: 1px dashed var(--dz-border2);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dz-newtag .main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dz-today-foot {
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  border-top: 1px solid var(--dz-raised);
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 10px;
+}
+.dz-today-foot .dz-btn {
+  height: 60px;
+  border-radius: 18px;
+}
+
+/* ---------- หมวดในตั้งค่าป้าย ---------- */
+.settings-sheet .dz-cats {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.settings-sheet[data-cat='general'] [data-cat]:not([data-cat~='general']),
+.settings-sheet[data-cat='normal'] [data-cat]:not([data-cat~='normal']),
+.settings-sheet[data-cat='fridge'] [data-cat]:not([data-cat~='fridge']),
+.settings-sheet[data-cat='hamper'] [data-cat]:not([data-cat~='hamper']),
+.settings-sheet[data-cat='flip'] [data-cat]:not([data-cat~='flip']),
+.settings-sheet[data-cat='advanced'] [data-cat]:not([data-cat~='advanced']) {
+  display: none;
+}
+
+/* ---------- แถบแดงบนจอคับแคบ 360px ---------- */
+@media (max-width: 370px) {
+  .dz-count {
+    font-size: 48px;
+  }
+  .dz-scan-label {
+    font-size: 22px;
+  }
+  .dz-types {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .dz-today-foot .dz-btn,
+  .dz-bottom .dz-btn {
+    font-size: 15px;
+  }
+}
+
+/* ---------- สถานะเครื่องปริ้น (ใช้ทั้งหน้าแรกและลอยบนกล้อง) ---------- */
+.dz-printer-float-slot {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 126px);
+  left: 16px;
+  z-index: 5;
+}
+.dz-printer-float {
+  background: rgba(12, 12, 14, 0.72);
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #d4d4d8;
+}
+
+/* ---------- กล้องเปิดไม่ได้ ---------- */
+.dz-denied {
+  background: var(--dz-bg);
+  color: var(--dz-text);
+  gap: 12px;
+}
+.dz-denied .dz-btn {
+  width: 100%;
+  max-width: 320px;
+}
+.dz-steps {
+  margin: 0;
+  padding-left: 20px;
+  max-width: 320px;
+  font-size: 14px;
+  color: #d4d4d8;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.dz-cats {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  padding-bottom: 2px;
+}
+.dz-cats .dz-chip[aria-pressed='true'] {
+  background: var(--dz-text);
+  border-color: var(--dz-text);
+  color: var(--dz-bg);
+  font-weight: 600;
+}
+
+.dz-alert-ic {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--dz-err-tx);
+  color: var(--dz-err-tx);
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ตัวอย่างป้ายต้องหน้าตาเดิม — ป้ายพื้นขาวบางจุดไม่กำหนดสีตัวหนังสือเอง (เช่นบรรทัดขนาดของป้าย 2 ราคา)
+ * ถ้ารับสีขาวจากธีมมืดมา จะมองไม่เห็นบนพื้นป้าย จึงตรึงเป็นสีเดิมของแอป (#171725) */
+.tag-preview-frame,
+.price-tag,
+.hamper-tag {
+  color: #171725;
+}

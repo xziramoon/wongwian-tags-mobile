@@ -5,7 +5,7 @@ import type { QueueItem } from '../types';
 import { queueToFlipData, type FlipData } from './data';
 import { getFlipSettings, useFlipStore, type FlipPrintKind } from './store';
 
-/* ส่งงานป้ายดำแดงไปเครื่องพิมพ์ปลายทาง (TAG_PRINTER.html) — บันทึกประวัติ (ต้องเปลี่ยนวันนี้ / ตัวป้ายถาวร) เมื่อส่งสำเร็จ
+/* ส่งงานป้ายดำแดงไปเครื่องปริ้นปลายทาง (TAG_PRINTER.html) — บันทึกประวัติ (ต้องเปลี่ยนวันนี้ / ตัวป้ายถาวร) เมื่อส่งสำเร็จ
  * โยน error ถ้าส่งไม่สำเร็จ ผู้เรียกแจ้งผู้ใช้เอง */
 export async function publishFlipJob(kind: FlipPrintKind, items: FlipData[]): Promise<void> {
   await printBridge.publishFlip(useQueueStore.getState().config, { kind, settings: getFlipSettings(), items });
@@ -28,12 +28,12 @@ export async function sendFlipFromQueue(items: QueueItem[]): Promise<void> {
 export async function sendFlipStandalone(kind: FlipPrintKind, items: FlipData[]): Promise<boolean> {
   const toast = useUIStore.getState().showToast;
   if (!items.length && kind !== 'stickers') {
-    toast('ยังไม่มีป้ายดำแดงให้ส่งพิมพ์', 'error');
+    toast('ยังไม่มีป้ายดำแดงให้ปริ้น', 'error');
     return false;
   }
   try {
     await publishFlipJob(kind, items);
-    toast('ส่งป้ายดำแดงไปเครื่องพิมพ์แล้ว ✓', 'success');
+    toast('ส่งป้ายดำแดงไปเครื่องปริ้นแล้ว ✓', 'success');
     return true;
   } catch {
     toast('ส่งไม่สำเร็จ กรุณาลองใหม่', 'error');

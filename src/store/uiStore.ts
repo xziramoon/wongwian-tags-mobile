@@ -6,13 +6,25 @@ import { autoFontSize } from '../lib/utils';
 /* แบบป้ายที่เลือกได้ในหน้าผลสแกน (แถบสินค้าหมดมีปุ่ม/ขั้นตอนของตัวเอง) */
 export const SCAN_TAG_MODES: TagMode[] = ['standard', 'dual', 'large', 'fridge', 'hamper', 'flip'];
 
+/* โหมดสแกน: keep = สแกนแล้วเก็บเข้ารายการเลย ไม่เปิดหน้าผลสแกน · review = ขอดูก่อนทุกชิ้น (แบบเดิม) */
+export type ScanMode = 'keep' | 'review';
+
+export interface KeptInfo {
+  barcode: string;
+  mode: TagMode;
+  name: string;
+  price: string;
+  qty: number;
+}
+
 interface Prefs {
   autoOpenCamera: boolean;
   /* แบบป้ายล่าสุดที่เลือกตอนสแกน — สแกนป้ายตู้แช่ทั้งแถวไม่ต้องกดเลือกใหม่ทุกชิ้น */
   lastTagMode: TagMode;
+  scanMode: ScanMode;
 }
 
-const DEFAULT_PREFS: Prefs = { autoOpenCamera: false, lastTagMode: 'standard' };
+const DEFAULT_PREFS: Prefs = { autoOpenCamera: false, lastTagMode: 'standard', scanMode: 'review' };
 
 function loadPrefs(): Prefs {
   try {
@@ -20,6 +32,7 @@ function loadPrefs(): Prefs {
     if (saved) {
       const p = { ...DEFAULT_PREFS, ...JSON.parse(saved) } as Prefs;
       if (!SCAN_TAG_MODES.includes(p.lastTagMode)) p.lastTagMode = 'standard';
+      if (p.scanMode !== 'keep' && p.scanMode !== 'review') p.scanMode = 'review';
       return p;
     }
   } catch {
@@ -89,6 +102,15 @@ interface UIState {
   openScanSheet: (item: QueueItem, found: boolean) => void;
   lastTagMode: TagMode;
   setScanTagMode: (mode: TagMode) => void;
+  scanMode: ScanMode;
+  setScanMode: (mode: ScanMode) => void;
+  /** ชิ้นล่าสุดที่เก็บในโหมดเก็บเลย (โชว์การ์ดบนกล้อง) + 2 ชิ้นก่อนหน้า */
+  lastKept: KeptInfo | null;
+  recentKept: { name: string; price: string }[];
+  setLastKept: (kept: KeptInfo | null) => void;
+  /** แผ่นเลือกแบบป้ายจากหน้ากล้อง */
+  tagTypeOpen: boolean;
+  setTagTypeOpen: (open: boolean) => void;
   updateScanSheetItem: (patch: Partial<QueueItem>) => void;
   closeScanSheet: () => void;
 
@@ -137,7 +159,7 @@ export const useUIStore = create<UIState>((set) => ({
   cameraEnabled: initialPrefs.autoOpenCamera,
   /* เปิดใหม่ทุกครั้ง = ลองขอกล้องใหม่ (เคยถูกปฏิเสธ/error แล้วไปแก้สิทธิ์มา ก็ไม่ต้องรีโหลดหน้า) */
   setCameraEnabled: (cameraEnabled) =>
-    set(cameraEnabled ? { cameraEnabled, cameraStatus: 'starting' } : { cameraEnabled }),
+    set(cameraEnabled ? { cameraEnabled, cameraStatus: 'starting', lastKept: null, recentKept: [] } : { cameraEnabled }),
 
   autoOpenCamera: initialPrefs.autoOpenCamera,
   setAutoOpenCamera: (autoOpenCamera) => {
@@ -150,6 +172,24 @@ export const useUIStore = create<UIState>((set) => ({
     savePrefs({ lastTagMode: mode });
     set((s) => ({ lastTagMode: mode, scanSheetItem: s.scanSheetItem ? withTagMode(s.scanSheetItem, mode) : s.scanSheetItem }));
   },
+
+  scanMode: initialPrefs.scanMode,
+  setScanMode: (mode) => {
+    savePrefs({ scanMode: mode });
+    set({ scanMode: mode });
+  },
+  lastKept: null,
+  recentKept: [],
+  setLastKept: (kept) =>
+    set((s) => ({
+      lastKept: kept,
+      recentKept:
+        kept && s.lastKept && s.lastKept.barcode !== kept.barcode
+          ? [{ name: s.lastKept.name, price: s.lastKept.price }, ...s.recentKept].slice(0, 2)
+          : s.recentKept,
+    })),
+  tagTypeOpen: false,
+  setTagTypeOpen: (tagTypeOpen) => set({ tagTypeOpen }),
 
   scanSheetOpen: false,
   scanSheetItem: null,

@@ -24,8 +24,8 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/wongwian-tags-mobile/',
         scope: '/wongwian-tags-mobile/',
-        theme_color: '#0e0e14',
-        background_color: '#0e0e14',
+        theme_color: '#0C0C0E',
+        background_color: '#0C0C0E',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

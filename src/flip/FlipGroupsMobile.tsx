@@ -88,7 +88,7 @@ function GroupCard({ g, dbVersion }: { g: FlipGroup; dbVersion: number }) {
         className="field-input"
         value={q}
         inputMode="search"
-        placeholder="พิมพ์บาร์โค้ด หรือค้นหาชื่อสินค้า แล้วกด Enter"
+        placeholder="กรอกบาร์โค้ด หรือค้นหาชื่อสินค้า แล้วกด Enter"
         onChange={(e) => setQ(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && onEnter()}
       />
@@ -102,8 +102,8 @@ function GroupCard({ g, dbVersion }: { g: FlipGroup; dbVersion: number }) {
         </div>
       )}
 
-      {gp.mismatch && <div className="flip-warn">⚠ ราคาสมาชิกไม่เท่ากัน ({gp.prices.map(fmtPrice).join(' / ')}) — แยกป้าย หรือแก้ราคาให้เท่ากัน</div>}
-      {overflow && <div className="flip-warn">⚠ กล่องชื่อกลิ่นเกินพื้นที่ — เพิ่มความกว้างกลุ่ม หรือย่อชื่อกลิ่น</div>}
+      {gp.mismatch && <div className="flip-warn">ระวัง: ราคาสมาชิกไม่เท่ากัน ({gp.prices.map(fmtPrice).join(' / ')}) — แยกป้าย หรือแก้ราคาให้เท่ากัน</div>}
+      {overflow && <div className="flip-warn">ระวัง: กล่องชื่อกลิ่นเกินพื้นที่ — เพิ่มความกว้างกลุ่ม หรือย่อชื่อกลิ่น</div>}
       {!g.members.length && <div className="flip-warn">ยังไม่มีสมาชิกในกลุ่ม</div>}
       <span className="fold-hint">
         ราคากลุ่ม: <b>{gp.price ? `${fmtPrice(gp.price)} บาท` : '—'}</b> (ดึงจากสมาชิก) · หมดกลิ่นเดียว = แปะสติกเกอร์ "หมด" · หมดทั้งกลุ่ม = พลิกแถบ
@@ -111,13 +111,13 @@ function GroupCard({ g, dbVersion }: { g: FlipGroup; dbVersion: number }) {
 
       <div className="flip-kind-row">
         <button type="button" className="btn btn-secondary" onClick={() => sendFlipStandalone('tags', data)}>
-          📡 ป้ายกลุ่ม
+          ป้ายกลุ่ม
         </button>
         <button type="button" className="btn btn-secondary" onClick={() => sendFlipStandalone('strips', data)}>
-          📡 แถบราคา
+          แถบราคา
         </button>
         <button type="button" className="btn btn-secondary" onClick={() => sendFlipStandalone('both', data)}>
-          📡 ทั้งคู่
+          ทั้งคู่
         </button>
       </div>
       <button
@@ -127,7 +127,7 @@ function GroupCard({ g, dbVersion }: { g: FlipGroup; dbVersion: number }) {
           if (confirm(`ลบกลุ่ม "${g.name}" ?`)) removeGroup(g.id);
         }}
       >
-        ✕ ลบกลุ่มนี้
+        ลบกลุ่มนี้
       </button>
     </div>
   );

@@ -55,6 +55,15 @@ class PrintBridge {
     return this.client.connection.state as AblyConnState;
   }
 
+  /** ลองต่อใหม่ทันที (ปุ่ม "ลองต่อใหม่" บนแถบแดงเครื่องปริ้นหลุด) — Ably ต่อใหม่เองอยู่แล้ว แต่กดเร่งได้ */
+  reconnect(): void {
+    try {
+      this.client.connection.connect();
+    } catch {
+      /* ต่อไม่ได้ก็รอรอบอัตโนมัติ */
+    }
+  }
+
   private waitConnected(): Promise<void> {
     if (this.client.connection.state === 'connected') return Promise.resolve();
     return new Promise((resolve, reject) => {
