@@ -1418,3 +1418,73 @@ textarea {
 .hamper-tag {
   color: #171725;
 }
+
+/* ============ ค้นหาสินค้า: อ่านง่ายบนพื้นมืด + ไม่ให้แป้นพิมพ์บัง ============ */
+.search-result-row {
+  min-height: 64px;
+  padding: 10px 12px 10px 14px;
+  gap: 12px;
+  background: #26262c;
+  border: 1.5px solid var(--dz-border2);
+}
+.search-result-row:active {
+  background: #33333b;
+  border-color: var(--dz-primary);
+}
+.sr-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sr-name {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sr-code {
+  align-self: flex-start;
+  font-family: var(--dz-mono);
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  color: #d4d4d8;
+  background: #0c0c0e;
+  border: 1px solid var(--dz-border2);
+  border-radius: 6px;
+  padding: 1px 8px;
+}
+.sr-price {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: var(--dz-primary);
+  border-radius: 10px;
+  padding: 9px 11px;
+}
+.sr-price small {
+  font-size: 11.5px;
+  font-weight: 500;
+}
+.sheet-backdrop-top {
+  align-items: flex-start;
+}
+.sheet-backdrop-top .manual-search-sheet {
+  border-radius: 0 0 20px 20px;
+  border-top: none;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-bottom: 12px;
+  height: var(--vvh, 100dvh);
+  max-height: var(--vvh, 100dvh);
+  animation: none;
+}

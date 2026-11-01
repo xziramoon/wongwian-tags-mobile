@@ -29,6 +29,25 @@ export default function ManualSearchSheet() {
     applyDebounced(query);
   }, [query, applyDebounced]);
 
+  /* the on-screen keyboard overlays the bottom sheet on phones, hiding the result list;
+   * track the visual viewport height so the sheet (pinned to the top while searching)
+   * always fits in the space above the keyboard */
+  useEffect(() => {
+    if (!open) return;
+    const vv = window.visualViewport;
+    const apply = () => {
+      document.documentElement.style.setProperty('--vvh', `${vv ? vv.height : window.innerHeight}px`);
+    };
+    apply();
+    vv?.addEventListener('resize', apply);
+    vv?.addEventListener('scroll', apply);
+    return () => {
+      vv?.removeEventListener('resize', apply);
+      vv?.removeEventListener('scroll', apply);
+      document.documentElement.style.removeProperty('--vvh');
+    };
+  }, [open]);
+
   if (!open) return null;
 
   const results: Product[] = database.search(debouncedQuery);
@@ -50,9 +69,8 @@ export default function ManualSearchSheet() {
   };
 
   return (
-    <div className="sheet-backdrop" onClick={handleClose}>
+    <div className="sheet-backdrop sheet-backdrop-top" onClick={handleClose}>
       <div className="sheet manual-search-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="sheet-handle" />
         <div className="manual-search-fixed">
           <div className="queue-drawer-header">
             <span>
@@ -70,6 +88,7 @@ export default function ManualSearchSheet() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="ค้นหาชื่อสินค้า หรือบาร์โค้ด"
             autoFocus
+            enterKeyHint="search"
           />
         </div>
         <div className="search-results">
@@ -84,8 +103,14 @@ export default function ManualSearchSheet() {
               className="search-result-row"
               onClick={() => handlePick(product)}
             >
-              <div className="queue-row-name">{product.ProductName || 'รหัส: ' + product.Barcode}</div>
-              <div className="queue-row-price">{product.Price || '0.00'} บาท</div>
+              <div className="sr-main">
+                <div className="sr-name">{product.ProductName || 'รหัส: ' + product.Barcode}</div>
+                <div className="sr-code">{product.Barcode}</div>
+              </div>
+              <div className="sr-price">
+                {product.Price || '0.00'}
+                <small>บาท</small>
+              </div>
             </button>
           ))}
         </div>
