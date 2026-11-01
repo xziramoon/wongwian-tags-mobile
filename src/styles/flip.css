@@ -61,6 +61,7 @@
 .ftn-nm { font-weight: 800; line-height: 1.15; color: #111; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; text-overflow: ellipsis; }
 .ftn-sz { font-size: 2.75mm; color: #333; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ftn-price { flex: 1 1 auto; min-height: 0; border-top: 0.75mm solid #111; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+.ftn-pack { align-self: stretch; margin-top: 0.6mm; }
 .ftn-unit { font-size: 3.5mm; font-weight: 800; color: #111; line-height: 1.2; }
 
 /* แถบป้ายแคบ: ด้านละ 43 × 21 พับแนวบน-ล่าง (กางออก 43 × 42) · ด้านสินค้าหมดพิมพ์กลับหัว 180° */

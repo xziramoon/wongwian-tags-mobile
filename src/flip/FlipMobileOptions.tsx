@@ -108,7 +108,7 @@ export default function FlipMobileOptions({ item }: { item: QueueItem }) {
       )}
 
       {variant === 'narrow' && (
-        <span className="fold-hint">ป้ายแคบไม่ปริ้นบาร์โค้ด/ราคายกลัง/คำมุมขวา · แถบราคา 43 × 21 มม. พับบน-ล่าง</span>
+        <span className="fold-hint">ป้ายแคบไม่ปริ้นบาร์โค้ด/คำมุมขวา · แสดงราคายกลังเป็นแถบดำใต้ราคา (ว่าง = ซ่อน) · แถบราคา 43 × 21 มม. พับบน-ล่าง</span>
       )}
 
       {variant !== 'group' && (
@@ -137,8 +137,8 @@ export default function FlipMobileOptions({ item }: { item: QueueItem }) {
         </>
       )}
 
-      {variant === 'full' &&
-        FIELDS.map(({ key, label, hint }) => {
+      {variant !== 'group' &&
+        FIELDS.filter((f) => variant === 'full' || f.key === 'pack').map(({ key, label, hint }) => {
           const overridden = overrides !== undefined && key in overrides;
           return (
             <div className="q-field" key={key}>
