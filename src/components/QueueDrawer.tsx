@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
 import { useUIStore } from '../store/uiStore';
 import { useOosStore } from '../store/oosStore';
-import { summarizeByType, totalTags, typeDef } from '../lib/tagTypes';
+import { itemLabel, summarizeByType, totalTags, typeDef } from '../lib/tagTypes';
 import { usePaperSheets } from '../lib/usePaper';
 import type { TagMode } from '../types';
 import PrinterOfflineBar from './PrinterOfflineBar';
@@ -142,8 +142,8 @@ export default function QueueDrawer() {
               const meta = rowMeta(item);
               return (
                 <li className="dz-row" key={`${item.Barcode}-${index}`}>
-                  <button type="button" className="dz-row-main" onClick={() => handleEditRow(index)} aria-label={`แก้ป้าย ${item.ProductName || 'ป้ายตู้แช่เปล่า'}`}>
-                    <span className="dz-row-name">{item.ProductName || 'ป้ายตู้แช่เปล่า'}</span>
+                  <button type="button" className="dz-row-main" onClick={() => handleEditRow(index)} aria-label={`แก้ป้าย ${itemLabel(item)}`}>
+                    <span className="dz-row-name">{itemLabel(item)}</span>
                     <span className="dz-row-meta">
                       <span className="ty">
                         <span className="dz-swatch" style={{ background: def.color }} />
@@ -176,7 +176,7 @@ export default function QueueDrawer() {
           {history.map((h) => {
             const d = new Date(h.ts);
             const when = `${d.getDate()}/${d.getMonth() + 1} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-            const preview = h.items.slice(0, 3).map((i) => i.ProductName || 'ป้ายตู้แช่เปล่า').join(', ');
+            const preview = h.items.slice(0, 3).map((i) => itemLabel(i)).join(', ');
             return (
               <li className="dz-row" key={h.id}>
                 <div className="dz-row-main" style={{ cursor: 'default' }}>

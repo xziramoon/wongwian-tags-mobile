@@ -34,4 +34,8 @@ export function summarizeByType(queue: QueueItem[]): TypeCount[] {
   return TAG_TYPES.filter((t) => counts.has(t.key)).map((def) => ({ def, count: counts.get(def.key) ?? 0 }));
 }
 
+/* ชื่อที่โชว์ในรายการ — ป้ายที่ไม่มีชื่อ: ตู้แช่ = ป้ายตู้แช่เปล่า, แบบอื่น = ป้ายที่กดราคาเอง */
+export const itemLabel = (i: QueueItem): string =>
+  i.ProductName || (i.TagMode === 'fridge' ? 'ป้ายตู้แช่เปล่า' : 'ป้ายราคา (ไม่มีชื่อ)');
+
 export const totalTags = (queue: QueueItem[]): number => queue.reduce((n, i) => n + Math.max(1, i.PrintQty || 1), 0);

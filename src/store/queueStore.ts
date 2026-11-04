@@ -20,7 +20,7 @@ import { useUIStore } from './uiStore';
 /* ⚠️ ตรรกะฟิลด์เริ่มต้น (normalize) ต้องคงเดิม — ยกมาจาก
  * wongwian-tags01/src/store/queueStore.ts normalize() ตรงตัว เพื่อให้ item ที่ส่งไป
  * ตรงกับ normalizeItem() ฝั่ง TAG_PRINTER.html */
-function normalize(q: Partial<QueueItem>): QueueItem {
+export function normalize(q: Partial<QueueItem>): QueueItem {
   return {
     Barcode: '',
     ProductName: '',
@@ -201,7 +201,12 @@ export const useQueueStore = create<QueueState>((set, get) => ({
     set((s) => {
       const queue = s.queue.slice();
       const existingIdx = queue.findIndex(
-        (i) => i.Barcode === item.Barcode && (i.Loc || '') === (item.Loc || '') && i.TagMode === item.TagMode,
+        (i) =>
+          i.Barcode === item.Barcode &&
+          (i.Loc || '') === (item.Loc || '') &&
+          i.TagMode === item.TagMode &&
+          /* บาร์โค้ดว่าง (ป้ายกดราคาเอง / ตู้แช่เปล่า) ไม่มีอะไรบอกว่าเป็นของชิ้นเดียวกัน — ต้องชื่อและราคาตรงกันถึงรวมจำนวน */
+          (item.Barcode !== '' || (i.ProductName === item.ProductName && i.Price === item.Price)),
       );
       if (existingIdx !== -1) {
         const existing = queue[existingIdx];

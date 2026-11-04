@@ -18,6 +18,7 @@ export default function HomeScreen() {
   const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
   const setQueueDrawerOpen = useUIStore((s) => s.setQueueDrawerOpen);
   const setFlipTodayOpen = useUIStore((s) => s.setFlipTodayOpen);
+  const setQuickPriceOpen = useUIStore((s) => s.setQuickPriceOpen);
   const autoOpenCamera = useUIStore((s) => s.autoOpenCamera);
   const setAutoOpenCamera = useUIStore((s) => s.setAutoOpenCamera);
   const lastTagMode = useUIStore((s) => s.lastTagMode);
@@ -147,6 +148,22 @@ export default function HomeScreen() {
           <span className="dz-card-sub">{last ? 'ส่งผิด? เอากลับมาแก้ได้' : 'ปริ้นแล้วจะเห็นตรงนี้'}</span>
         </div>
       </div>
+
+      <button type="button" className="dz-quick-btn" onClick={() => setQuickPriceOpen(true)}>
+        <span className="dz-card-ic" style={{ background: 'var(--dz-raised)', color: '#d4d4d8' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="4" y="3" width="16" height="18" rx="2" />
+            <path d="M8 7h8M8 11h1M12 11h1M16 11h0M8 15h1M12 15h1M16 15h0" />
+          </svg>
+        </span>
+        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+          <span className="dz-card-title">กดราคาเอง</span>
+          <span className="dz-card-sub">ไม่ต้องสแกนสินค้า — กดตัวเลขแล้วปริ้น</span>
+        </span>
+        <span className="dz-chevron" aria-hidden="true">
+          ›
+        </span>
+      </button>
 
       <label className="dz-pref">
         <input type="checkbox" checked={autoOpenCamera} onChange={(e) => setAutoOpenCamera(e.target.checked)} />
