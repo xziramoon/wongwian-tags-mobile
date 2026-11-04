@@ -10,6 +10,7 @@ import CameraPermissionDenied from './components/CameraPermissionDenied';
 import HomeScreen from './components/HomeScreen';
 import ScanResultSheet from './components/ScanResultSheet';
 import TagTypePicker from './components/TagTypePicker';
+import QuickPriceSheet from './components/QuickPriceSheet';
 import QueueDrawer from './components/QueueDrawer';
 import ManualSearchSheet from './components/ManualSearchSheet';
 import SettingsSheet from './components/SettingsSheet';
@@ -89,6 +90,7 @@ function App() {
       <SettingsSheet />
       <TagEditSheet />
       <TagTypePicker />
+      <QuickPriceSheet />
       <FlipTodaySheet />
       <PendingSendBar />
       <ToastContainer />

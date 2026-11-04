@@ -130,6 +130,10 @@ interface UIState {
   flipTodayOpen: boolean;
   setFlipTodayOpen: (open: boolean) => void;
 
+  /** กดราคาเอง (แป้นตัวเลข ไม่ต้องสแกน) */
+  quickPriceOpen: boolean;
+  setQuickPriceOpen: (open: boolean) => void;
+
   /** TagEditSheet — either creating a new item from a scan/search preview, or
    * editing an existing queue row by index. null when the sheet is closed. */
   tagEditTarget: { mode: 'new'; item: QueueItem } | { mode: 'edit'; index: number } | null;
@@ -214,6 +218,9 @@ export const useUIStore = create<UIState>((set) => ({
 
   flipTodayOpen: false,
   setFlipTodayOpen: (flipTodayOpen) => set({ flipTodayOpen }),
+
+  quickPriceOpen: false,
+  setQuickPriceOpen: (quickPriceOpen) => set({ quickPriceOpen }),
 
   tagEditTarget: null,
   openTagEditNew: (item) => set({ tagEditTarget: { mode: 'new', item } }),
