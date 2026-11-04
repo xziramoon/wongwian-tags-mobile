@@ -64,15 +64,18 @@ export const CN_NAME_STEPS: Record<CnVariant, { upTo: number; size: number }[]> 
 };
 export const CN_NAME_LINES: Record<CnVariant, number> = { sp: 2, sl: 2, pl: 3, pp: 2 };
 
-/* ช่องราคา: ขนาดตัวเลขอัตโนมัติ = fitWidth(maxW, maxH, minH) (ธีมเอียง -4° หักมุมไว้ใน maxW แล้ว) */
-export const CN_PRICE_BOX: Record<CnVariant, { maxW: number; maxH: number; minH: number }> = {
-  sp: { maxW: 140, maxH: 116, minH: 37 },
-  sl: { maxW: 169, maxH: 106, minH: 37 },
-  pl: { maxW: 143, maxH: 124, minH: 34 },
-  pp: { maxW: 175, maxH: 112, minH: 40 },
+/* ช่องราคา: ตัวเลขขยายให้ใหญ่สุดเท่าที่ช่องที่เหลือจริงรับได้ (priceFit.ts วัดขอบหมึกจริง + เอียง -4°)
+ * beside = "บาท" อยู่ข้างตัวเลข (แถบตั้งแนวนอน) · ไม่ใช่ = อยู่ใต้ตัวเลขชิดขวา · bahtMm = ขนาดตัวอักษร "บาท" · gap = ระยะห่างจากตัวเลข */
+export const CN_PRICE_LAYOUT: Record<CnVariant, { bahtMm: number; beside: boolean; gap: number }> = {
+  sp: { bahtMm: 16.4, beside: false, gap: 1.6 },
+  sl: { bahtMm: 19, beside: true, gap: 6.4 },
+  pp: { bahtMm: 16.4, beside: false, gap: 1.6 },
+  pl: { bahtMm: 17.5, beside: false, gap: 1.6 },
 };
-/* แนวนอน แถบตั้ง: ชื่อเกินจำนวนนี้ = กิน 2 บรรทัด ช่องราคาเตี้ยลง */
-export const CN_SL_LONG_NAME = { chars: 24, maxH: 87 };
+/* ขอบเว้นรอบตัวเลขในช่องราคา (มม. ต่อด้าน) */
+export const CN_PRICE_PAD = { x: 4, y: 3 };
+export const CN_PRICE_TILT = 4; // องศา
+export const CN_PRICE_CAP = 220; // เพดานขนาดตัวเลข (มม.) กันราคาหลักเดียวบนช่องใหญ่ผิดปกติ
 
 export const CN_PRICE_FAMILY = "'Potta One',cursive";
 export const CN_PRICE_WEIGHT = 400;
@@ -82,17 +85,5 @@ export const nameSizeFor = (v: CnVariant, name: string): number => {
   const n = name.length;
   return (CN_NAME_STEPS[v].find((s) => n <= s.upTo) ?? CN_NAME_STEPS[v][CN_NAME_STEPS[v].length - 1]).size;
 };
-
-/* ขนาดตัวเลขราคา (มม.) ใช้ fitWidth ที่ส่งเข้ามา (วัดความกว้างจริงของฟอนต์) */
-export function priceSizeFor(
-  v: CnVariant,
-  name: string,
-  price: string,
-  fit: (text: string, family: string, weight: number, maxW: number, maxS: number, minS: number) => number,
-): number {
-  const b = CN_PRICE_BOX[v];
-  const maxH = v === 'sl' && name.length > CN_SL_LONG_NAME.chars ? CN_SL_LONG_NAME.maxH : b.maxH;
-  return fit(price, CN_PRICE_FAMILY, CN_PRICE_WEIGHT, b.maxW, maxH, b.minH);
-}
 
 export const cnRed = (s: CnSignSettings): string => (s.mono ? CN_MONO_INK : s.red);

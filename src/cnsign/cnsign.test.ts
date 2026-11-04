@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../lib/database', () => ({ database: { find: () => undefined, search: () => [], onChange: () => () => {} } }));
 
 import type { QueueItem } from '../types';
-import { CN_PRICE_BOX, DEFAULT_CN_SETTINGS, cnRed, cnVariant, nameSizeFor, priceSizeFor } from './config';
+import { CN_PRICE_CAP, CN_PRICE_PAD, DEFAULT_CN_SETTINGS, cnRed, cnVariant, nameSizeFor } from './config';
+import { priceFit, type InkMetrics } from './priceFit';
 import { cnPageCount, fromQueueItem, queueToCnData, splitByOrient } from './data';
 
 const item = (over: Partial<QueueItem> = {}): QueueItem =>
@@ -42,23 +43,38 @@ describe('ป้ายจีน A4 · ขนาดชื่อตามจำน
   });
 });
 
-describe('ป้ายจีน A4 · ช่องราคา', () => {
-  const fitSpy = vi.fn((_t: string, _f: string, _w: number, _maxW: number, maxS: number, _minS: number) => maxS);
-  it('ส่ง maxW/maxH/minH ตามแบบ ด้วยฟอนต์ Potta One', () => {
-    (['sp', 'sl', 'pl', 'pp'] as const).forEach((v) => {
-      fitSpy.mockClear();
-      priceSizeFor(v, 'น้ำปลา', '35', fitSpy);
-      const b = CN_PRICE_BOX[v];
-      expect(fitSpy).toHaveBeenCalledWith('35', "'Potta One',cursive", 400, b.maxW, b.maxH, b.minH);
-    });
+describe('ป้ายจีน A4 · ช่องราคา (ขยายให้ใหญ่สุดตามขอบหมึกจริง)', () => {
+  // ตัวเลขสมมติ "35": หมึกกว้าง 1.164em สูง 0.86em
+  const m: InkMetrics = { adv: 1.228, abl: -0.03, abr: 1.194, asc: 0.8, desc: 0.06, fa: 1.16, fd: 0.29 };
+  const px = (css: string) => {
+    const n = [...css.matchAll(/calc\(\(100(cqw|cqh) - ([\d.]+)mm\) \/ ([\d.]+)\)/g)];
+    return Object.fromEntries(n.map((x) => [x[1], { pad: Number(x[2]), div: Number(x[3]) }]));
+  };
+  it('ขนาดตัวเลข = min(กว้าง, สูง, เพดาน) จากช่องที่เหลือจริง (cqw/cqh) ไม่ใช่ค่าตายตัว', () => {
+    const f = priceFit('sp', m, 1);
+    expect(f.fontSize).toMatch(/^min\(calc\(\(100cqw - /);
+    expect(f.fontSize).toContain('100cqh');
+    expect(f.fontSize.endsWith(`${CN_PRICE_CAP}mm)`)).toBe(true);
   });
-  it('แถบตั้งแนวนอน: ชื่อเกิน 24 ตัว maxH ลดเหลือ 87 มม. (ชื่อกิน 2 บรรทัด)', () => {
-    fitSpy.mockClear();
-    priceSizeFor('sl', 'ก'.repeat(25), '35', fitSpy);
-    expect(fitSpy.mock.calls[0][4]).toBe(87);
-    fitSpy.mockClear();
-    priceSizeFor('sl', 'ก'.repeat(24), '35', fitSpy);
-    expect(fitSpy.mock.calls[0][4]).toBe(106);
+  it('เผื่อมุมเอียง -4° จากขอบหมึกจริง: กว้าง/สูงหลังเอียงมากกว่าหมึกเดิมนิดหน่อย', () => {
+    const { cqw, cqh } = px(priceFit('sp', m, 1).fontSize);
+    expect(cqw.div).toBeGreaterThan(1.164); // 1.164cos4 + 0.86sin4 ≈ 1.221
+    expect(cqw.div).toBeLessThan(1.3);
+    expect(cqh.div).toBeGreaterThan(0.86); // 1.164sin4 + 0.86cos4 ≈ 0.939
+    expect(cqh.div).toBeLessThan(1);
+  });
+  it('บาทใต้ตัวเลข: หักความสูงบาท+ระยะห่างจากช่อง · บาทข้างตัวเลข (sl): หักความกว้างบาทแทน', () => {
+    const under = px(priceFit('sp', m, 1).fontSize);
+    expect(under.cqh.pad).toBeCloseTo(2 * CN_PRICE_PAD.y + 16.4 + 1.6, 3);
+    expect(under.cqw.pad).toBeCloseTo(2 * CN_PRICE_PAD.x, 3);
+    const beside = px(priceFit('sl', m, 1.72).fontSize); // "บาท" กว้าง 1.72em ที่ 19 มม.
+    expect(beside.cqw.pad).toBeCloseTo(2 * CN_PRICE_PAD.x + 1.72 * 19 + 6.4, 3);
+    expect(beside.cqh.pad).toBeCloseTo(2 * CN_PRICE_PAD.y, 3);
+  });
+  it('กล่องสูงเท่าตัวเลขที่เอียงแล้ว และเอียง -4° พร้อมขยับให้หมึกอยู่กลางกล่อง', () => {
+    const f = priceFit('pl', m, 1);
+    expect(f.lineHeight).toBeGreaterThan(0.86);
+    expect(f.transform).toMatch(/^rotate\(-4deg\) translate\(/);
   });
 });
 

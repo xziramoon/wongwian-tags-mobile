@@ -56,14 +56,15 @@
 .cn-sl .cn-size, .cn-pl .cn-size { font-size: 9mm; }
 
 /* ---------- ราคา ---------- */
-.cn-priceblk { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+/* ช่องราคาเป็น container: ตัวเลขวัดขนาดจากช่องที่เหลือจริง (cqw/cqh — priceFit.ts) */
+.cn-priceblk { flex: 1 1 0; min-height: 0; container-type: size; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .cn-pw { display: flex; flex-direction: column; align-items: flex-end; gap: 1.6mm; }
 .cn-num {
   display: inline-block; font-family: 'Potta One', cursive; font-weight: 400; color: var(--cn-red);
-  transform: rotate(-4deg); text-shadow: 0 0 0.5mm currentColor; line-height: 0.95; white-space: nowrap;
+  text-shadow: 0 0 0.5mm currentColor; white-space: nowrap; /* ขนาด/ความสูงบรรทัด/เอียง ตั้งแบบ inline จาก priceFit.ts */
 }
 .cn-baht { font-weight: 800; font-size: 16.4mm; color: #111; line-height: 1; }
-.cn-sl .cn-pw { flex-direction: row; align-items: flex-end; gap: 6.4mm; padding-bottom: 4.8mm; }
+.cn-sl .cn-pw { flex-direction: row; align-items: flex-end; gap: 6.4mm; }
 .cn-sl .cn-baht { font-size: 19mm; }
 .cn-pl .cn-baht { font-size: 17.5mm; }
 
@@ -93,7 +94,7 @@
 .cn-pl-left .cn-pack-p { font-size: 16.4mm; }
 .cn-pl-left .cn-pack-b { font-size: 8mm; }
 .cn-pl-left .cn-foot { margin: 0 -8mm; padding: 0 8mm; height: 10.6mm; font-size: 4.5mm; }
-.cn-pl-right { flex: 1 1 0; min-width: 0; border-left: 1.6mm solid #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cn-pl-right { flex: 1 1 0; min-width: 0; container-type: size; border-left: 1.6mm solid #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
 /* ---------- ขาว-ดำ: ไม่มีสีแดงเหลือ ---------- */
 .cn-mono { --cn-red: #111; }
