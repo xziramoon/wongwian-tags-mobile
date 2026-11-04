@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUIStore } from '../store/uiStore';
 import { useQueueStore, previewFromBarcode } from '../store/queueStore';
-import { openCamera, closeCamera, startDecoding, stopDecoding, hasTorch, setTorch, getZoomRange, setZoom } from '../lib/scan';
+import { openCamera, closeCamera, startDecoding, stopDecoding, hasTorch, setTorch, getZoomRange, getZoom, setZoom, refocus, pickInitialZoom } from '../lib/scan';
 import { feedback } from '../lib/feedback';
 import { tryKeepScan, resetKeepCooldown } from '../lib/scanKeep';
 import { totalTags, typeDef } from '../lib/tagTypes';
@@ -12,6 +12,8 @@ import { IconClose, IconFlash } from './Icons';
 const IDLE_CLOSE_MS = 2 * 60 * 1000;
 /* พักหลังปิดแผ่นผลสแกนก่อนอ่านต่อ — เท่ากับเวลาเปิดกล้องใหม่ของแบบเดิมโดยประมาณ ให้ทันยกมือถือออก */
 const RESUME_DELAY_MS = 1000;
+/* เล็งนานเท่านี้แล้วยังไม่ติด → ขึ้นคำแนะนำ (ถอยห่าง/แตะโฟกัส/เปิดไฟฉาย/กรอกเลข) */
+const STRUGGLE_HINT_MS = 7000;
 
 interface ZoomRange {
   min: number;
@@ -50,6 +52,7 @@ export default function CameraScanner() {
   const [torchOn, setTorchOn] = useState(false);
   const [zoomRange, setZoomRange] = useState<ZoomRange | null>(null);
   const [zoomValue, setZoomValue] = useState(1);
+  const [struggling, setStruggling] = useState(false);
 
   const handleDetect = useCallback(
     (code: string) => {
@@ -94,7 +97,7 @@ export default function CameraScanner() {
         setTorchAvailable(hasTorch());
         const range = getZoomRange();
         setZoomRange(range);
-        if (range) setZoomValue(range.min);
+        if (range) setZoomValue(getZoom() ?? pickInitialZoom(range));
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -123,6 +126,14 @@ export default function CameraScanner() {
       stopDecoding();
     };
   }, [cameraReady, anySheetOpen, handleDetect]);
+
+  // เล็งนานแล้วยังไม่ติด → แนะนำวิธี (เริ่มนับใหม่ทุกครั้งที่สแกนติดหรือแตะจอ)
+  useEffect(() => {
+    setStruggling(false);
+    if (anySheetOpen || !cameraReady) return;
+    const t = window.setTimeout(() => setStruggling(true), STRUGGLE_HINT_MS);
+    return () => window.clearTimeout(t);
+  }, [anySheetOpen, cameraReady, lastActivity]);
 
   // ปิดกล้องอัตโนมัติเมื่อไม่ได้ใช้ — นับเฉพาะตอนกล้องโชว์อยู่ (มีแผ่นไหนเปิดทับ = กำลังใช้งาน)
   useEffect(() => {
@@ -168,7 +179,7 @@ export default function CameraScanner() {
      * เดิมนับแค่ตอนสแกนติด — คนกำลังเล็งบาร์โค้ดยาก ๆ อยู่โดนกล้องปิดกลางคัน */
     <div className="camera-scanner" onPointerDownCapture={() => setLastActivity(Date.now())}>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video ref={videoRef} className="camera-video" autoPlay playsInline muted />
+      <video ref={videoRef} className="camera-video" autoPlay playsInline muted onClick={() => void refocus()} />
 
       <div className="dz-cam-top">
         <button type="button" className="dz-cam-btn" onClick={() => setCameraEnabled(false)} aria-label="ปิดกล้อง กลับหน้าแรก">
@@ -202,7 +213,17 @@ export default function CameraScanner() {
         <i />
         <i className="line" />
       </div>
-      <div className="dz-cam-hint">ส่องบาร์โค้ดให้อยู่ในกรอบ</div>
+      <div className="dz-cam-hint">
+        {struggling ? (
+          <>
+            ยังไม่ติด? ลองถอยห่างอีกนิด · แตะจอเพื่อโฟกัส
+            <br />
+            {torchAvailable ? 'เปิดไฟฉายถ้าแสงน้อย · ' : ''}หรือกด "กรอกเลข"
+          </>
+        ) : (
+          'ส่องบาร์โค้ดให้อยู่ในกรอบ'
+        )}
+      </div>
       {ablyStatus !== 'connected' && (
         <div className="dz-printer-float-slot">
           <ConnectionStatus />
