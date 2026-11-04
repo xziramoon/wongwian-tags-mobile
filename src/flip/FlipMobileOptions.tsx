@@ -27,7 +27,7 @@ export function FlipSendKindPicker() {
   const update = useFlipStore((s) => s.updateSetting);
   return (
     <div>
-      <span className="q-lbl">เมื่อปริ้น ให้พิมพ์</span>
+      <span className="q-lbl">กดปริ้นแล้ว ให้ปริ้น</span>
       <div className="flip-kind-row">
         {SEND_KINDS.map((k) => (
           <button
@@ -55,6 +55,16 @@ export default function FlipMobileOptions({ item }: { item: QueueItem }) {
   const auto = fromQueueItem(item, settings, {});
   const variant: FlipVariant = overrides?.variant ?? 'full';
   const memberOf = groups.find((g) => g.members.some((m) => m.barcode === item.Barcode));
+
+  /* ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด): ตัวเลือกรายสินค้าผูกกับบาร์โค้ด จึงใช้ไม่ได้ — ขนาดตั้งตอนกดราคา */
+  if (!item.Barcode) {
+    return (
+      <div className="flip-ov" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignSelf: 'stretch' }}>
+        <span className="fold-hint">ป้ายที่กดราคาเอง — เปลี่ยนขนาดเต็ม/แคบได้ที่ปุ่ม "กดราคาเอง" หน้าแรก</span>
+        <FlipSendKindPicker />
+      </div>
+    );
+  }
 
   const chooseGroup = (id: string) => {
     setOverride(item.Barcode, 'variant', 'group');

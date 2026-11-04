@@ -22,6 +22,8 @@ export interface QueueItem {
   Exp: string;
   Image: string;
   PrintQty: number;
+  /** ป้ายดำแดงที่กดราคาเอง (บาร์โค้ดว่าง) — เก็บขนาดป้ายไว้ที่รายการเอง เพราะไม่มีบาร์โค้ดให้ผูกตัวเลือกรายสินค้า */
+  FlipVariant?: 'full' | 'narrow';
   PriceDiff: string | null;
   OosEta: string; // เช่น '18 ก.ย.' หรือ ''
   OosReason: OosReason;

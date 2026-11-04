@@ -158,7 +158,7 @@ export function fromQueueItem(
     footer: ov.footer ?? item.Barcode,
     lot: (item.Loc || '').trim() || database.find(item.Barcode)?.Lot || '',
     qty,
-    variant: ov.variant === 'narrow' ? 'narrow' : 'full',
+    variant: (ov.variant ?? item.FlipVariant) === 'narrow' ? 'narrow' : 'full',
     tagW: ov.tagW ?? settings.tagW,
     nameSz: ov.nameSz ?? settings.nameSz,
   };

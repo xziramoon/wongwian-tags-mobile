@@ -4,7 +4,7 @@ import { autoFontSize } from './utils';
 
 /* กดราคาเอง (ไม่ต้องสแกนสินค้า): แป้นตัวเลขกดราคา → ปริ้นป้ายได้เลย
  * ใช้กับของที่ไม่มีบาร์โค้ด หรือไม่อยู่ในชีต — ป้ายไม่มีบาร์โค้ด (ใช้บาร์โค้ดว่างแบบเดียวกับป้ายตู้แช่เปล่า) */
-export const QUICK_MODES: TagMode[] = ['standard', 'large', 'fridge'];
+export const QUICK_MODES: TagMode[] = ['standard', 'large', 'fridge', 'flip'];
 export const QUICK_UNITS = ['ชิ้น', 'ขวด', 'แพ็ค', 'ถุง', 'กก.'];
 
 export type KeypadKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '.' | 'back' | 'clear';
@@ -38,6 +38,8 @@ export function makeQuickItem(opts: {
   unit: string;
   mode: TagMode;
   qty: number;
+  /** ป้ายดำแดง: ขนาดเต็ม 90 มม. / แคบ 45 มม. */
+  flipVariant?: 'full' | 'narrow';
   config: Pick<Config, 'globalNameSz'>;
 }): QueueItem {
   const name = opts.name.trim();
@@ -50,5 +52,6 @@ export function makeQuickItem(opts: {
     Price: cleanPrice(opts.price),
     Unit: opts.unit.trim() || 'ชิ้น',
     PrintQty: Math.max(1, opts.qty),
+    ...(opts.mode === 'flip' ? { FlipVariant: opts.flipVariant === 'narrow' ? ('narrow' as const) : ('full' as const) } : {}),
   });
 }

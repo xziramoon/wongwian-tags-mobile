@@ -94,6 +94,7 @@ export const useFlipStore = create<FlipState>((set) => ({
     set((s) => {
       const lastPrinted = { ...s.lastPrinted };
       items.forEach((d) => {
+        if (!d.barcode) return; // ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด) ไม่มีสินค้าให้เทียบราคาทีหลัง ไม่ลงรายการ "ต้องเปลี่ยนวันนี้"
         const prev = lastPrinted[d.barcode];
         const unplaced = prev?.placed === false;
         lastPrinted[d.barcode] = {
@@ -115,6 +116,7 @@ export const useFlipStore = create<FlipState>((set) => ({
     set((s) => {
       const tagsPrinted = { ...s.tagsPrinted };
       items.forEach((d) => {
+        if (!d.barcode) return;
         tagsPrinted[d.barcode] = { name: d.sig ?? d.name, lot: d.lot, date: today() };
       });
       save(FLIP_KEYS.tagsPrinted, tagsPrinted);
