@@ -13,6 +13,7 @@ import {
 import { database } from '../lib/database';
 import { printBridge } from '../lib/printBridge';
 import { sendFlipFromQueue } from '../flip/flipSend';
+import { sendCnFromQueue } from '../cnsign/cnSend';
 import { autoFontSize, extractSize } from '../lib/utils';
 import { printRank } from '../lib/fridge';
 import { useUIStore } from './uiStore';
@@ -321,20 +322,33 @@ export const useQueueStore = create<QueueState>((set, get) => ({
       // แถบสินค้าหมด (oos) สูงแค่ 1.4 ซม. ไม่เท่าป้ายอื่น (4.0 ซม.) — ถ้าปนกลางแถวใน A4
       // จะเกิดช่องว่างฟันหลอ เรียงแถบไปท้ายสุดของงานพิมพ์เสมอ — ป้ายตู้แช่ (3.5 ซม.) ก็สูงไม่เท่า จัดกลุ่มไว้ก่อนแถบ
       // ป้ายดำแดง (แถบพลิก) ส่งเป็นงานแยก — ตัวรับพิมพ์ A4 ขอบ 5 มม. คนละแบบกับป้ายทั่วไป
-      const stdItems = queue.filter((i) => i.TagMode !== 'flip');
+      // ป้ายจีน A4 ก็ส่งเป็นงานแยกเช่นกัน (A4 1 ป้าย/แผ่น แนวตั้ง/นอนแยกงาน)
+      const stdItems = queue.filter((i) => i.TagMode !== 'flip' && i.TagMode !== 'cnsign');
       const flipItems = queue.filter((i) => i.TagMode === 'flip');
+      const cnItems = queue.filter((i) => i.TagMode === 'cnsign');
+      const specialItems = [...flipItems, ...cnItems];
       if (stdItems.length) {
         const ordered = [...stdItems].sort((a, b) => printRank(a.TagMode) - printRank(b.TagMode));
         await printBridge.publish(config, ordered);
-        if (flipItems.length) {
-          // ส่งป้ายทั่วไปสำเร็จแล้ว — ถ้าส่งป้ายดำแดงไม่สำเร็จ คิวต้องเหลือแต่ป้ายดำแดง กันกดส่งซ้ำแล้วป้ายทั่วไปออกซ้ำ
+        if (specialItems.length) {
+          // ส่งป้ายทั่วไปสำเร็จแล้ว — ถ้าส่งป้ายดำแดง/ป้ายจีนไม่สำเร็จ คิวต้องเหลือแต่ป้ายพวกนั้น กันกดส่งซ้ำแล้วป้ายทั่วไปออกซ้ำ
           set((s) => {
-            persist(flipItems, s.config);
-            return { queue: flipItems };
+            persist(specialItems, s.config);
+            return { queue: specialItems };
           });
         }
       }
-      if (flipItems.length) await sendFlipFromQueue(flipItems);
+      if (flipItems.length) {
+        await sendFlipFromQueue(flipItems);
+        if (cnItems.length) {
+          // ป้ายดำแดงออกไปแล้ว — ถ้าส่งป้ายจีนไม่สำเร็จ คิวเหลือแต่ป้ายจีน
+          set((s) => {
+            persist(cnItems, s.config);
+            return { queue: cnItems };
+          });
+        }
+      }
+      if (cnItems.length) await sendCnFromQueue(cnItems);
       set((s) => {
         persist([], s.config);
         const history = [{ id: `${Date.now()}`, ts: Date.now(), items: queue }, ...s.history].slice(

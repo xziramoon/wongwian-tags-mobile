@@ -3,6 +3,8 @@ import type { Config, QueueItem } from '../types';
 import type { FlipPrintKind } from '../flip/store';
 import type { FlipData } from '../flip/data';
 import type { FlipSettings } from '../flip/config';
+import type { CnOrient, CnSignSettings } from '../cnsign/config';
+import type { CnSignData } from '../cnsign/data';
 import { ABLY_API_KEY, PRINT_TAGS_CHANNEL, PRINT_EVENT_NAME, PRINT_PAYLOAD_VERSION } from '../constants';
 
 /* ป้ายดำแดง (แถบพลิก) ส่งเป็นงานแยก ฟิลด์ flip — ตัวรับ TAG_PRINTER.html วาดและพิมพ์ A4 เอง */
@@ -12,12 +14,20 @@ export interface FlipPayload {
   items: FlipData[];
 }
 
+/* ป้ายจีน A4 ส่งเป็นงานแยก ฟิลด์ cnsign (1 งาน = 1 แนวกระดาษ) — ตัวรับ TAG_PRINTER.html วาดและพิมพ์ A4 เอง */
+export interface CnSignPayload {
+  orient: CnOrient;
+  settings: CnSignSettings;
+  items: CnSignData[];
+}
+
 export interface PrintPayload {
   v: number;
   ts: number;
   config: Config;
   items: QueueItem[];
   flip?: FlipPayload;
+  cnsign?: CnSignPayload;
 }
 
 export type AblyConnState = 'connecting' | 'connected' | 'disconnected' | 'suspended' | 'failed' | 'closed';
@@ -90,6 +100,12 @@ class PrintBridge {
   async publishFlip(config: Config, flip: FlipPayload): Promise<void> {
     await this.waitConnected();
     const payload: PrintPayload = { v: PRINT_PAYLOAD_VERSION, ts: Date.now(), config, items: [], flip };
+    await this.client.channels.get(PRINT_TAGS_CHANNEL).publish(PRINT_EVENT_NAME, payload);
+  }
+
+  async publishCnSign(config: Config, cnsign: CnSignPayload): Promise<void> {
+    await this.waitConnected();
+    const payload: PrintPayload = { v: PRINT_PAYLOAD_VERSION, ts: Date.now(), config, items: [], cnsign };
     await this.client.channels.get(PRINT_TAGS_CHANNEL).publish(PRINT_EVENT_NAME, payload);
   }
 }

@@ -4,7 +4,7 @@ import { PREFS_STORAGE_KEY } from '../constants';
 import { autoFontSize } from '../lib/utils';
 
 /* แบบป้ายที่เลือกได้ในหน้าผลสแกน (แถบสินค้าหมดมีปุ่ม/ขั้นตอนของตัวเอง) */
-export const SCAN_TAG_MODES: TagMode[] = ['standard', 'dual', 'large', 'fridge', 'hamper', 'flip'];
+export const SCAN_TAG_MODES: TagMode[] = ['standard', 'dual', 'large', 'fridge', 'hamper', 'flip', 'cnsign'];
 
 /* โหมดสแกน: keep = สแกนแล้วเก็บเข้ารายการเลย ไม่เปิดหน้าผลสแกน · review = ขอดูก่อนทุกชิ้น (แบบเดิม) */
 export type ScanMode = 'keep' | 'review';

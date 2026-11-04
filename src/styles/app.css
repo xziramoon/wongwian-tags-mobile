@@ -1326,6 +1326,7 @@ textarea {
 .settings-sheet[data-cat='fridge'] [data-cat]:not([data-cat~='fridge']),
 .settings-sheet[data-cat='hamper'] [data-cat]:not([data-cat~='hamper']),
 .settings-sheet[data-cat='flip'] [data-cat]:not([data-cat~='flip']),
+.settings-sheet[data-cat='cn'] [data-cat]:not([data-cat~='cn']),
 .settings-sheet[data-cat='advanced'] [data-cat]:not([data-cat~='advanced']) {
   display: none;
 }

@@ -44,10 +44,13 @@ export function countFlipPages(data: FlipData[], kind: 'tags' | 'strips' | 'both
   return tags + strips;
 }
 
+/* ป้ายจีน A4: 1 ป้าย = 1 แผ่น */
+export const cnSheets = (queue: QueueItem[]): number => queue.filter((i) => i.TagMode === 'cnsign').reduce((n, i) => n + qtyOf(i), 0);
+
 export function paperSheets(queue: QueueItem[], config: Config, flipPages = 0): number {
   const fridge = queue.filter((i) => i.TagMode === 'fridge').reduce((n, i) => n + qtyOf(i), 0);
   const hamper = queue.filter((i) => i.TagMode === 'hamper').reduce((n, i) => n + qtyOf(i), 0);
   const fridgeSheets = fridge ? Math.ceil(fridge / Math.max(1, fridgeSheetLayout(config).perSheet)) : 0;
   const hamperSheets = hamper ? Math.ceil(hamper / Math.max(1, hamperSheetLayout(config).perSheet)) : 0;
-  return flowSheets(queue, config) + fridgeSheets + hamperSheets + flipPages;
+  return flowSheets(queue, config) + fridgeSheets + hamperSheets + flipPages + cnSheets(queue);
 }

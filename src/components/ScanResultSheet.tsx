@@ -7,6 +7,7 @@ import type { QueueItem } from '../types';
 import { isVeg } from '../lib/veg';
 import { SCAN_TYPES } from '../lib/tagTypes';
 import FlipMobileOptions from '../flip/FlipMobileOptions';
+import CnMobileOptions from '../cnsign/CnMobileOptions';
 
 /* หน้าผลสแกน (ดีไซน์ใหม่ 1c/1j/1k): ชื่อ + ราคา · ตัวอย่างป้าย · เลือกแบบป้าย · ปุ่มเล็ก เจ / อยู่ชั้น / ของหมดแล้ว
  * · แถบล่าง ตัวนับ ± · เก็บไว้ก่อน · ปริ้นเลย
@@ -188,6 +189,7 @@ export default function ScanResultSheet() {
             </button>
           </div>
           {item.TagMode === 'flip' && <FlipMobileOptions item={item} />}
+          {item.TagMode === 'cnsign' && <CnMobileOptions item={item} onSet={(f, v) => updateScanSheetItem({ [f]: v })} />}
           {item.TagMode === 'fridge' && (
             <span className="fold-hint">
               {config.fridgeFill ? 'ถมขีดตามราคาให้แล้ว (ราคามีสตางค์ = เว้นว่างให้ระบาย)' : `ป้ายปริ้น 888 เปล่า — เอาเมจิกระบาย ${item.Price || '?'} บาท เอง`}
