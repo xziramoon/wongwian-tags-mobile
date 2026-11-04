@@ -45,6 +45,7 @@ export default function HomeScreen() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div className="dz-home-title">ทำป้ายราคา</div>
           <ConnectionStatus inline />
+          <div className="dz-home-ver">รุ่น {__APP_VERSION__}</div>
         </div>
         <button type="button" className="dz-icon-btn" onClick={() => setSettingsSheetOpen(true)} aria-label="ตั้งค่าป้าย">
           <IconSettings size={22} />

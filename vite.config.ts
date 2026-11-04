@@ -1,10 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { execSync } from 'node:child_process'
+
+// เลขรุ่นที่โชว์ในชื่อหน้า/หน้าแรก: วันที่-เวลา build (เวลาไทย) + รหัส commit — ดูว่าเครื่องได้รุ่นล่าสุดหรือยัง
+const commit = (() => {
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim()
+  } catch {
+    return 'dev'
+  }
+})()
+const stamp = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 16).replace('T', ' ')
+const APP_VERSION = `${stamp} · ${commit}`
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/wongwian-tags-mobile/',
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
   plugins: [
     react(),
     VitePWA({

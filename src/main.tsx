@@ -12,6 +12,8 @@ import './styles/tag-hamper.css'
 import './styles/flip.css'
 import App from './App.tsx'
 
+document.title = `วงเวียน สแกนป้ายราคา v${__APP_VERSION__}`
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

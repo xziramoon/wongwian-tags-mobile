@@ -1488,3 +1488,9 @@ textarea {
   max-height: var(--vvh, 100dvh);
   animation: none;
 }
+
+.dz-home-ver {
+  font-size: 11.5px;
+  color: var(--dz-muted);
+  font-family: var(--dz-mono);
+}
