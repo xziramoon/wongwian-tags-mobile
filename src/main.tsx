@@ -10,6 +10,7 @@ import './styles/tag-mono.css'
 import './styles/tag-fridge.css'
 import './styles/tag-hamper.css'
 import './styles/flip.css'
+import './styles/tag-cnsign.css'
 import App from './App.tsx'
 
 document.title = `วงเวียน สแกนป้ายราคา v${__APP_VERSION__}`

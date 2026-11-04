@@ -6,6 +6,7 @@ import { HAMPER_DEFAULTS } from '../lib/hamper';
 import type { DualStyle, QueueItem } from '../types';
 import TagPreview from './TagPreview';
 import FlipMobileOptions from '../flip/FlipMobileOptions';
+import CnMobileOptions from '../cnsign/CnMobileOptions';
 import { IconClose } from './Icons';
 
 /* Shared new/edit tag-design sheet, driven by uiStore.tagEditTarget:
@@ -269,10 +270,18 @@ export default function TagEditSheet() {
             >
               ดำแดง (แถบพลิก)
             </button>
+            <button
+              type="button"
+              className={`mode-btn${item.TagMode === 'cnsign' ? ' active' : ''}`}
+              onClick={() => setField('TagMode', 'cnsign')}
+            >
+              ป้ายจีน A4
+            </button>
           </div>
         </div>
 
         {item.TagMode === 'flip' && <FlipMobileOptions item={item} />}
+        {item.TagMode === 'cnsign' && <CnMobileOptions item={item} onSet={(f, v) => setField(f, v)} />}
 
         {item.TagMode === 'dual' && (
           <div className="mode-btns mode-btns-2">

@@ -1,0 +1,103 @@
+/* ป้ายใหญ่ "ป้ายจีน" A4 (spec-chinese-sign-a4) — ทุกขนาดเป็น มม. · ตรงกับ wongwian-tags01 (src/styles/tag-cnsign.css) และตัวรับ TAG_PRINTER.html
+ * แก้ที่นี่ต้องแก้ที่นั่นด้วย · ฟอนต์: Kanit (ตัวไทย) · Potta One (ตัวเลขราคา) · Noto Serif SC 900 (ตัวจีน) */
+.cn {
+  --cn-red: #C0141C;
+  box-sizing: border-box; position: relative; display: flex; overflow: hidden;
+  background: #fff; color: #111; border: 1.6mm solid #111;
+  font-family: 'Kanit', sans-serif; font-weight: 400; line-height: 1.15;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.cn *, .cn *::before, .cn *::after { box-sizing: border-box; }
+.cn-p { width: 200mm; height: 287mm; }
+.cn-l { width: 287mm; height: 200mm; }
+.cn-sp, .cn-sl { flex-direction: row; }
+.cn-pp, .cn-pl { flex-direction: column; }
+.cn-grow { flex: 1 1 0; min-height: 0; min-width: 0; }
+
+/* ---------- แถบตั้ง (strip) ---------- */
+.cn-side { flex: 0 0 36mm; background: #111; padding: 3.2mm; display: flex; flex-direction: column; align-items: center; gap: 5.8mm; }
+.cn-sl .cn-side { flex-basis: 34.4mm; gap: 4.8mm; }
+.cn-plate {
+  width: 100%; background: var(--cn-red); color: #fff; padding: 4.8mm 0 4.2mm; text-align: center;
+  font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 22mm; line-height: 1.08; flex: none;
+}
+.cn-sl .cn-plate { font-size: 19mm; }
+.cn-plate span { display: block; }
+.cn-shopv { writing-mode: vertical-rl; font-weight: 800; font-size: 11.6mm; color: #fff; letter-spacing: 0.5mm; white-space: nowrap; flex: none; }
+.cn-sl .cn-shopv { font-size: 10mm; }
+.cn-dash { width: 15mm; height: 0.8mm; background: var(--cn-red); flex: none; }
+.cn-sl .cn-dash { width: 13mm; }
+.cn-cornerv { writing-mode: vertical-rl; font-weight: 400; font-size: 7mm; color: #ccc; padding-bottom: 2mm; white-space: nowrap; flex: none; }
+.cn-sl .cn-cornerv { font-size: 5.8mm; }
+.cn-main { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+
+/* ---------- แผ่นป้ายบน (plaque) หัวป้าย ---------- */
+.cn-ph { flex: none; height: 36mm; background: #111; display: flex; align-items: stretch; gap: 6.4mm; padding-right: 7mm; }
+.cn-pl .cn-ph { height: 32.8mm; gap: 8mm; }
+.cn-ph-plate { flex: none; background: var(--cn-red); padding: 2.4mm; display: flex; }
+.cn-ph-plate-in {
+  border: 0.8mm solid #fff; padding: 0 6.4mm; display: flex; align-items: center; color: #fff; white-space: nowrap;
+  font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 17mm; letter-spacing: 3.2mm; line-height: 1;
+}
+.cn-ph-shop { flex: 1 1 0; min-width: 0; align-self: center; color: #fff; font-weight: 800; font-size: 15mm; letter-spacing: 0.3mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cn-pl .cn-ph-shop { font-size: 19mm; }
+.cn-ph-corner { flex: none; align-self: center; color: #ccc; font-weight: 400; font-size: 6mm; white-space: nowrap; }
+.cn-pl .cn-ph-corner { font-size: 7mm; }
+
+/* ---------- ชื่อ + ขนาด ---------- */
+.cn-head { flex: none; padding: 9mm 8.5mm 5.8mm; border-bottom: 1.6mm solid #111; }
+.cn-pp .cn-head { padding: 7.4mm 8.5mm 5.3mm; }
+.cn-name {
+  font-weight: 800; line-height: 1.15; color: #111; word-break: break-word; text-wrap: balance; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+}
+.cn-pl .cn-name { -webkit-line-clamp: 3; }
+.cn-size { font-weight: 400; font-size: 10mm; color: #333; margin-top: 1mm; line-height: 1.15; }
+.cn-sl .cn-size, .cn-pl .cn-size { font-size: 9mm; }
+
+/* ---------- ราคา ---------- */
+.cn-priceblk { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cn-pw { display: flex; flex-direction: column; align-items: flex-end; gap: 1.6mm; }
+.cn-num {
+  display: inline-block; font-family: 'Potta One', cursive; font-weight: 400; color: var(--cn-red);
+  transform: rotate(-4deg); text-shadow: 0 0 0.5mm currentColor; line-height: 0.95; white-space: nowrap;
+}
+.cn-baht { font-weight: 800; font-size: 16.4mm; color: #111; line-height: 1; }
+.cn-sl .cn-pw { flex-direction: row; align-items: flex-end; gap: 6.4mm; padding-bottom: 4.8mm; }
+.cn-sl .cn-baht { font-size: 19mm; }
+.cn-pl .cn-baht { font-size: 17.5mm; }
+
+/* ---------- ยกลัง (กลืนไปกับป้าย ไม่มีกรอบ/แถบดำ) ---------- */
+.cn-pack { flex: none; margin: 0 8.5mm; border-top: 0.5mm solid #111; padding: 2.6mm 0 3.7mm; display: flex; align-items: baseline; justify-content: space-between; gap: 4mm; }
+.cn-pack-l { min-width: 0; font-weight: 600; font-size: 10.6mm; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cn-pack-r { flex: none; display: flex; align-items: baseline; gap: 2mm; }
+.cn-pack-p { font-family: 'Potta One', cursive; font-weight: 400; font-size: 17mm; color: var(--cn-red); line-height: 1; }
+.cn-pack-b { font-weight: 800; font-size: 8.5mm; color: #111; }
+.cn-sl .cn-pack-l { font-size: 10mm; }
+.cn-sl .cn-pack-p { font-size: 15.3mm; }
+.cn-sl .cn-pack-b { font-size: 8mm; }
+
+/* ---------- ท้ายป้าย ---------- */
+.cn-foot { flex: none; height: 10.6mm; border-top: 0.5mm solid #111; display: flex; align-items: center; justify-content: space-between; padding: 0 7.4mm; font-weight: 400; font-size: 5mm; color: #555; white-space: nowrap; }
+.cn-sl .cn-foot { height: 10mm; font-size: 4.8mm; }
+.cn-foot-bc { letter-spacing: 0.5mm; }
+
+/* ---------- plaque-l: ซ้ายข้อมูล / ขวาราคา ---------- */
+.cn-pbody { flex: 1 1 0; min-height: 0; display: flex; }
+.cn-pl-left { flex: 0 0 44%; min-width: 0; padding: 7.4mm 8mm 0; display: flex; flex-direction: column; gap: 2mm; }
+.cn-pl-info { flex: none; display: flex; flex-direction: column; gap: 2mm; }
+.cn-pl-info .cn-size { margin-top: 0; }
+.cn-pl-left .cn-pack2 { margin: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 2mm 0 2.4mm; }
+.cn-pl-left .cn-pack-l { font-size: 9mm; }
+.cn-pl-left .cn-pack-r { justify-content: flex-end; }
+.cn-pl-left .cn-pack-p { font-size: 16.4mm; }
+.cn-pl-left .cn-pack-b { font-size: 8mm; }
+.cn-pl-left .cn-foot { margin: 0 -8mm; padding: 0 8mm; height: 10.6mm; font-size: 4.5mm; }
+.cn-pl-right { flex: 1 1 0; min-width: 0; border-left: 1.6mm solid #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+/* ---------- ขาว-ดำ: ไม่มีสีแดงเหลือ ---------- */
+.cn-mono { --cn-red: #111; }
+.cn-mono .cn-plate { background: #fff; color: #111; }
+.cn-mono .cn-dash { background: #fff; }
+.cn-mono .cn-ph-plate { background: #fff; }
+.cn-mono .cn-ph-plate-in { border-color: #111; color: #111; }

@@ -14,6 +14,7 @@ export const TAG_TYPES: TagTypeDef[] = [
   { key: 'fridge', label: 'ตู้แช่', color: '#22D3EE' },
   { key: 'hamper', label: 'กระเช้า', color: '#FBBF24' },
   { key: 'flip', label: 'ดำแดง', color: '#FF4D3D' },
+  { key: 'cnsign', label: 'ป้ายจีน A4', color: '#FB923C' },
   { key: 'oos', label: 'ของหมด', color: '#A1A1AA' },
 ];
 

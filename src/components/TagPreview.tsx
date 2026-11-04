@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Config, QueueItem } from '../types';
 import PriceTag from './PriceTag';
 import FlipMobilePreview from '../flip/FlipMobilePreview';
+import CnMobilePreview from '../cnsign/CnMobilePreview';
 
 /* CSS's fixed physical-unit ratio (96dpi / 2.54 cm-per-inch) — tag.css sizes tags in
  * real cm via --tag-w/--tag-h/--large-w/--large-h, which must NOT be touched, so this
@@ -72,5 +73,6 @@ function PriceTagPreview({ item, config, maxWidth = FRAME_MAX_WIDTH }: Props) {
 /* ป้ายดำแดง (แถบพลิก) มีตัวป้าย + แถบราคา วาดแยก (src/flip) — แบบอื่นใช้พรีวิวป้ายเดิม */
 export default function TagPreview(props: Props) {
   if (props.item.TagMode === 'flip') return <FlipMobilePreview item={props.item} />;
+  if (props.item.TagMode === 'cnsign') return <CnMobilePreview item={props.item} />;
   return <PriceTagPreview {...props} />;
 }

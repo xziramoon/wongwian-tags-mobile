@@ -1,4 +1,4 @@
-export type TagMode = 'standard' | 'dual' | 'large' | 'oos' | 'fridge' | 'hamper' | 'flip';
+export type TagMode = 'standard' | 'dual' | 'large' | 'oos' | 'fridge' | 'hamper' | 'flip' | 'cnsign';
 export type DualStyle = 'A' | 'B';
 export type OosReason = 'temp' | 'stop'; // temp = หมดชั่วคราว, stop = เลิกจำหน่าย
 
@@ -24,6 +24,9 @@ export interface QueueItem {
   PrintQty: number;
   /** ป้ายดำแดงที่กดราคาเอง (บาร์โค้ดว่าง) — เก็บขนาดป้ายไว้ที่รายการเอง เพราะไม่มีบาร์โค้ดให้ผูกตัวเลือกรายสินค้า */
   FlipVariant?: 'full' | 'narrow';
+  /* ป้ายจีน A4 (TagMode 'cnsign') — ว่าง = ใช้ค่าจากตั้งค่า cnSign.settings */
+  CnStyle?: 'strip' | 'plaque';
+  CnOrient?: 'portrait' | 'landscape';
   PriceDiff: string | null;
   OosEta: string; // เช่น '18 ก.ย.' หรือ ''
   OosReason: OosReason;

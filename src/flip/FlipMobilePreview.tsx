@@ -8,7 +8,7 @@ import { useDbVersion } from './useDbVersion';
 
 const MM = 96 / 25.4; // px ต่อ มม. (ป้ายวาดเป็น mm จริง ย่อด้วย transform ให้พอดีจอ)
 
-function ScaleToFit({ wMm, hMm, children }: { wMm: number; hMm: number; children: ReactNode }) {
+export function ScaleToFit({ wMm, hMm, children }: { wMm: number; hMm: number; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   useEffect(() => {

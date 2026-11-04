@@ -8,6 +8,7 @@ import { PRICE_FONTS, THEME_PRESETS } from '../constants';
 import { fridgeSheetLayout } from '../lib/fridge';
 import { hamperSheetLayout } from '../lib/hamper';
 import FlipSettingsFold from '../flip/FlipSettingsFold';
+import CnSettingsFold from '../cnsign/CnSettingsFold';
 import { IconClose } from './Icons';
 
 /* placeholder shown in the embedded preview when the queue is still empty */
@@ -68,13 +69,14 @@ const FRIDGE_BAR_OPTS: [string, string][] = [
  * always-visible basics up top, ~12 SliderRows tucked under a <details> fold so the
  * common case (pick a preset, maybe change the header text) doesn't need scrolling
  * past a wall of sliders. */
-type SettingsCat = 'general' | 'normal' | 'fridge' | 'hamper' | 'flip' | 'advanced';
+type SettingsCat = 'general' | 'normal' | 'fridge' | 'hamper' | 'flip' | 'cn' | 'advanced';
 const CATS: [SettingsCat, string][] = [
   ['general', 'ทั่วไป'],
   ['normal', 'ป้ายปกติ'],
   ['fridge', 'ตู้แช่'],
   ['hamper', 'กระเช้า'],
   ['flip', 'ดำแดง'],
+  ['cn', 'ป้ายจีน A4'],
   ['advanced', 'ขั้นสูง'],
 ];
 
@@ -312,6 +314,9 @@ export default function SettingsSheet() {
 
         <div data-cat="flip">
           <FlipSettingsFold />
+        </div>
+        <div data-cat="cn">
+          <CnSettingsFold />
         </div>
 
         <details className="fold" open data-cat="fridge">
