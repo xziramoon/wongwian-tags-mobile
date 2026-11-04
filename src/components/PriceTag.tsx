@@ -422,14 +422,16 @@ export default function PriceTag({ item, config, selected }: Props) {
         <div className="tag-large-body">
           <div className="tag-large-left">
             {imgURL && (
-              <img
-                className="tag-large-img"
-                src={imgURL}
-                onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
-              />
+              <div className="tag-large-imgbox">
+                <img
+                  className="tag-large-img"
+                  src={imgURL}
+                  onError={(e) => ((e.currentTarget.parentNode as HTMLElement).style.display = 'none')}
+                />
+              </div>
             )}
             {safeSize && (
-              <div>
+              <div className="tag-large-size">
                 {LBL_SIZE} {safeSize}
               </div>
             )}
@@ -438,7 +440,7 @@ export default function PriceTag({ item, config, selected }: Props) {
             </div>
             {safePack && <div>📦 {safePack}</div>}
             {(item.Mfg || item.Exp) && (
-              <div style={{ marginTop: 6 }}>
+              <div>
                 {item.Mfg && (
                   <div className="tag-date-txt" style={{ fontSize: 11 }}>
                     MFG: {item.Mfg}
@@ -451,6 +453,16 @@ export default function PriceTag({ item, config, selected }: Props) {
                 )}
               </div>
             )}
+          </div>
+          <div className="tag-large-divider" />
+          <div className={`tag-large-right${hasWs ? ' has-ws' : ''}`}>
+            <div
+              className="tag-price-slide"
+              style={{ transform: `translateX(${xOffset}px)`, display: 'flex', alignItems: 'baseline' }}
+            >
+              <div className="tag-price-large">{pDisp}</div>
+              <div className="tag-baht-large">บาท</div>
+            </div>
             {hasWs && (
               <div className="tag-large-box">
                 <div className="tag-large-box-title">{safeUnit2 || 'ราคาส่ง'}</div>
@@ -459,16 +471,6 @@ export default function PriceTag({ item, config, selected }: Props) {
                 </div>
               </div>
             )}
-          </div>
-          <div className="tag-large-divider" />
-          <div className="tag-large-right">
-            <div
-              className="tag-price-slide"
-              style={{ transform: `translateX(${xOffset}px)`, display: 'flex', alignItems: 'baseline' }}
-            >
-              <div className="tag-price-large">{pDisp}</div>
-              <div className="tag-baht-large">บาท</div>
-            </div>
           </div>
         </div>
       </>
