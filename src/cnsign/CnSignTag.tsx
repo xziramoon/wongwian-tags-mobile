@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react';
-import { fitWidth, useFontsTick } from '../flip/fit';
-import { cnRed, cnVariant, nameSizeFor, priceSizeFor, type CnSignSettings, type CnVariant } from './config';
+import { useFontsTick } from '../flip/fit';
+import { cnRed, cnVariant, nameSizeFor, type CnSignSettings, type CnVariant } from './config';
 import type { CnSignData } from './data';
+import { measureInk, priceFit } from './priceFit';
 
 const mm = (n: number) => `${n.toFixed(2)}mm`;
 
@@ -14,11 +15,11 @@ function Name({ v, d }: { v: CnVariant; d: CnSignData }) {
   );
 }
 
-function Price({ d, size, unit }: { d: CnSignData; size: number; unit: string }) {
+function Price({ d, numStyle, unit }: { d: CnSignData; numStyle: CSSProperties; unit: string }) {
   return (
     <div className="cn-priceblk">
       <div className="cn-pw">
-        <div className="cn-num" style={{ fontSize: mm(size) }}>
+        <div className="cn-num" style={numStyle}>
           {d.price}
         </div>
         <div className="cn-baht">{unit}</div>
@@ -53,10 +54,11 @@ function Foot({ d }: { d: CnSignData }) {
 export function CnSignTag({ data: d, settings: s, className }: { data: CnSignData; settings: CnSignSettings; className?: string }) {
   useFontsTick("'Potta One'", "'Noto Serif SC'", "'Kanit'");
   const v = cnVariant(d.style, d.orient);
-  const size = priceSizeFor(v, d.name, d.price, fitWidth);
+  const fit = priceFit(v, measureInk(d.price), measureInk(s.unit, "'Kanit',sans-serif", 800).adv);
+  const numStyle: CSSProperties = { fontSize: fit.fontSize, lineHeight: fit.lineHeight, transform: fit.transform };
   const wrap = `cn cn-${v} ${d.orient === 'portrait' ? 'cn-p' : 'cn-l'}${s.mono ? ' cn-mono' : ''}${className ? ` ${className}` : ''}`;
   const style = { '--cn-red': cnRed(s) } as CSSProperties;
-  const price = <Price d={d} size={size} unit={s.unit} />;
+  const price = <Price d={d} numStyle={numStyle} unit={s.unit} />;
   const head = (
     <div className="cn-head">
       <Name v={v} d={d} />
@@ -134,7 +136,7 @@ export function CnSignTag({ data: d, settings: s, className }: { data: CnSignDat
         </div>
         <div className="cn-pl-right">
           <div className="cn-pw">
-            <div className="cn-num" style={{ fontSize: mm(size) }}>
+            <div className="cn-num" style={numStyle}>
               {d.price}
             </div>
             <div className="cn-baht">{s.unit}</div>
