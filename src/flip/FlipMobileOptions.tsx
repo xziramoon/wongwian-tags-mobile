@@ -56,12 +56,11 @@ export default function FlipMobileOptions({ item }: { item: QueueItem }) {
   const variant: FlipVariant = overrides?.variant ?? 'full';
   const memberOf = groups.find((g) => g.members.some((m) => m.barcode === item.Barcode));
 
-  /* ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด): ตัวเลือกรายสินค้าผูกกับบาร์โค้ด จึงใช้ไม่ได้ — ขนาดตั้งตอนกดราคา */
+  /* ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด): ตัวเลือกรายสินค้าผูกกับบาร์โค้ด จึงใช้ไม่ได้ — ปริ้นเฉพาะแถบราคาเสมอ */
   if (!item.Barcode) {
     return (
-      <div className="flip-ov" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignSelf: 'stretch' }}>
-        <span className="fold-hint">ป้ายที่กดราคาเอง — เปลี่ยนขนาดเต็ม/แคบได้ที่ปุ่ม "กดราคาเอง" หน้าแรก</span>
-        <FlipSendKindPicker />
+      <div className="flip-ov" style={{ alignSelf: 'stretch' }}>
+        <span className="fold-hint">ป้ายที่กดราคาเอง — ปริ้นเฉพาะแถบราคา</span>
       </div>
     );
   }

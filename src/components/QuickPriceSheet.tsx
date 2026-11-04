@@ -4,7 +4,6 @@ import { useQueueStore } from '../store/queueStore';
 import { typeDef } from '../lib/tagTypes';
 import { QUICK_MODES, QUICK_UNITS, cleanPrice, isValidPrice, makeQuickItem, pressKey, type KeypadKey } from '../lib/quickPrice';
 import TagPreview from './TagPreview';
-import { FlipSendKindPicker } from '../flip/FlipMobileOptions';
 import { IconClose } from './Icons';
 
 const KEYS: { key: KeypadKey; label: string; aria?: string }[] = [
@@ -38,12 +37,11 @@ export default function QuickPriceSheet() {
   const [unit, setUnit] = useState('ชิ้น');
   const [mode, setMode] = useState(() => (QUICK_MODES.includes(lastTagMode) ? lastTagMode : 'standard'));
   const [qty, setQty] = useState(1);
-  const [flipVariant, setFlipVariant] = useState<'full' | 'narrow'>('full');
 
   if (!open) return null;
 
   const valid = isValidPrice(price);
-  const item = makeQuickItem({ price: valid ? price : '0', name, unit, mode, qty, flipVariant, config });
+  const item = makeQuickItem({ price: valid ? price : '0', name, unit, mode, qty, config });
 
   const reset = () => {
     setPrice('');
@@ -56,14 +54,14 @@ export default function QuickPriceSheet() {
   };
   const keep = () => {
     if (!valid) return;
-    addItem(makeQuickItem({ price, name, unit, mode, qty, flipVariant, config }));
+    addItem(makeQuickItem({ price, name, unit, mode, qty, config }));
     useUIStore.getState().showToast(`เก็บป้ายราคา ${cleanPrice(price)} บาท ${qty} ใบแล้ว`, 'success');
     setOpen(false);
     reset();
   };
   const printNow = () => {
     if (!valid) return;
-    addItem(makeQuickItem({ price, name, unit, mode, qty, flipVariant, config }));
+    addItem(makeQuickItem({ price, name, unit, mode, qty, config }));
     setOpen(false);
     reset();
     requestSend();
@@ -132,19 +130,7 @@ export default function QuickPriceSheet() {
           )}
           {mode === 'fridge' && config.fridgeFill && <span className="fold-hint">ถมตัวเลขตามราคาที่กดให้แล้ว (ราคามีสตางค์ = เว้นว่างให้ระบายเอง)</span>}
           {mode === 'flip' && (
-            <div className="dz-form">
-              <span className="field-label">ขนาดป้ายดำแดง</span>
-              <div className="dz-units">
-                <button type="button" className="dz-chip" aria-pressed={flipVariant === 'full'} onClick={() => setFlipVariant('full')}>
-                  เต็ม 90 มม.
-                </button>
-                <button type="button" className="dz-chip" aria-pressed={flipVariant === 'narrow'} onClick={() => setFlipVariant('narrow')}>
-                  แคบ 45 มม.
-                </button>
-              </div>
-              <FlipSendKindPicker />
-              <span className="fold-hint">ได้ตัวป้ายถาวรกับแถบราคาพลิกได้ — ไม่มีบาร์โค้ดและราคายกลัง (ไม่ได้มาจากสินค้า)</span>
-            </div>
+            <span className="fold-hint">ดำแดง: ปริ้นเฉพาะแถบราคา (กดเลขแล้วได้แถบราคาพลิกเลย ไม่มีตัวป้ายถาวร)</span>
           )}
         </div>
 

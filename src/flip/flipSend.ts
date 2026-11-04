@@ -21,7 +21,11 @@ export function flipDataFromQueue(items: QueueItem[]): FlipData[] {
 
 /* ป้ายดำแดงในคิว — ส่งตามชนิดที่ตั้งไว้ (ตัวป้าย / แถบราคา / ทั้งคู่) */
 export async function sendFlipFromQueue(items: QueueItem[]): Promise<void> {
-  await publishFlipJob(useFlipStore.getState().settings.sendKind, flipDataFromQueue(items));
+  /* ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด) ปริ้นเฉพาะแถบราคาเสมอ — ไม่มีตัวป้ายถาวรให้ปริ้น */
+  const quick = items.filter((i) => !i.Barcode);
+  const scanned = items.filter((i) => i.Barcode);
+  if (scanned.length) await publishFlipJob(useFlipStore.getState().settings.sendKind, flipDataFromQueue(scanned));
+  if (quick.length) await publishFlipJob('strips', flipDataFromQueue(quick));
 }
 
 /* ส่งงานเดี่ยวจากหน้าอื่น (ต้องเปลี่ยนวันนี้ / สติกเกอร์ / ป้ายกลุ่ม) พร้อมแจ้งผล */

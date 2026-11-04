@@ -41,12 +41,17 @@ export default function FlipMobilePreview({ item }: { item: QueueItem }) {
   const s = stripSize(d);
   return (
     <div className="flip-prev">
-      <ScaleToFit wMm={t.w} hMm={t.h}>
-        <FlipTagAny data={d} settings={settings} />
-      </ScaleToFit>
-      <span className="flip-prev-cap">
-        {d.variant === 'group' ? 'ป้ายกลุ่ม' : d.variant === 'narrow' ? 'ป้ายแคบ' : 'ตัวป้ายถาวร'} {t.w} × {t.h} มม.
-      </span>
+      {/* ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด) ปริ้นเฉพาะแถบราคา ไม่โชว์ตัวป้าย */}
+      {item.Barcode && (
+        <>
+          <ScaleToFit wMm={t.w} hMm={t.h}>
+            <FlipTagAny data={d} settings={settings} />
+          </ScaleToFit>
+          <span className="flip-prev-cap">
+            {d.variant === 'group' ? 'ป้ายกลุ่ม' : d.variant === 'narrow' ? 'ป้ายแคบ' : 'ตัวป้ายถาวร'} {t.w} × {t.h} มม.
+          </span>
+        </>
+      )}
       <ScaleToFit wMm={s.w} hMm={s.h}>
         <FlipStripAny data={d} settings={settings} />
       </ScaleToFit>
