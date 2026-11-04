@@ -12,12 +12,12 @@ export function usePaperSheets(): number {
   const overrides = useFlipStore((s) => s.overrides);
   const groups = useFlipStore((s) => s.groups);
   return useMemo(() => {
-    const flipData = queueToFlipData(
-      queue.filter((i) => i.TagMode === 'flip'),
-      settings,
-      overrides,
-      groups,
-    );
-    return paperSheets(queue, config, countFlipPages(flipData, settings.sendKind));
+    const flipItems = queue.filter((i) => i.TagMode === 'flip');
+    const toData = (items: typeof queue) => queueToFlipData(items, settings, overrides, groups);
+    // ป้ายที่กดราคาเอง (ไม่มีบาร์โค้ด) ปริ้นเฉพาะแถบราคา
+    const pages =
+      countFlipPages(toData(flipItems.filter((i) => i.Barcode)), settings.sendKind) +
+      countFlipPages(toData(flipItems.filter((i) => !i.Barcode)), 'strips');
+    return paperSheets(queue, config, pages);
   }, [queue, config, settings, overrides, groups]);
 }

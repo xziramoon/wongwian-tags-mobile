@@ -145,12 +145,12 @@ export function FlipNarrowTag({ data, settings }: Props) {
   const autoNameSz = useMemo(() => fitNarrowName(data.name, family, !!data.size), [data.name, data.size, family, tick]);
   // ป้ายแคบกว้างแค่ 45 มม. — ขนาดที่ตั้งเองย่อเป็น 70% (2.5–4.5 มม.)
   const nameSz = data.nameSz ? Math.min(4.5, Math.max(2.5, data.nameSz * 0.7)) : autoNameSz;
-  // มีราคายกลัง = เหลือที่ให้ราคาน้อยลง (แถบดำใต้ราคาสูง ~4 มม.)
+  // มีราคายกลัง = เหลือที่ให้ราคาน้อยลง (แถบดำใต้ราคาสูง ~4.5 มม.) — ตัวเลขสูงสุด 9.5 มม. เว้นช่องไฟจากเส้นใต้ชื่อ
   const priceSz = useMemo(
-    () => (data.pack ? fitWidth(price, priceFamily, priceWeight, maxW, 11.5, 8) : fitWidth(price, priceFamily, priceWeight, maxW, 15, 10)),
+    () => (data.pack ? fitWidth(price, priceFamily, priceWeight, maxW, 9.5, 7) : fitWidth(price, priceFamily, priceWeight, maxW, 15, 10)),
     [price, priceFamily, priceWeight, maxW, data.pack, tick],
   );
-  const packSz = useMemo(() => fitWidth(data.pack, family, 600, 40, 3, 2), [data.pack, family, tick]);
+  const packSz = useMemo(() => fitWidth(data.pack, family, 600, 40, 2.8, 2), [data.pack, family, tick]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
@@ -165,7 +165,7 @@ export function FlipNarrowTag({ data, settings }: Props) {
         </div>
         {data.size && <div className="ftn-sz">{data.size}</div>}
       </div>
-      <div className="ftn-price">
+      <div className={`ftn-price${data.pack ? ' ftn-has-pack' : ''}`}>
         <div className="fs-price" style={{ fontSize: `${priceSz}mm` }}>
           {price}
         </div>
@@ -191,16 +191,16 @@ export function FlipNarrowStrip({ data, settings }: Props) {
   const maxW = settings.theme === 'ink' ? 36 : 39;
   /* eslint-disable react-hooks/exhaustive-deps */
   const priceSz = useMemo(
-    () => (data.pack ? fitWidth(price, priceFamily, priceWeight, maxW, 11.5, 8) : fitWidth(price, priceFamily, priceWeight, maxW, 15, 10)),
+    () => (data.pack ? fitWidth(price, priceFamily, priceWeight, maxW, 9.5, 7) : fitWidth(price, priceFamily, priceWeight, maxW, 15, 10)),
     [price, priceFamily, priceWeight, maxW, data.pack, tick],
   );
-  const packSz = useMemo(() => fitWidth(data.pack, family, 600, 39, 3, 2), [data.pack, family, tick]);
+  const packSz = useMemo(() => fitWidth(data.pack, family, 600, 39, 2.8, 2), [data.pack, family, tick]);
   const outSz = useMemo(() => fitWidth(settings.outText, family, 800, 39, 6.5, 4), [settings.outText, family, tick]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
     <div className={wrapClass(settings, 'fsn')} style={flipVars(settings)}>
-      <div className="fsn-face fsn-front">
+      <div className={`fsn-face fsn-front${data.pack ? ' ftn-has-pack' : ''}`}>
         <div className="fs-price" style={{ fontSize: `${priceSz}mm` }}>
           {price}
         </div>

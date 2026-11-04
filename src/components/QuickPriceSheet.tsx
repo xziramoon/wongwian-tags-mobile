@@ -109,7 +109,7 @@ export default function QuickPriceSheet() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span className="dz-label">แบบป้าย</span>
-          <div className="dz-types" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+          <div className="dz-types">
             {QUICK_MODES.map((m) => {
               const t = typeDef(m);
               return (
@@ -129,6 +129,9 @@ export default function QuickPriceSheet() {
             </div>
           )}
           {mode === 'fridge' && config.fridgeFill && <span className="fold-hint">ถมตัวเลขตามราคาที่กดให้แล้ว (ราคามีสตางค์ = เว้นว่างให้ระบายเอง)</span>}
+          {mode === 'flip' && (
+            <span className="fold-hint">ดำแดง: ปริ้นเฉพาะแถบราคา (กดเลขแล้วได้แถบราคาพลิกเลย ไม่มีตัวป้ายถาวร)</span>
+          )}
         </div>
 
         <div className="dz-form">

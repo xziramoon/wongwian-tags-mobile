@@ -63,6 +63,12 @@
 .ftn-price { flex: 1 1 auto; min-height: 0; border-top: 0.75mm solid #111; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
 .ftn-pack { align-self: stretch; margin-top: 0.6mm; }
 .ftn-unit { font-size: 3.5mm; font-weight: 800; color: #111; line-height: 1.2; }
+/* ป้ายแคบ + แถบยกลัง: พื้นที่ราคาสูงแค่ ~22 มม. (แถบราคา 21 มม.) ต้องใส่ ราคา + "บาท" + แถบยกลัง
+ * เดิมเต็มพอดีจนตัวเลขราคาแตะเส้นใต้ชื่อ → เว้นขอบบน ลดตัวเลข/บาท/แถบยกลังลงเล็กน้อย ให้มีช่องไฟ */
+.ftn-price { box-sizing: border-box; padding-top: 1mm; }
+.fsn-front.ftn-has-pack { padding-top: 0.6mm; }
+.ftn-has-pack .ftn-unit { font-size: 3mm; line-height: 1.1; }
+.ftn-has-pack .ftn-pack { margin-top: 0.4mm; padding-top: 0.5mm; padding-bottom: 0.5mm; }
 
 /* แถบป้ายแคบ: ด้านละ 43 × 21 พับแนวบน-ล่าง (กางออก 43 × 42) · ด้านสินค้าหมดพิมพ์กลับหัว 180° */
 .fsn { position: relative; width: 43mm; height: 42mm; display: flex; flex-direction: column; background: #fff; box-sizing: border-box; flex-shrink: 0; font-family: var(--ft-font, 'Kanit', sans-serif); color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }

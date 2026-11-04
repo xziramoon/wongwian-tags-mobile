@@ -206,7 +206,8 @@ export const useQueueStore = create<QueueState>((set, get) => ({
           (i.Loc || '') === (item.Loc || '') &&
           i.TagMode === item.TagMode &&
           /* บาร์โค้ดว่าง (ป้ายกดราคาเอง / ตู้แช่เปล่า) ไม่มีอะไรบอกว่าเป็นของชิ้นเดียวกัน — ต้องชื่อและราคาตรงกันถึงรวมจำนวน */
-          (item.Barcode !== '' || (i.ProductName === item.ProductName && i.Price === item.Price)),
+          (item.Barcode !== '' ||
+            (i.ProductName === item.ProductName && i.Price === item.Price && (i.FlipVariant || '') === (item.FlipVariant || ''))),
       );
       if (existingIdx !== -1) {
         const existing = queue[existingIdx];

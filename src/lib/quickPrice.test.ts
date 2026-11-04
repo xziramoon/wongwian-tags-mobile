@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanPrice, isValidPrice, makeQuickItem, pressKey, type KeypadKey } from './quickPrice';
+import { fromQueueItem } from '../flip/data';
+import { DEFAULT_FLIP_SETTINGS } from '../flip/config';
 
 const mem = new Map<string, string>();
 vi.stubGlobal('localStorage', {
@@ -89,5 +91,48 @@ describe('ป้ายที่กดราคาเอง', () => {
     const q = useQueueStore.getState().queue;
     expect(q).toHaveLength(1);
     expect(q[0].PrintQty).toBe(48);
+  });
+});
+
+describe('ป้ายดำแดงที่กดราคาเอง', () => {
+  beforeEach(() => mem.clear());
+  const mk = (variant: 'full' | 'narrow', price = '35', qty = 1) =>
+    makeQuickItem({ price, name: 'น้ำปลา', unit: 'ขวด', mode: 'flip', qty, flipVariant: variant, config: { globalNameSz: 0 } });
+
+  it('เก็บขนาดป้ายไว้ที่รายการ (ไม่มีบาร์โค้ดให้ผูกตัวเลือกรายสินค้า)', () => {
+    expect(mk('narrow')).toMatchObject({ TagMode: 'flip', Barcode: '', FlipVariant: 'narrow' });
+    expect(mk('full').FlipVariant).toBe('full');
+    // แบบอื่นไม่มีฟิลด์นี้
+    expect(makeQuickItem({ price: '5', name: '', unit: 'ชิ้น', mode: 'standard', qty: 1, config: { globalNameSz: 0 } }).FlipVariant).toBeUndefined();
+  });
+
+  it('แปลงเป็นข้อมูลวาดป้ายดำแดง: แคบ/เต็มตามที่เลือก ไม่มีบาร์โค้ดและบรรทัดล่าง ไม่มีแถบยกลัง', () => {
+    const narrow = fromQueueItem(mk('narrow', '45'), DEFAULT_FLIP_SETTINGS, {});
+    expect(narrow).toMatchObject({ variant: 'narrow', barcode: '', footer: '', pack: '', price: '45', name: 'น้ำปลา' });
+    expect(fromQueueItem(mk('full'), DEFAULT_FLIP_SETTINGS, {}).variant).toBe('full');
+  });
+
+  it('คนละขนาดป้ายไม่ถูกรวมเป็นใบเดียว แต่ขนาดเดียวกันรวมจำนวน', async () => {
+    const { useQueueStore } = await import('../store/queueStore');
+    useQueueStore.setState({ queue: [] });
+    const add = useQueueStore.getState().addItem;
+    add(mk('full', '35', 1));
+    add(mk('narrow', '35', 1));
+    add(mk('narrow', '35', 2));
+    const q = useQueueStore.getState().queue;
+    expect(q.map((i) => [i.FlipVariant, i.PrintQty])).toEqual([
+      ['full', 1],
+      ['narrow', 3],
+    ]);
+  });
+
+  it('ป้ายที่ไม่มีบาร์โค้ดไม่ลงประวัติ "ต้องเปลี่ยนวันนี้" / ตัวป้ายถาวร (ไม่มีสินค้าให้เทียบราคา)', async () => {
+    const { useFlipStore } = await import('../flip/store');
+    useFlipStore.setState({ lastPrinted: {}, tagsPrinted: {} });
+    const d = fromQueueItem(mk('narrow'), DEFAULT_FLIP_SETTINGS, {});
+    useFlipStore.getState().markStripsPrinted([d]);
+    useFlipStore.getState().markTagsPrinted([d]);
+    expect(useFlipStore.getState().lastPrinted).toEqual({});
+    expect(useFlipStore.getState().tagsPrinted).toEqual({});
   });
 });
