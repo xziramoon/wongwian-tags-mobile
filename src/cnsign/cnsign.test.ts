@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../lib/database', () => ({ database: { find: () => undefined, search: () => [], onChange: () => () => {} } }));
 
 import type { QueueItem } from '../types';
-import { CN_PRICE_CAP, CN_PRICE_PAD, DEFAULT_CN_SETTINGS, cnRed, cnVariant, nameSizeFor } from './config';
+import { CN_INK_PARAMS, CN_PRICE_CAP, CN_PRICE_PAD, DEFAULT_CN_SETTINGS, boostRed, cnRed, cnVariant, nameSizeFor } from './config';
 import { priceFit, type InkMetrics } from './priceFit';
 import { cnPageCount, fromQueueItem, queueToCnData, splitByOrient } from './data';
 
@@ -112,9 +112,39 @@ describe('ป้ายจีน A4 · ข้อมูลจากคิว', () 
   });
 });
 
+describe('ป้ายจีน A4 · ความเข้มสี (เครื่องพิมพ์สีซีด)', () => {
+  const lum = (hex: string) => {
+    const n = parseInt(hex.slice(1), 16);
+    return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255);
+  };
+  it('normal = สีเดิม · rich/max เข้มขึ้นตามลำดับ และยังเป็นสีแดง', () => {
+    expect(boostRed('#C0141C', 'normal')).toBe('#C0141C');
+    const rich = boostRed('#C0141C', 'rich');
+    const max = boostRed('#C0141C', 'max');
+    expect(lum(rich)).toBeLessThan(lum('#C0141C'));
+    expect(lum(max)).toBeLessThan(lum(rich));
+    [rich, max].forEach((c) => {
+      const n = parseInt(c.slice(1), 16);
+      expect(n >> 16).toBeGreaterThan(((n >> 8) & 255) * 3); // แดงเด่นชัด ไม่เพี้ยนเป็นสีอื่น
+    });
+  });
+  it('สีที่อ่านไม่ได้คืนค่าเดิม · #rgb ย่อใช้ได้ · ดำ/ขาวไม่เพี้ยน', () => {
+    expect(boostRed('red-ish', 'max')).toBe('red-ish');
+    expect(boostRed('#f00', 'rich')).toMatch(/^#[0-9A-F]{6}$/);
+    expect(boostRed('#000000', 'max')).toBe('#000000');
+  });
+  it('ค่าตั้งต้น = เข้ม · ขาว-ดำไม่ใช้ boost · ขอบหนาเพิ่มตามระดับ', () => {
+    expect(DEFAULT_CN_SETTINGS.ink).toBe('rich');
+    expect(cnRed({ ...DEFAULT_CN_SETTINGS, mono: true, ink: 'max' })).toBe('#111111');
+    expect(cnRed({ ...DEFAULT_CN_SETTINGS, ink: 'rich' })).toBe(boostRed(DEFAULT_CN_SETTINGS.red, 'rich'));
+    expect(CN_INK_PARAMS.normal.stroke).toBe(0);
+    expect(CN_INK_PARAMS.max.stroke).toBeGreaterThan(CN_INK_PARAMS.rich.stroke);
+  });
+});
+
 describe('ป้ายจีน A4 · ขาว-ดำ', () => {
   it('mono = สีแดงเป็นดำ', () => {
     expect(cnRed({ ...DEFAULT_CN_SETTINGS, mono: true })).toBe('#111111');
-    expect(cnRed({ ...DEFAULT_CN_SETTINGS, mono: false })).toBe(DEFAULT_CN_SETTINGS.red);
+    expect(cnRed({ ...DEFAULT_CN_SETTINGS, mono: false, ink: 'normal' })).toBe(DEFAULT_CN_SETTINGS.red);
   });
 });
