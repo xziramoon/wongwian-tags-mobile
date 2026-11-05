@@ -1,6 +1,6 @@
 import type { QueueItem } from '../types';
 import CnMobilePreview from './CnMobilePreview';
-import { CN_ORIENTS, CN_REDS, CN_STYLES, DEFAULT_CN_SETTINGS } from './config';
+import { CN_INK_LEVELS, CN_ORIENTS, CN_REDS, CN_STYLES, DEFAULT_CN_SETTINGS } from './config';
 import { useCnStore } from './store';
 
 const SAMPLE: QueueItem = {
@@ -84,6 +84,18 @@ export default function CnSettingsFold() {
             <input className="field-input" value={raw[key]} onChange={(e) => update(key, e.target.value)} />
           </div>
         ))}
+
+        <div className="cfg-full">
+          <span className="cfg-lbl">ความเข้มสี (ปริ้นออกมาซีดให้เพิ่ม)</span>
+          <div className="flip-kind-row">
+            {CN_INK_LEVELS.map((t) => (
+              <button key={t.value} type="button" className={`mode-btn${raw.ink === t.value ? ' active' : ''}`} aria-pressed={raw.ink === t.value} onClick={() => update('ink', t.value)}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <span className="fold-hint">แดงเข้มขึ้น ตัวเลขราคาหนาขึ้น ตัวเทา/เส้นบางเข้มขึ้น</span>
+        </div>
 
         <div>
           <span className="cfg-lbl">สีแดง</span>

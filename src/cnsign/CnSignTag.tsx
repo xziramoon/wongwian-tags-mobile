@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { useFontsTick } from '../flip/fit';
-import { cnRed, cnVariant, nameSizeFor, type CnSignSettings, type CnVariant } from './config';
+import { CN_INK_PARAMS, cnRed, cnVariant, nameSizeFor, type CnSignSettings, type CnVariant } from './config';
 import type { CnSignData } from './data';
 import { measureInk, priceFit } from './priceFit';
 
@@ -56,8 +56,8 @@ export function CnSignTag({ data: d, settings: s, className }: { data: CnSignDat
   const v = cnVariant(d.style, d.orient);
   const fit = priceFit(v, measureInk(d.price), measureInk(s.unit, "'Kanit',sans-serif", 800).adv);
   const numStyle: CSSProperties = { fontSize: fit.fontSize, lineHeight: fit.lineHeight, transform: fit.transform };
-  const wrap = `cn cn-${v} ${d.orient === 'portrait' ? 'cn-p' : 'cn-l'}${s.mono ? ' cn-mono' : ''}${className ? ` ${className}` : ''}`;
-  const style = { '--cn-red': cnRed(s) } as CSSProperties;
+  const wrap = `cn cn-${v} ${d.orient === 'portrait' ? 'cn-p' : 'cn-l'}${s.mono ? ' cn-mono' : ` cn-ink-${s.ink ?? 'normal'}`}${className ? ` ${className}` : ''}`;
+  const style = { '--cn-red': cnRed(s), '--cn-stroke': `${CN_INK_PARAMS[s.ink ?? 'normal'].stroke}mm` } as CSSProperties;
   const price = <Price d={d} numStyle={numStyle} unit={s.unit} />;
   const head = (
     <div className="cn-head">

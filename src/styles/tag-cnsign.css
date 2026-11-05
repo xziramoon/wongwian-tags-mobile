@@ -96,6 +96,19 @@
 .cn-pl-left .cn-foot { margin: 0 -8mm; padding: 0 8mm; height: 10.6mm; font-size: 4.5mm; }
 .cn-pl-right { flex: 1 1 0; min-width: 0; container-type: size; border-left: 1.6mm solid #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
+/* ---------- ความเข้มสี (เครื่องพิมพ์สีซีด) — ตั้งจาก "ความเข้มสี" ในเมนู ป้ายจีน A4 ---------- */
+.cn { --cn-line: 0.5mm; }
+.cn-num, .cn-pack-p { -webkit-text-stroke: var(--cn-stroke, 0mm) var(--cn-red); paint-order: stroke fill; }
+.cn-ink-rich { --cn-line: 0.8mm; }
+.cn-ink-max { --cn-line: 1.1mm; }
+.cn-ink-rich .cn-size, .cn-ink-rich .cn-pack-l { color: #1a1a1a; }
+.cn-ink-rich .cn-foot { color: #2b2b2b; }
+.cn-ink-max .cn-size, .cn-ink-max .cn-pack-l { color: #000; }
+.cn-ink-max .cn-foot { color: #111; }
+.cn-ink-rich .cn-cornerv, .cn-ink-rich .cn-ph-corner, .cn-ink-max .cn-cornerv, .cn-ink-max .cn-ph-corner { color: #fff; }
+.cn-ink-max .cn-baht, .cn-ink-max .cn-pack-b { color: #000; }
+.cn-pack, .cn-foot { border-top-width: var(--cn-line); }
+
 /* ---------- ขาว-ดำ: ไม่มีสีแดงเหลือ ---------- */
 .cn-mono { --cn-red: #111; }
 .cn-mono .cn-plate { background: #fff; color: #111; }
