@@ -1,6 +1,9 @@
 import type { QueueItem } from '../types';
 import CnMobilePreview from './CnMobilePreview';
 import { CN_INK_LEVELS, CN_ORIENTS, CN_REDS, CN_STYLES, DEFAULT_CN_SETTINGS } from './config';
+import { useUIStore } from '../store/uiStore';
+import { CN_COLOR_TESTS } from './config';
+import { sendCnColorTests } from './cnSend';
 import { useCnStore } from './store';
 
 const SAMPLE: QueueItem = {
@@ -120,6 +123,21 @@ export default function CnSettingsFold() {
           <input type="checkbox" id="cn-mono" checked={raw.mono} onChange={(e) => update('mono', e.target.checked)} />
           <label htmlFor="cn-mono">โหมดขาวดำ (แดงเป็นดำ) — หรือเปิด "ปริ้นขาว-ดำ" ด้านบนของตั้งค่า</label>
         </div>
+
+        <button
+          type="button"
+          className="dz-btn"
+          onClick={() => {
+            const toast = useUIStore.getState().showToast;
+            sendCnColorTests().then(
+              () => toast(`ส่งใบทดสอบสี ${CN_COLOR_TESTS.length} แผ่นไปเครื่องปริ้นแล้ว`, 'success'),
+              () => toast('ส่งไม่สำเร็จ กรุณาลองใหม่', 'error'),
+            );
+          }}
+        >
+          ปริ้นใบทดสอบสี ({CN_COLOR_TESTS.length} แผ่น)
+        </button>
+        <span className="fold-hint">ปริ้นป้ายตัวอย่างหลายความเข้ม ใบละแบบ ท้ายป้ายบอกชื่อแบบ — เลือกแบบที่สีสวยบนเครื่องปริ้นแล้วตั้งตาม</span>
 
         <button type="button" className="dz-btn" onClick={reset} disabled={isDefault}>
           คืนค่าเริ่มต้น

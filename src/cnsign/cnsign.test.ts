@@ -3,9 +3,9 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../lib/database', () => ({ database: { find: () => undefined, search: () => [], onChange: () => () => {} } }));
 
 import type { QueueItem } from '../types';
-import { CN_INK_PARAMS, CN_PRICE_CAP, CN_PRICE_PAD, DEFAULT_CN_SETTINGS, boostRed, cnRed, cnVariant, nameSizeFor } from './config';
+import { CN_COLOR_TESTS, CN_INK_PARAMS, CN_PRICE_CAP, CN_PRICE_PAD, DEFAULT_CN_SETTINGS, boostRed, cnRed, cnVariant, nameSizeFor } from './config';
 import { priceFit, type InkMetrics } from './priceFit';
-import { cnPageCount, fromQueueItem, queueToCnData, splitByOrient } from './data';
+import { cnPageCount, colorTestSample, fromQueueItem, queueToCnData, splitByOrient } from './data';
 
 const item = (over: Partial<QueueItem> = {}): QueueItem =>
   ({
@@ -146,5 +146,19 @@ describe('ป้ายจีน A4 · ขาว-ดำ', () => {
   it('mono = สีแดงเป็นดำ', () => {
     expect(cnRed({ ...DEFAULT_CN_SETTINGS, mono: true })).toBe('#111111');
     expect(cnRed({ ...DEFAULT_CN_SETTINGS, mono: false, ink: 'normal' })).toBe(DEFAULT_CN_SETTINGS.red);
+  });
+});
+
+describe('ป้ายจีน A4 · ใบทดสอบสี', () => {
+  it('มีหลายแบบ ครอบคลุมทั้งสามระดับความเข้มและแดงสด ไม่ซ้ำกัน', () => {
+    expect(CN_COLOR_TESTS.length).toBeGreaterThanOrEqual(4);
+    expect(new Set(CN_COLOR_TESTS.map((t) => t.label)).size).toBe(CN_COLOR_TESTS.length);
+    expect(CN_COLOR_TESTS.map((t) => t.ink)).toEqual(expect.arrayContaining(['normal', 'rich', 'max']));
+    expect(CN_COLOR_TESTS.some((t) => t.red)).toBe(true);
+  });
+  it('ป้ายตัวอย่างเป็นแนวตั้งใบเดียว ท้ายป้ายบอกชื่อแบบที่ทดสอบ', () => {
+    const d = colorTestSample('เข้มมาก');
+    expect(d).toMatchObject({ orient: 'portrait', qty: 1, price: '35' });
+    expect(d.branch).toContain('เข้มมาก');
   });
 });

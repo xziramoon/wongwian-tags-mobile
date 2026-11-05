@@ -140,4 +140,14 @@ export function boostRed(hex: string, ink: CnInk): string {
   return toHex((r1 + m) * 255, (g1 + m) * 255, (b1 + m) * 255);
 }
 
+/* ใบทดสอบสี: ปริ้นป้ายตัวอย่างเดียวกันหลายแบบ (ระดับความเข้ม/แดงสด) ให้เลือกจากกระดาษจริงว่าเครื่องพิมพ์ไหนเหมาะแบบไหน
+ * ท้ายป้ายแต่ละใบบอกชื่อแบบ — ได้ผลดีที่สุดแล้วไปตั้งค่าในเมนู "ป้ายจีน A4" ตามนั้น */
+export const CN_COLOR_TESTS: { label: string; ink: CnInk; red?: string }[] = [
+  { label: 'ปกติ', ink: 'normal' },
+  { label: 'เข้ม', ink: 'rich' },
+  { label: 'เข้มมาก', ink: 'max' },
+  { label: 'ปกติ + แดงสด #E30613', ink: 'normal', red: '#E30613' },
+  { label: 'เข้ม + แดงสด #E30613', ink: 'rich', red: '#E30613' },
+];
+
 export const cnRed = (s: CnSignSettings): string => (s.mono ? CN_MONO_INK : boostRed(s.red, s.ink));

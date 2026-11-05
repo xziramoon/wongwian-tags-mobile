@@ -40,6 +40,20 @@ export function fromQueueItem(item: QueueItem, settings: CnSignSettings, config:
   };
 }
 
+/* ป้ายตัวอย่างของใบทดสอบสี — ท้ายป้ายบอกชื่อแบบที่ทดสอบ */
+export const colorTestSample = (label: string): CnSignData => ({
+  name: 'น้ำปลาทิพรส สูตรต้นตำรับ',
+  size: '700 มล.',
+  price: '35',
+  packLabel: 'ยกลัง 12 ขวด',
+  packPrice: '399',
+  barcode: '8850144000013',
+  branch: `ทดสอบสี: ${label}`,
+  style: 'strip',
+  orient: 'portrait',
+  qty: 1,
+});
+
 export const queueToCnData = (items: QueueItem[], settings: CnSignSettings, config: Pick<Config, 'branchLabel'>): CnSignData[] =>
   items.filter((i) => i.TagMode === 'cnsign').map((i) => fromQueueItem(i, settings, config));
 
